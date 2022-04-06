@@ -1,5 +1,9 @@
 package top.parak.kraft.kvstore.message;
 
+import top.parak.kraft.core.node.NodeId;
+
+import javax.annotation.Nonnull;
+
 /**
  * @author KHighness
  * @since 2022-03-14
@@ -8,6 +12,10 @@ package top.parak.kraft.kvstore.message;
 public class Redirect {
 
     private final String leaderId;
+
+    public Redirect(NodeId leaderId) {
+        this(leaderId != null ? leaderId.getValue() : null);
+    }
 
     public Redirect(String leaderId) {
         this.leaderId = leaderId;

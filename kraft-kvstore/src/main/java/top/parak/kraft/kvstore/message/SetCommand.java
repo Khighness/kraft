@@ -2,9 +2,8 @@ package top.parak.kraft.kvstore.message;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import top.parak.kraft.kvstore.Protos;
+import top.parak.kraft.kvstore.support.proto.Protos;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 /**

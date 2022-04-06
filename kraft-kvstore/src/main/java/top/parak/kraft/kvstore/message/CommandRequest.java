@@ -31,4 +31,5 @@ public class CommandRequest<T> {
     public T getCommand() {
         return command;
     }
+
 }
