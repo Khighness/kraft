@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Rpc message decoder.
- * <h3>Protocol</h3>
+ * <p><b>Protocol</b></p>
  * <pre>
  *   |<-------(4)------>|<-------(4)------>|<--MessageLength->|
  *   +------------------+------------------+------------------+

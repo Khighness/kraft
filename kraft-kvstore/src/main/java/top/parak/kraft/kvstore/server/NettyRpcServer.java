@@ -53,7 +53,7 @@ public class NettyRpcServer {
     /**
      * Start server.
      *
-     * @throws IOException if occur io exception
+     * @throws IOException if IO exception occurs
      */
     public void start() throws IOException {
         this.node.start();
@@ -82,7 +82,7 @@ public class NettyRpcServer {
      * Stop server.
      *
      * @throws InterruptedException if interrupted
-     * @throws IOException if occur io exception
+     * @throws IOException if IO exception occurs
      */
     public void stop() throws Exception {
         logger.info("stopping rpc server ...");
