@@ -17,24 +17,24 @@ import top.parak.kraft.kvstore.support.toolkit.RuntimeUtil;
 import java.io.IOException;
 
 /**
- * Netty rpc server.
+ * KV-store server.
  *
  * @author KHighness
  * @since 2022-03-30
  * @email parakovo@gmail.com
  */
-public class NettyRpcServer {
+public class KVStoreServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyRpcServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KVStoreServer.class);
 
     private final Node node;
     private final int port;
-    private final NettyRpcServerHandler serverHandler;
+    private final KVStoreServerHandler serverHandler;
 
-    public NettyRpcServer(Node node, int port) {
+    public KVStoreServer(Node node, int port) {
         this.node = node;
         this.port = port;
-        this.serverHandler = new NettyRpcServerHandler(new NettyRpcServerService(node));
+        this.serverHandler = new KVStoreServerHandler(new KVStoreServerService(node));
     }
 
     /**
@@ -69,8 +69,8 @@ public class NettyRpcServer {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline p = ch.pipeline();
-                        p.addLast(new RpcMessageEncoder());
-                        p.addLast(new RpcMessageDecoder());
+                        p.addLast(new KVStoreMessageEncoder());
+                        p.addLast(new KVStoreMessageDecoder());
                         p.addLast(handlerGroup, serverHandler);
                     }
                 });

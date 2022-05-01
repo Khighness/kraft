@@ -24,21 +24,21 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
- * Netty rpc server service.
+ * KV-store server service.
  *
  * @author KHighness
  * @since 2022-03-31
  * @email parakovo@gmail.com
  */
-public class NettyRpcServerService {
+public class KVStoreServerService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyRpcServerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(KVStoreServerService.class);
 
     private final Node node;
     private final ConcurrentHashMap<String, CommandRequest<?>> pendingCommands = new ConcurrentHashMap<>();
     private Map<String, byte[]> map = new HashMap<>();
 
-    public NettyRpcServerService(Node node) {
+    public KVStoreServerService(Node node) {
         this.node = node;
         this.node.registerStateMachine(new StateMachineImpl());
     }

@@ -12,7 +12,7 @@ import top.parak.kraft.kvstore.message.GetCommand;
 import top.parak.kraft.kvstore.message.SetCommand;
 
 /**
- * Netty rpc server handler.
+ * KV-store server handler.
  * <p><b>NOTE</b></p>
  * Custom {@link ChannelInboundHandlerAdapter} must release msg after invoking
  * {@link ChannelInboundHandlerAdapter#channelRead(ChannelHandlerContext, Object) channelRead}.
@@ -23,13 +23,13 @@ import top.parak.kraft.kvstore.message.SetCommand;
  * @since 2022-03-31
  * @email parakovo@gmail.com
  */
-public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
+public class KVStoreServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ChannelInboundHandlerAdapter.class);
 
-    private final NettyRpcServerService service;
+    private final KVStoreServerService service;
 
-    public NettyRpcServerHandler(NettyRpcServerService service) {
+    public KVStoreServerHandler(KVStoreServerService service) {
         this.service = service;
     }
 

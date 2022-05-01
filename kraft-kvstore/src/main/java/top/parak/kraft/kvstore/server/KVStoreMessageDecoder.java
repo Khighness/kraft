@@ -12,7 +12,7 @@ import top.parak.kraft.kvstore.message.*;
 import java.util.List;
 
 /**
- * Rpc message decoder.
+ * KV-store message decoder.
  * <p><b>Protocol</b></p>
  * <pre>
  *   |<-------(4)------>|<-------(4)------>|<--MessageLength->|
@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2022-03-30
  * @email parakovo@gmail.com
  */
-public class RpcMessageDecoder extends ByteToMessageDecoder {
+public class KVStoreMessageDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {

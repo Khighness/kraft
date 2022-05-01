@@ -23,7 +23,7 @@ public class CommandServerLauncher {
     private static final String MODE_STANDBY      = "standby";
     private static final String MODE_GROUP_MEMBER = "group-member";
 
-    private volatile NettyRpcServer rpcServer;
+    private volatile KVStoreServer rpcServer;
 
     private void execute(String[] args) throws Exception {
         Options options = new Options();

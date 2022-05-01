@@ -14,7 +14,7 @@ import top.parak.kraft.kvstore.message.*;
 import java.io.IOException;
 
 /**
- * Rpc message decoder.
+ * KV-store message decoder.
  * <p><b>Protocol</b></p>
  * <pre>
  *   |<-------(4)------>|<-------(4)------>|<--MessageLength->|
@@ -27,7 +27,7 @@ import java.io.IOException;
  * @since 2022-03-30
  * @email parakovo@gmail.com
  */
-public class RpcMessageEncoder extends MessageToByteEncoder<Object> {
+public class KVStoreMessageEncoder extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
