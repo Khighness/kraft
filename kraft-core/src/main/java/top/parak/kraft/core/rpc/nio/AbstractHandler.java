@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.Channel;
 import top.parak.kraft.core.rpc.message.*;
@@ -19,16 +20,33 @@ import java.util.Objects;
  * @since 2022-04-13
  * @email parakovo@gmail.com
  */
-abstract class AbstractHandler extends ChannelDuplexHandler {
+public abstract class AbstractHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
+
+    /**
+     * EventBus is a pub-sub component used to publish event to subscribers.
+     * This decouples the RAFT algorithm component and RPC implementation component.
+     */
     protected final EventBus eventBus;
+    /**
+     * The if of remote node.
+     */
     NodeId remotedId;
+    /**
+     * RPC channel between remote node and self.
+     */
     protected Channel channel;
+    /**
+     * The last {@link AppendEntriesRpc}.
+     */
     private AppendEntriesRpc lastAppendEntriesRpc;
+    /**
+     * The last {@link InstallSnapshotRpc}.
+     */
     private InstallSnapshotRpc lastInstallSnapshotRpc;
 
-    AbstractHandler(EventBus eventBus) {
+    public AbstractHandler(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
@@ -70,7 +88,19 @@ abstract class AbstractHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-
+        if (msg instanceof AppendEntriesRpc) {
+            lastAppendEntriesRpc = (AppendEntriesRpc) msg;
+        } else if (msg instanceof InstallSnapshotRpc) {
+            lastInstallSnapshotRpc = (InstallSnapshotRpc) msg;
+        }
         super.write(ctx, msg, promise);
     }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.warn(cause.getMessage(), cause);
+        ctx.close();
+    }
+
 }

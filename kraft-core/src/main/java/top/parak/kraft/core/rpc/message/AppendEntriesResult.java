@@ -3,7 +3,7 @@ package top.parak.kraft.core.rpc.message;
 import java.io.Serializable;
 
 /**
- * AppendEntries RPC results.
+ * AppendEntries RPC result.
  *
  * @author KHighness
  * @since 2022-03-31

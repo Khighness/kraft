@@ -15,11 +15,12 @@ import java.io.IOException;
 
 /**
  * KV-store message decoder.
- * <p><b>Protocol</b></p>
+ *
+ * <p><b>Transport protocol between KV-server and KV-client</b></p>
  * <pre>
- *   |<-------(4)------>|<-------(4)------>|<--MessageLength->|
+ *   |<-------(4)------>|<-------(4)------>|<--ContentLength->|
  *   +------------------+------------------+------------------+
- *   |   MessageType    |   MessageLength  |   MessageBytes   |
+ *   |   Message Type   |  Message Length  | Message Content  |
  *   +------------------+------------------+------------------+
  * </pre>
  *
@@ -85,11 +86,13 @@ public class KVStoreMessageEncoder extends MessageToByteEncoder<Object> {
     }
 
     private void writeMessage(int messageType, MessageLite message, ByteBuf out) throws IOException {
-        // 4 bytes
+        // 1. write message type (4 bytes)
         out.writeInt(messageType);
+        // 2. write message
         byte[] bytes = message.toByteArray();
-        // 4 bytes
+        // 2.1 write message length (4 bytes)
         out.writeInt(bytes.length);
+        // 2.2 write message content (unfixed bytes)
         out.writeBytes(bytes);
     }
 

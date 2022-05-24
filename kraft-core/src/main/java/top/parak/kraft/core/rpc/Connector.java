@@ -16,7 +16,7 @@ import java.util.Collection;
 public interface Connector {
 
     /**
-     * Initialize connector.
+     * Initialize the connector.
      * <p>
      * Should not call more than once.
      * </p>
@@ -24,7 +24,7 @@ public interface Connector {
     void initialize();
 
     /**
-     * Send request vote rpc.
+     * Send RequestVote RPC.
      * <p>
      * Remember to exclude self node before sending.
      * </p>
@@ -38,7 +38,7 @@ public interface Connector {
     void sendRequestVote(@Nonnull RequestVoteRpc rpc, @Nonnull Collection<NodeEndpoint> destinationEndpoints);
 
     /**
-     * Reply request vote result.
+     * Reply RequestVote result.
      *
      * @param result     result
      * @param rpcMessage rpc message
@@ -46,23 +46,23 @@ public interface Connector {
     void replyRequestVote(@Nonnull RequestVoteResult result, @Nonnull RequestVoteRpcMessage rpcMessage);
 
     /**
-     * Send append entries rpc.
+     * Send AppendEntries RPC.
      *
      * @param rpc                 rpc
      * @param destinationEndpoint destination endpoint
      */
-    void sendAppendEntries(@Nonnull AppendEntriesResult rpc, @Nonnull NodeEndpoint destinationEndpoint);
+    void sendAppendEntries(@Nonnull AppendEntriesRpc rpc, @Nonnull NodeEndpoint destinationEndpoint);
 
     /**
-     * Reply install snapshot rpc.
+     * Reply AppendEntries result.
      *
      * @param result     result
      * @param rpcMessage rpc message
      */
-    void replyRequestVote(@Nonnull AppendEntriesResult result, @Nonnull AppendEntriesRpcMessage rpcMessage);
+    void replyAppendEntries(@Nonnull AppendEntriesResult result, @Nonnull AppendEntriesRpcMessage rpcMessage);
 
     /**
-     * Send install snapshot rpc.
+     * Send InstallSnapshot RPC.
      *
      * @param rpc                 rpc
      * @param destinationEndpoint destination endpoint
@@ -70,7 +70,7 @@ public interface Connector {
     void sendInstallSnapshot(@Nonnull InstallSnapshotRpc rpc, @Nonnull NodeEndpoint destinationEndpoint);
 
     /**
-     * Reply install snapshot rpc.
+     * Reply InstallSnapshot result.
      *
      * @param result     result
      * @param rpcMessage rpc message

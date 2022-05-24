@@ -13,9 +13,9 @@ import java.io.IOException;
  * Log entries file.
  *
  * <p><b>Structure of log entries file</b></p>
- * {@link EntriesFile} organizes file in lines, and each lines records the log entry kind,
- * the log entry index (4 byte), the log entry term (4 byte), the length of command (4 byte)
- * and the specific command content (unfixed).
+ * {@link EntriesFile} organizes file in lines, and each lines records the log entry kind (4 byte),
+ * the log entry index (4 byte), the log entry term (4 byte), the length of command (4 byte) and
+ * the specific command content (unfixed byte).
  * <pre>
  * +----------+----------+----------+----------+----------------+
  * |   int(4) |   int(4) |   int(4) |   int(4) |     bytes      |

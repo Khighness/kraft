@@ -6,7 +6,6 @@ import com.google.common.primitives.Longs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 /**
  * {@link SeekableFile} implementation based on byte array.

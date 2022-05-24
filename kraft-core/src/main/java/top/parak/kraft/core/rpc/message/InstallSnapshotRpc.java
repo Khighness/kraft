@@ -3,7 +3,6 @@ package top.parak.kraft.core.rpc.message;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -26,7 +25,7 @@ public class InstallSnapshotRpc {
      */
     private NodeId leaderId;
     /**
-     * The snapshot replaces all entries up through and including this index
+     * The snapshot replaces all entries up through and including this index.
      */
     private int lastIndex;
     /**

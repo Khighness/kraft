@@ -3,6 +3,7 @@ package top.parak.kraft.kvstore.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+
 import top.parak.kraft.core.service.AddNodeCommand;
 import top.parak.kraft.core.service.RemoveNodeCommand;
 import top.parak.kraft.kvstore.message.MessageConstants;
@@ -13,11 +14,12 @@ import java.util.List;
 
 /**
  * KV-store message decoder.
- * <p><b>Protocol</b></p>
+ *
+ * <p><b>Transport protocol between KV-server and KV-client</b></p>
  * <pre>
- *   |<-------(4)------>|<-------(4)------>|<--MessageLength->|
+ *   |<-------(4)------>|<-------(4)------>|<--ContentLength->|
  *   +------------------+------------------+------------------+
- *   |   MessageType    |   MessageLength  |   MessageBytes   |
+ *   |   Message Type   |  Message Length  | Message Content  |
  *   +------------------+------------------+------------------+
  * </pre>
  *

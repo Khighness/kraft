@@ -22,7 +22,7 @@ public class RequestVoteRpc implements Serializable {
     /**
      * The node id of candidate.
      */
-    private NodeId nodeId;
+    private NodeId candidateId;
     /**
      * The index of candidate' s last log entry.
      */
@@ -40,12 +40,12 @@ public class RequestVoteRpc implements Serializable {
         this.term = term;
     }
 
-    public NodeId getNodeId() {
-        return nodeId;
+    public NodeId getCandidateId() {
+        return candidateId;
     }
 
-    public void setNodeId(NodeId nodeId) {
-        this.nodeId = nodeId;
+    public void setCandidateId(NodeId candidateId) {
+        this.candidateId = candidateId;
     }
 
     public int getLastLogIndex() {
@@ -68,7 +68,7 @@ public class RequestVoteRpc implements Serializable {
     public String toString() {
         return "RequestVoteRpc{" +
                 "term=" + term +
-                ", nodeId=" + nodeId +
+                ", nodeId=" + candidateId +
                 ", lastLogIndex=" + lastLogIndex +
                 ", lastLogTerm=" + lastLogTerm +
                 '}';

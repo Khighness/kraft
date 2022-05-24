@@ -14,42 +14,42 @@ import javax.annotation.Nonnull;
 public interface Channel {
 
     /**
-     * Write request vote rpc.
+     * Write RequestVote RPC.
      *
      * @param rpc rpc
      */
     void writeRequestVoteRpc(@Nonnull RequestVoteRpc rpc);
 
     /**
-     * Write request vote result.
+     * Write RequestVote result.
      *
      * @param result result
      */
     void writeRequestVoteResult(@Nonnull RequestVoteResult result);
 
     /**
-     * Write append entries rpc.
+     * Write AppendEntries RPC.
      *
      * @param rpc rpc
      */
     void writeAppendEntriesRpc(@Nonnull AppendEntriesRpc rpc);
 
     /**
-     * Write append entries rpc.
+     * Write AppendEntries result.
      *
      * @param result result
      */
     void writeAppendEntriesResult(@Nonnull AppendEntriesResult result);
 
     /**
-     * Write install snapshot rpc.
+     * Write InstallSnapshot RPC.
      *
      * @param rpc rpc
      */
     void writeInstallSnapshotRpc(@Nonnull InstallSnapshotRpc rpc);
 
     /**
-     * Write install snapshot result.
+     * Write InstallSnapshot result.
      *
      * @param result result
      */

@@ -13,55 +13,55 @@ import javax.annotation.Nonnull;
  * @since 2022-04-14
  * @email parakovo@gmail.com
  */
-class NioChannel implements Channel {
+public class NioChannel implements Channel {
 
-    private final io.netty.channel.Channel nettChannel;
+    private final io.netty.channel.Channel nettyChannel;
 
-    NioChannel(io.netty.channel.Channel nettChannel) {
-        this.nettChannel = nettChannel;
+    public NioChannel(io.netty.channel.Channel nettChannel) {
+        this.nettyChannel = nettChannel;
     }
 
     @Override
     public void writeRequestVoteRpc(@Nonnull RequestVoteRpc rpc) {
-        nettChannel.writeAndFlush(rpc);
+        nettyChannel.writeAndFlush(rpc);
     }
 
     @Override
     public void writeRequestVoteResult(@Nonnull RequestVoteResult result) {
-        nettChannel.writeAndFlush(result);
+        nettyChannel.writeAndFlush(result);
     }
 
     @Override
     public void writeAppendEntriesRpc(@Nonnull AppendEntriesRpc rpc) {
-        nettChannel.writeAndFlush(rpc);
+        nettyChannel.writeAndFlush(rpc);
     }
 
     @Override
     public void writeAppendEntriesResult(@Nonnull AppendEntriesResult result) {
-        nettChannel.writeAndFlush(result);
+        nettyChannel.writeAndFlush(result);
     }
 
     @Override
     public void writeInstallSnapshotRpc(@Nonnull InstallSnapshotRpc rpc) {
-        nettChannel.writeAndFlush(rpc);
+        nettyChannel.writeAndFlush(rpc);
     }
 
     @Override
     public void writeInstallSnapshotResult(@Nonnull InstallSnapshotResult result) {
-        nettChannel.writeAndFlush(result);
+        nettyChannel.writeAndFlush(result);
     }
 
     @Override
     public void close() {
         try {
-            nettChannel.close().sync();
+            nettyChannel.close().sync();
         } catch (InterruptedException e) {
-            throw new ChannelException("failed to close", e);
+            throw new ChannelException("failed to close channel", e);
         }
     }
 
     io.netty.channel.Channel getDelegate() {
-        return nettChannel;
+        return nettyChannel;
     }
 
 }

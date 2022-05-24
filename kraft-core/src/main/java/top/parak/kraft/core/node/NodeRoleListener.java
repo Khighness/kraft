@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 public interface NodeRoleListener {
 
     /**
-     * Called when node role changes.
+     * Called when node's role changes.
      * <p>
      * e.g. Follower -> Candidate
      * </p>

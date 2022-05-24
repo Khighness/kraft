@@ -92,7 +92,7 @@ public class CommandServerLauncher {
         String id = cmdLine.getOptionValue('i');
         String host = cmdLine.getOptionValue('h', "localhost");
         int portRaftServer = ((Long) cmdLine.getParsedOptionValue("p1")).intValue();
-        int portService = ((Long) cmdLine.getParsedOptionValue("p2")).intValue();
+        int portKVService = ((Long) cmdLine.getParsedOptionValue("p2")).intValue();
 
         NodeEndpoint nodeEndpoint = new NodeEndpoint(id, host, portRaftServer);
     }

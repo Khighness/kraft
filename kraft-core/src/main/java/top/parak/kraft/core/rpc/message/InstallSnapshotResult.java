@@ -1,7 +1,7 @@
 package top.parak.kraft.core.rpc.message;
 
 /**
- * InstallSnapshot RPC arguments.
+ * InstallSnapshot RPC result.
  *
  * @author KHighness
  * @since 2022-04-13
