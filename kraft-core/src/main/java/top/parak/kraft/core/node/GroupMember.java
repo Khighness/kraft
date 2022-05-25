@@ -49,8 +49,8 @@ public class GroupMember {
         return removing;
     }
 
-    public void setRemoving(boolean removing) {
-        this.removing = removing;
+    public void setRemoving() {
+        this.removing = true;
     }
 
 }

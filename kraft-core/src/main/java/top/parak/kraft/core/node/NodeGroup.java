@@ -148,7 +148,16 @@ public class NodeGroup {
         logger.info("downgrade node {}", id);
         GroupMember member = findMember(id);
         member.setMajor(false);
+        member.setRemoving();
+    }
 
+    /**
+     * Check if member is unique one in group, in other word, check if standalone mode.
+     *
+     * @return true if only one member and the id of member equals to specified id, otherwise false
+     */
+    boolean isStandalone() {
+        return memberMap.size() == 1 && memberMap.containsKey(selfId);
     }
 
 }

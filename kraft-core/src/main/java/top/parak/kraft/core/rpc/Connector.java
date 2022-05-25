@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 
 /**
- * Connector.
+ * Connector which used to communicate between nodes internally.
  *
  * @author KHighness
  * @since 2022-03-31

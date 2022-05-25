@@ -5,7 +5,7 @@ import top.parak.kraft.core.rpc.message.*;
 import javax.annotation.Nonnull;
 
 /**
- * Channel between nodes.
+ * Channel between two nodes.
  *
  * @author KHighness
  * @since 2022-03-18
