@@ -7,7 +7,7 @@ import top.parak.kraft.core.service.ChannelException;
 import javax.annotation.Nonnull;
 
 /**
- * Nio-based channel.
+ * NIO channel.
  *
  * @author KHighness
  * @since 2022-04-14

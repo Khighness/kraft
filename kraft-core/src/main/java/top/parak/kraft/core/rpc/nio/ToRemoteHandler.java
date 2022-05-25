@@ -19,6 +19,13 @@ public class ToRemoteHandler extends AbstractHandler {
     private static final Logger logger = LoggerFactory.getLogger(ToRemoteHandler.class);
     private final NodeId selfId;
 
+    /**
+     * Create ToRemoteHandler.
+     *
+     * @param eventBus eventBus
+     * @param remoteId id of remote node
+     * @param selfId   self id
+     */
     public ToRemoteHandler(EventBus eventBus, NodeId remoteId, NodeId selfId) {
         super(eventBus);
         this.remotedId = remoteId;
@@ -30,6 +37,7 @@ public class ToRemoteHandler extends AbstractHandler {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        // send the first message: selfId
         ctx.write(selfId);
         channel = new NioChannel(ctx.channel());
     }

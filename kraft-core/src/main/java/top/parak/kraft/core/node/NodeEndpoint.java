@@ -41,7 +41,6 @@ public class NodeEndpoint {
         this(new NodeId(id), new Address(host, port));
     }
 
-
     /**
      * Get node id.
      *
@@ -50,6 +49,15 @@ public class NodeEndpoint {
     @Nonnull
     public NodeId getId() {
         return this.id;
+    }
+
+    /**
+     * Get address.
+     *
+     * @return address
+     */
+    public Address getAddress() {
+        return address;
     }
 
     /**

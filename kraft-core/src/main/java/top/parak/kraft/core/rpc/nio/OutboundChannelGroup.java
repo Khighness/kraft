@@ -5,15 +5,16 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.Address;
+import top.parak.kraft.core.rpc.ChannelConnectException;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.FutureTask;
+import java.net.ConnectException;
+import java.util.concurrent.*;
 
 /**
  * The container to manage outbound channels (channels to remote channels).
@@ -50,10 +51,26 @@ public class OutboundChannelGroup {
     public NioChannel getOrConnect(NodeId nodeId, Address address) {
         Future<NioChannel> future = channelMap.get(nodeId);
         if (future == null) {
-            FutureTask futureTask = new FutureTask<>(() -> connect(nodeId, address));
+            FutureTask<NioChannel> newFuture = new FutureTask<>(() -> connect(nodeId, address));
+             future = channelMap.putIfAbsent(nodeId, newFuture);
+             if (future == null) {
+                 future = newFuture;
+                 newFuture.run();
+             }
         }
-
-        return null;
+        try {
+            return future.get();
+        } catch (Exception e) {
+            channelMap.remove(nodeId);
+            if (e instanceof ExecutionException) {
+                Throwable cause = e.getCause();
+                if (cause instanceof ConnectException) {
+                    throw new ChannelConnectException("failed to get channel to node " + nodeId +
+                            ", cause " + cause.getMessage(), cause);
+                }
+            }
+            throw new ChannelException("failed to get channel to node " + nodeId, e);
+        }
     }
 
     /**
@@ -92,6 +109,9 @@ public class OutboundChannelGroup {
         return new NioChannel(nettyChannel);
     }
 
+    /**
+     * Close all channels.
+     */
     void closeAll() {
         logger.debug("close all outbound channels");
         channelMap.forEach((nodeId, nioChannelFuture) -> {
