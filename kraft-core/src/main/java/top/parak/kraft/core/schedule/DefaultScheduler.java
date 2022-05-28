@@ -3,6 +3,8 @@ package top.parak.kraft.core.schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import top.parak.kraft.core.node.config.NodeConfig;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Random;
@@ -28,6 +30,11 @@ public class DefaultScheduler implements Scheduler {
     private final int logReplicationInternal;
     private final Random electionTimeoutRandom;
     private final ScheduledExecutorService scheduledExecutorService;
+
+    public DefaultScheduler(NodeConfig config) {
+        this(config.getMinElectionTimeout(), config.getMaxElectionTimeout(), config.getLogReplicationDelay(),
+                config.getLogReplicationInterval());
+    }
 
     public DefaultScheduler(int minElectionTimeout, int maxElectionTimeout, int logReplicationDelay, int logReplicationInternal) {
         if (minElectionTimeout <= 0 || maxElectionTimeout <= 0 || minElectionTimeout > maxElectionTimeout) {

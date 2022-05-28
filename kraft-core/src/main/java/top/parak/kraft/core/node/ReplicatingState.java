@@ -10,10 +10,9 @@ package top.parak.kraft.core.node;
  * </p>
  * <p>
  * In the entire log replication process, the leader's {@code commitIndex}
- * is determined by the follower's {@link ReplicatingState}. Among the
- * {@link ReplicatingState#matchIndex} of all followers, more than half
- * of the {@link ReplicatingState#matchIndex} will become leader's new
- * {@code commitIndex}.
+ * is determined by the follower's {@code #matchIndex}. Among the {@code matchIndex}
+ * of all followers, more than half of the {@code matchIndex} will become
+ * leader's new {@code commitIndex}.
  * </p>
  *
  * @author KHighness
@@ -41,6 +40,26 @@ public class ReplicatingState {
      * The last replicated timestamp.
      */
     private long lastReplicatedAt = 0;
+
+    /**
+     * Create ReplicatingState.
+     *
+     * @param nextIndex next index
+     */
+    public ReplicatingState(int nextIndex) {
+        this(nextIndex, 0);
+    }
+
+    /**
+     * Create ReplicatingState.
+     *
+     * @param nextIndex  next index
+     * @param matchIndex match index
+     */
+    public ReplicatingState(int nextIndex, int matchIndex) {
+        this.nextIndex = nextIndex;
+        this.matchIndex= matchIndex;
+    }
 
     /**
      * Get the index of the next log entry that needs to be sent to the follower.
@@ -112,6 +131,35 @@ public class ReplicatingState {
      */
     public void setLastReplicatedAt(long lastReplicatedAt) {
         this.lastReplicatedAt = lastReplicatedAt;
+    }
+
+    /**
+     * Back off next index, in other word, decrease.
+     *
+     * @return true if decrease successfully
+     */
+    public boolean backOffNextIndex() {
+        if (nextIndex > 1) {
+            nextIndex--;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Advance next index and match index by last entry index.
+     *
+     * @param lastEntryIndex last entry index
+     * @return true if advanced, false if no change
+     */
+    public boolean advance(int lastEntryIndex) {
+        // changed
+        boolean result = (matchIndex != lastEntryIndex || nextIndex != (lastEntryIndex + 1));
+
+        matchIndex = lastEntryIndex;
+        nextIndex = lastEntryIndex + 1;
+
+        return result;
     }
 
     @Override

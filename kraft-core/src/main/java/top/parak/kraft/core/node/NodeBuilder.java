@@ -12,7 +12,10 @@ import top.parak.kraft.core.node.store.FileNodeStore;
 import top.parak.kraft.core.node.store.MemoryNodeStore;
 import top.parak.kraft.core.node.store.NodeStore;
 import top.parak.kraft.core.rpc.Connector;
+import top.parak.kraft.core.rpc.nio.NioConnector;
+import top.parak.kraft.core.schedule.DefaultScheduler;
 import top.parak.kraft.core.schedule.Scheduler;
+import top.parak.kraft.core.support.task.ListeningTaskExecutor;
 import top.parak.kraft.core.support.task.TaskExecutor;
 
 import javax.annotation.Nonnull;
@@ -20,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.Executors;
 
 /**
  * Node builder.
@@ -115,6 +119,20 @@ public class NodeBuilder {
         Preconditions.checkNotNull(selfId);
         this.group = new NodeGroup(endpoints, selfId);
         this.selfId = selfId;
+        this.eventBus = new EventBus(selfId.getValue());
+    }
+
+    /**
+     * Create NodeBuilder.
+     *
+     * @param selfId self id
+     * @param group  group
+     */
+    public NodeBuilder(@Nonnull NodeId selfId, @Nonnull NodeGroup group) {
+        Preconditions.checkNotNull(selfId);
+        Preconditions.checkNotNull(group);
+        this.selfId = selfId;
+        this.group = group;
         this.eventBus = new EventBus(selfId.getValue());
     }
 
@@ -232,14 +250,36 @@ public class NodeBuilder {
         return this;
     }
 
+    /**
+     * Build context for node.
+     *
+     * @return node context
+     */
     @Nonnull
     private NodeContext buildContext() {
         NodeContext nodeContext = new NodeContext();
         nodeContext.setConfig(config);
-
+        nodeContext.setMode(evaluateMode());
+        nodeContext.setLog(log != null ? log : new MemoryLog(eventBus));
+        nodeContext.setSelfId(selfId);
+        nodeContext.setConfig(config);
+        nodeContext.setEventBus(eventBus);
+        nodeContext.setScheduler(scheduler != null ? scheduler : new DefaultScheduler(config));
+        nodeContext.setConnector(connector != null ? connector : createNioCreator());
+        nodeContext.setTaskExecutor(taskExecutor != null ? taskExecutor : new ListeningTaskExecutor(
+                Executors.newSingleThreadExecutor(r -> new Thread(r, "node"))
+        ));
+        nodeContext.setGroupConfigChangeTaskExecutor(groupConfigChangeTaskExecutor != null ? groupConfigChangeTaskExecutor :
+                new ListeningTaskExecutor(Executors.newSingleThreadExecutor(r -> new Thread(r, "group-config-change"))));
         return nodeContext;
     }
 
+    /**
+     * Evaluate mode.
+     *
+     * @return mode
+     * @see NodeGroup#isStandalone()
+     */
     @Nonnull
     public NodeMode evaluateMode() {
         if (standby) {
@@ -249,6 +289,21 @@ public class NodeBuilder {
             return NodeMode.STANDALONE;
         }
         return NodeMode.GROUP_MEMBER;
+    }
+
+    /**
+     * Create nio connector.
+     *
+     * @return nio connector
+     */
+    @Nonnull
+    private NioConnector createNioCreator() {
+        int port = group.findSelf().getEndpoint().getPort();
+        if (workerGroup != null) {
+            return new NioConnector(workerGroup, selfId, eventBus, port, config.getLogReplicationInterval());
+        }
+        return new NioConnector(new NioEventLoopGroup(config.getNioWorkerThreads()), false,
+                selfId, eventBus, port, config.getLogReplicationInterval());
     }
 
 }

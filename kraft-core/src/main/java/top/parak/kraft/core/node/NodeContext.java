@@ -1,10 +1,12 @@
 package top.parak.kraft.core.node;
 
 import com.google.common.eventbus.EventBus;
+
 import top.parak.kraft.core.log.Log;
 import top.parak.kraft.core.node.config.NodeConfig;
 import top.parak.kraft.core.node.store.NodeStore;
 import top.parak.kraft.core.rpc.Connector;
+import top.parak.kraft.core.schedule.Scheduler;
 import top.parak.kraft.core.support.task.TaskExecutor;
 
 /**
@@ -24,6 +26,7 @@ public class NodeContext {
     private Log log;
     private Connector connector;
     private NodeStore store;
+    private Scheduler scheduler;
     private NodeMode mode;
     private NodeConfig config;
     private EventBus eventBus;
@@ -68,6 +71,14 @@ public class NodeContext {
 
     public void setStore(NodeStore store) {
         this.store = store;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
     public NodeMode getMode() {
