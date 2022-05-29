@@ -2,9 +2,9 @@ package top.parak.kraft.kvstore.message;
 
 import top.parak.kraft.core.node.NodeId;
 
-import javax.annotation.Nonnull;
-
 /**
+ * Redirect message.
+ *
  * @author KHighness
  * @since 2022-03-14
  * @email parakovo@gmail.com

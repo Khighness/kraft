@@ -3,6 +3,8 @@ package top.parak.kraft.kvstore.message;
 import java.util.Arrays;
 
 /**
+ * GetCommandResponse message.
+ *
  * @author KHighness
  * @since 2022-03-14
  * @email parakovo@gmail.com

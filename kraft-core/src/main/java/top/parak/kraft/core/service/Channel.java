@@ -7,6 +7,12 @@ package top.parak.kraft.core.service;
  */
 public interface Channel {
 
-    Object send(Object payload);
+    /**
+     * Send message.
+     *
+     * @param message message
+     * @return response
+     */
+    Object send(Object message);
 
 }

@@ -20,16 +20,16 @@ public class ServerRouter {
     private final Map<NodeId, Channel> availableServers = new HashMap<>();
     private NodeId leaderId;
 
-    private Object send(Object payload) {
+    public Object send(Object message) {
         for (NodeId nodeId : getCandidateNodeIds()) {
             try {
-                Object result = doSend(nodeId, payload);
+                Object result = doSend(nodeId, message);
                 this.leaderId = nodeId;
                 return result;
             } catch (RedirectException e) {
                 logger.debug("not a leader server, redirect to server {}", e.getLeaderId());
                 this.leaderId = e.getLeaderId();
-                return doSend(e.getLeaderId(), payload);
+                return doSend(e.getLeaderId(), message);
             } catch (Exception e) {
                 logger.debug("failed to process with server " + nodeId + ", cause: " + e.getMessage());
             }
@@ -56,13 +56,13 @@ public class ServerRouter {
         return availableServers.keySet();
     }
 
-    private Object doSend(NodeId id, Object payload) {
+    private Object doSend(NodeId id, Object message) {
         Channel channel = this.availableServers.get(id);
         if (channel == null) {
             throw new IllegalStateException("no such channel to server " + id);
         }
         logger.debug("send request to server {}", id);
-        return channel.send(payload);
+        return channel.send(message);
     }
 
     public void add(NodeId id, Channel channel) {

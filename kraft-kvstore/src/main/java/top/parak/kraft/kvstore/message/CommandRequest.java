@@ -3,7 +3,13 @@ package top.parak.kraft.kvstore.message;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 
+import top.parak.kraft.kvstore.client.cmd.Command;
+
 /**
+ * Encapsulate client's command and netty's chanel.
+ * @see Command
+ * @see Channel
+ *
  * @author KHighness
  * @since 2022-03-14
  * @email parakovo@gmail.com

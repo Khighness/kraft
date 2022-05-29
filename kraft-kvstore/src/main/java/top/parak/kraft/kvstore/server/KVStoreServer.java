@@ -11,6 +11,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import top.parak.kraft.core.node.Node;
 import top.parak.kraft.kvstore.support.toolkit.RuntimeUtil;
 
@@ -31,6 +32,12 @@ public class KVStoreServer {
     private final int port;
     private final KVStoreServerHandler serverHandler;
 
+    /**
+     * Create KVStoreServer.
+     *
+     * @param node node
+     * @param port port
+     */
     public KVStoreServer(Node node, int port) {
         this.node = node;
         this.port = port;

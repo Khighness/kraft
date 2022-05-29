@@ -7,6 +7,8 @@ import top.parak.kraft.kvstore.support.proto.Protos;
 import java.util.UUID;
 
 /**
+ * SetCommand message.
+ *
  * @author KHighness
  * @since 2022-03-14
  * @email parakovo@gmail.com
