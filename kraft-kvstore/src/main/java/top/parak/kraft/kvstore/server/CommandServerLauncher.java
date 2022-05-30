@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import top.parak.kraft.core.node.NodeEndpoint;
 
 /**
- * Server launcher.
+ * Command server launcher.
  *
  * @author KHighness
  * @since 2022-04-01
@@ -24,7 +24,7 @@ public class CommandServerLauncher {
     private static final String MODE_STANDBY      = "standby";
     private static final String MODE_GROUP_MEMBER = "group-member";
 
-    private volatile KVStoreServer rpcServer;
+    private volatile KVStoreServer server;
 
     private void execute(String[] args) throws Exception {
         Options options = new Options();
@@ -41,16 +41,17 @@ public class CommandServerLauncher {
                         "if starts with mode group-member, please ensure id in group config")
                 .build());
         options.addOption(Option.builder("p1")
-                .longOpt("port-raft-node")
+                .longOpt("raft-rpc-port")
                 .hasArg()
                 .argName("port")
                 .type(Number.class)
                 .required()
-                .desc("port of raft node, required when starts with standalone or standby mode")
+                .desc("port of raft rpc, required when starts with standalone or standby mode")
                 .build());
         options.addOption(Option.builder("p2")
-                .longOpt("port-service")
-                .hasArg().argName("port")
+                .longOpt("service-port")
+                .hasArg()
+                .argName("port")
                 .type(Number.class)
                 .required()
                 .desc("port of service. required")
@@ -63,8 +64,8 @@ public class CommandServerLauncher {
         options.addOption(Option.builder("gc")
                 .hasArgs()
                 .argName("node-endpoint")
-                .desc("group config, required when starts with group-member mode. format: <node-endpoint> <node-endpoint..., >" +
-                        "format of node-endpoint: <node-id>, <host>, <port-raft-node>, eg: A, 127.0.0.1, 8001 B, 127.0.0.1, 8002")
+                .desc("group config, required when starts with group-member mode. format: <node-endpoint> <node-endpoint>..., " +
+                        "format of node-endpoint: <node-id>,<host>,<raft-rpc-port>, e.g: A,127.0.0.1,8001 B,127.0.0.1,8002")
                 .build());
 
         if (args.length == 0) {

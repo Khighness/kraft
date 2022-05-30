@@ -1,6 +1,9 @@
 package top.parak.kraft.kvstore.client.cmd;
 
+import com.google.common.annotations.Beta;
+
 import top.parak.kraft.core.node.NodeId;
+
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
@@ -10,6 +13,7 @@ import top.parak.kraft.kvstore.client.CommandContext;
  * @since 2022-05-30
  * @email parakovo@gmail.com
  */
+@Beta
 public class ClientSetLeaderCommand implements Command {
 
     @Override

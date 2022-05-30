@@ -31,12 +31,12 @@ public class KVStoreClient {
     /**
      * Add node.
      *
-     * @param nodeId node's id
-     * @param host   node's host
-     * @param port   node's port
+     * @param nodeId        node's id
+     * @param host          node's host
+     * @param raftRpcPort   node's raft rpc port
      */
-    public void addNode(String nodeId, String host, int port) {
-        serverRouter.send(new AddNodeCommand(nodeId, host, port));
+    public void addNode(String nodeId, String host, int raftRpcPort) {
+        serverRouter.send(new AddNodeCommand(nodeId, host, raftRpcPort));
     }
 
     /**

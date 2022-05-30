@@ -2,11 +2,13 @@ package top.parak.kraft.kvstore.client;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.MessageLite;
+
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.service.*;
 import top.parak.kraft.kvstore.message.GetCommand;
 import top.parak.kraft.kvstore.message.MessageConstants;
 import top.parak.kraft.kvstore.message.SetCommand;
+import top.parak.kraft.kvstore.server.KVStoreServer;
 import top.parak.kraft.kvstore.support.proto.Protos;
 
 import java.io.*;
@@ -14,13 +16,17 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
- * Socket channel.
+ * KV-store client socket channel.
+ * <p>
+ * {@link KVStoreClient} will create a socket channel for every {@link KVStoreServer}.
+ * All socket channels will be managed by {@link CommandContext}.
+ * </p>
  *
  * @author KHighness
  * @since 2022-05-29
  * @email parakovo@gmail.com
  */
-public class SocketChannel implements Channel {
+public class KVStoreClientSocketChannel implements Channel {
 
     private final String host;
     private final int port;
@@ -31,7 +37,7 @@ public class SocketChannel implements Channel {
      * @param host host
      * @param port port
      */
-    public SocketChannel(String host, int port) {
+    public KVStoreClientSocketChannel(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -66,7 +72,7 @@ public class SocketChannel implements Channel {
                 return null;
             case MessageConstants.MSG_TYPE_FAILURE:
                 Protos.Failure protoFailure = Protos.Failure.parseFrom(message);
-                throw new ChannelException("error_code " + protoFailure.getErrorCode() + ", mesage " + protoFailure.getMessage());
+                throw new ChannelException("error_code " + protoFailure.getErrorCode() + ", message " + protoFailure.getMessage());
             case MessageConstants.MSG_TYPE_REDIRECT:
                 Protos.Redirect protoRedirect = Protos.Redirect.parseFrom(message);
                 throw new RedirectException(new NodeId(protoRedirect.getLeaderId()));

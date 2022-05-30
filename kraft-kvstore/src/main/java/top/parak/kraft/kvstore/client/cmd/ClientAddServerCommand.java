@@ -1,7 +1,8 @@
 package top.parak.kraft.kvstore.client.cmd;
 
+import com.google.common.annotations.Beta;
+
 import top.parak.kraft.kvstore.client.CommandContext;
-import top.parak.kraft.kvstore.client.cmd.Command;
 
 /**
  * ClientAddServer command.
@@ -10,6 +11,7 @@ import top.parak.kraft.kvstore.client.cmd.Command;
  * @since 2022-05-29
  * @email parakovo@gmail.com
  */
+@Beta
 public class ClientAddServerCommand implements Command {
 
     @Override
@@ -19,23 +21,22 @@ public class ClientAddServerCommand implements Command {
 
     @Override
     public void execute(String arguments, CommandContext context) {
-        // <node-id> <host> <port>
+        // <node-id> <host> <service-port>
         String[] pieces = arguments.split("\\s");
         if (pieces.length != 3) {
-            throw new IllegalArgumentException("usage: " + getName() + "<node-id> <host> <port>");
+            throw new IllegalArgumentException("usage: " + getName() + "<node-id> <host> <service-port>");
         }
 
         String nodeId = pieces[0];
         String host = pieces[1];
-        int port;
+        int servicePort;
         try {
-            port = Integer.parseInt(pieces[2]);
+            servicePort = Integer.parseInt(pieces[2]);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("illegal port [" + pieces[2] + "]");
         }
 
-
-        context.clientAddServer(nodeId, host, port);
+        context.clientAddServer(nodeId, host, servicePort);
         context.printServerList();
     }
 
