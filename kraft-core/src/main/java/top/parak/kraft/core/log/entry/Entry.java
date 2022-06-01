@@ -18,11 +18,11 @@ public interface Entry {
      */
     int KIND_GENERAL = 1;
     /**
-     * The kind of the log entry for adding node.
+     * The kind of the group config log entry for adding node.
      */
     int KIND_ADD_NODE = 3;
     /**
-     * The kind of the log entry for removing node.
+     * The kind of the  group config log entry for removing node.
      */
     int KIND_REMOVE_NODE = 4;
 

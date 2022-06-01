@@ -1,7 +1,5 @@
 package top.parak.kraft.core.rpc;
 
-import top.parak.kraft.core.service.ChannelException;
-
 /**
  * Thrown when channel connection occur exception.
  *

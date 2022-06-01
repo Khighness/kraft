@@ -50,7 +50,7 @@ public class KVStoreClientSocketChannel implements Channel {
             this.write(socket.getOutputStream(), message);
             return this.read(socket.getInputStream());
         } catch (IOException e) {
-            throw new ChannelException("failed to snd and receive", e);
+            throw new ChannelException("failed to send and receive", e);
         }
     }
 

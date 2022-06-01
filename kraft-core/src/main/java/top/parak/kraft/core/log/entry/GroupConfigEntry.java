@@ -5,9 +5,11 @@ import top.parak.kraft.core.node.NodeEndpoint;
 import java.util.Set;
 
 /**
- * Group config updating entry.
- * @see AddNodeEntry
- * @see RemoveNodeEntry
+ * Group config entry.
+ * <ul>
+ * <li>{@link AddNodeEntry}</li>
+ * <li>{@link RemoveNodeEntry}</li>
+ * </ul>
  *
  * @author KHighness
  * @since 2022-03-31

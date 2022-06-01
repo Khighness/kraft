@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.Address;
 import top.parak.kraft.core.rpc.ChannelConnectException;
+import top.parak.kraft.core.rpc.ChannelException;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.ConnectException;

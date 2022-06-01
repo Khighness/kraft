@@ -2,7 +2,7 @@ package top.parak.kraft.core.rpc.nio;
 
 import top.parak.kraft.core.rpc.Channel;
 import top.parak.kraft.core.rpc.message.*;
-import top.parak.kraft.core.service.ChannelException;
+import top.parak.kraft.core.rpc.ChannelException;
 
 import javax.annotation.Nonnull;
 

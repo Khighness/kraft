@@ -1,7 +1,7 @@
 package top.parak.kraft.core.log.entry;
 
 /**
- * Abstract entry.
+ * Abstract log entry.
  *
  * @author KHighness
  * @since 2022-03-31

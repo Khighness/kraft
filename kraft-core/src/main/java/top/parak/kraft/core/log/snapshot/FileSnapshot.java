@@ -45,7 +45,7 @@ public class FileSnapshot implements Snapshot {
      */
     private int lastIncludedTerm;
     /**
-     * The last group config in the snapshot.
+     * The last group config.
      */
     private Set<NodeEndpoint> lastConfig;
     /**
@@ -102,6 +102,7 @@ public class FileSnapshot implements Snapshot {
             Protos.SnapshotHeader header = Protos.SnapshotHeader.parseFrom(headerBytes);
             lastIncludedIndex = header.getLastIndex();
             lastIncludedTerm = header.getLastTerm();
+            // read group config
             lastConfig = header.getLastConfigList().stream()
                     .map(e -> new NodeEndpoint(e.getId(), e.getHost(), e.getPort()))
                     .collect(Collectors.toSet());

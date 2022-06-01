@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Log entry for adding node.
+ * Group config log entry for adding node.
  *
  * @author KHighness
  * @since 2022-03-31
