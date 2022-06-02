@@ -10,9 +10,22 @@ package top.parak.kraft.core.node;
  */
 public class GroupMember {
 
+    /**
+     * The node endpoint of the group member.
+     */
     private final NodeEndpoint endpoint;
+    /**
+     * The replicating state of the group member.
+     */
     private ReplicatingState replicatingState;
+    /**
+     * True if the member is catching upb when entering the group,
+     * otherwise false which means it has finished catching up.
+     */
     private boolean major;
+    /**
+     * True if the group member is removed, otherwise false.
+     */
     private boolean removing = false;
 
     GroupMember(NodeEndpoint endpoint) {
