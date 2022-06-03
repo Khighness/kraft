@@ -21,7 +21,8 @@ public class AppendEntriesResult implements Serializable {
      */
     private final int term;
     /**
-     * If the follower has appended the log entries or already has the log entries.
+     * True if the follower has appended the log entries or already has the log entries,
+     * otherwise false.
      */
     private final boolean success;
 

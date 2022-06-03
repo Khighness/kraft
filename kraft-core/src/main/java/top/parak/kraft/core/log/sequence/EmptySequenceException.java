@@ -9,5 +9,5 @@ import top.parak.kraft.core.log.LogException;
  * @since 2022-04-01
  * @email parakovo@gmail.com
  */
-class EmptySequenceException extends LogException {
+public class EmptySequenceException extends LogException {
 }

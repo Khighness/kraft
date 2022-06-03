@@ -1,6 +1,9 @@
 package top.parak.kraft.core.rpc.message;
 
+import com.google.common.base.Preconditions;
 import top.parak.kraft.core.node.NodeId;
+
+import javax.annotation.Nonnull;
 
 /**
  * AppendEntriesResult message.
@@ -18,37 +21,29 @@ public class AppendEntriesResultMessage {
     /**
      * Leader id, invoker id.
      */
-    private final NodeId nodeId;
+    private final NodeId sourceNodeId;
     /**
      * AppendEntries RPC arguments.
      */
     private final AppendEntriesRpc rpc;
 
-    public AppendEntriesResultMessage(AppendEntriesResult result, NodeId nodeId, AppendEntriesRpc rpc) {
+    public AppendEntriesResultMessage(AppendEntriesResult result, NodeId sourceNodeId, @Nonnull AppendEntriesRpc rpc) {
+        Preconditions.checkNotNull(rpc);
         this.result = result;
-        this.nodeId = nodeId;
+        this.sourceNodeId = sourceNodeId;
         this.rpc = rpc;
     }
 
-    public AppendEntriesResult getResult() {
+    public AppendEntriesResult get() {
         return result;
     }
 
-    public NodeId getNodeId() {
-        return nodeId;
+    public NodeId getSourceNodeId() {
+        return sourceNodeId;
     }
 
     public AppendEntriesRpc getRpc() {
         return rpc;
-    }
-
-    @Override
-    public String toString() {
-        return "AppendEntriesResultMessage{" +
-                "result=" + result +
-                ", nodeId=" + nodeId +
-                ", rpc=" + rpc +
-                '}';
     }
 
 }

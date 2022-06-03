@@ -15,17 +15,17 @@ import top.parak.kraft.core.log.Log;
 public class NodeConfig {
 
     /**
-     * Minimum election timeout
+     * Minimum election timeout.
      */
     private int minElectionTimeout = 3000;
 
     /**
-     * Maximum election timeout
+     * Maximum election timeout.
      */
     private int maxElectionTimeout = 6000;
 
     /**
-     * Delay for first log replication after becoming leader
+     * Delay for first log replication after becoming leader.
      */
     private int logReplicationDelay = 0;
 
@@ -39,27 +39,35 @@ public class NodeConfig {
     private int logReplicationInterval = 1000;
 
     /**
+     * Read timeout to receive response from follower.
+     * <p>
+     * If no response received from follower, resend log replication rpc.
+     * </p>
+     */
+    private int logReplicationReadTimeout = 900;
+
+    /**
      * Max entries to send when replicating log to followers
      */
     private int maxReplicationEntries = Log.ALL_ENTRIES;
 
     /**
-     * Max entries to send when replicating log to new node
+     * Max entries to send when replicating log to new node.
      */
     private int maxReplicationEntriesForNewNode = Log.ALL_ENTRIES;
 
     /**
-     * Data length in install snapshot rpc
+     * Data length in install snapshot rpc.
      */
     private int snapshotDataLength = 1024;
 
     /**
-     * Worker thread count in nio connector
+     * Worker thread count in nio connector.
      */
     private int nioWorkerThreads = 0;
 
     /**
-     * Max round for new node to catch up
+     * Max round for new node to catch up.
      */
     private int newNodeMaxRound = 10;
 
@@ -70,6 +78,17 @@ public class NodeConfig {
      * </p>
      */
     private int newNodeReadTimeout = 3000;
+
+    /**
+     * Timeout for new node to make progress.
+     * <p>
+     * If new node cannot make progress after this timeout, it cannot be added to group and reply TIMEOUT.
+     * </p>
+     * <p>
+     * Default to election timeout.
+     * </p>
+     */
+    private int newNodeAdvanceTimeout = 3000;
 
     /**
      * Timeout to wait for previous group config change to complete.
@@ -109,6 +128,14 @@ public class NodeConfig {
 
     public void setLogReplicationInterval(int logReplicationInterval) {
         this.logReplicationInterval = logReplicationInterval;
+    }
+
+    public int getLogReplicationReadTimeout() {
+        return logReplicationReadTimeout;
+    }
+
+    public void setLogReplicationReadTimeout(int logReplicationReadTimeout) {
+        this.logReplicationReadTimeout = logReplicationReadTimeout;
     }
 
     public int getMaxReplicationEntries() {
@@ -159,6 +186,14 @@ public class NodeConfig {
         this.newNodeReadTimeout = newNodeReadTimeout;
     }
 
+    public int getNewNodeAdvanceTimeout() {
+        return newNodeAdvanceTimeout;
+    }
+
+    public void setNewNodeAdvanceTimeout(int newNodeAdvanceTimeout) {
+        this.newNodeAdvanceTimeout = newNodeAdvanceTimeout;
+    }
+
     public int getPreviousGroupConfigChangeTimeout() {
         return previousGroupConfigChangeTimeout;
     }
@@ -166,4 +201,5 @@ public class NodeConfig {
     public void setPreviousGroupConfigChangeTimeout(int previousGroupConfigChangeTimeout) {
         this.previousGroupConfigChangeTimeout = previousGroupConfigChangeTimeout;
     }
+
 }

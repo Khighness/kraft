@@ -39,7 +39,7 @@ public class MemoryNodeStore implements NodeStore {
 
     @Nullable
     @Override
-    public NodeId getNotedFor() {
+    public NodeId getVotedFor() {
         return votedFor;
     }
 

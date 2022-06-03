@@ -18,6 +18,10 @@ public class CandidateNodeRole extends AbstractNodeRole {
     private final int votesCount;
     private final ElectionTimeout electionTimeout;
 
+    public CandidateNodeRole(int term, ElectionTimeout electionTimeout) {
+        this(term, 1, electionTimeout);
+    }
+
     public CandidateNodeRole(int term, int votesCount, ElectionTimeout electionTimeout) {
         super(RoleName.FOLLOWER, term);
         this.votesCount = votesCount;

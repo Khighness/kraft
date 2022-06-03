@@ -24,7 +24,7 @@ import java.util.List;
  * @email parakovo@gmail.com
  */
 @NotThreadSafe
-abstract class AbstractEntrySequence implements EntrySequence {
+public abstract class AbstractEntrySequence implements EntrySequence {
 
     /**
      * The index of the first log entry stored in the log entry sequence

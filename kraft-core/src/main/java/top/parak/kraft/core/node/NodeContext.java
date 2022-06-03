@@ -33,7 +33,7 @@ public class NodeContext {
     private TaskExecutor taskExecutor;
     private TaskExecutor groupConfigChangeTaskExecutor;
 
-    public NodeId getSelfId() {
+    public NodeId selfId() {
         return selfId;
     }
 
@@ -41,7 +41,7 @@ public class NodeContext {
         this.selfId = selfId;
     }
 
-    public NodeGroup getGroup() {
+    public NodeGroup group() {
         return group;
     }
 
@@ -49,7 +49,7 @@ public class NodeContext {
         this.group = group;
     }
 
-    public Log getLog() {
+    public Log log() {
         return log;
     }
 
@@ -57,7 +57,7 @@ public class NodeContext {
         this.log = log;
     }
 
-    public Connector getConnector() {
+    public Connector connector() {
         return connector;
     }
 
@@ -65,7 +65,7 @@ public class NodeContext {
         this.connector = connector;
     }
 
-    public NodeStore getStore() {
+    public NodeStore store() {
         return store;
     }
 
@@ -73,7 +73,7 @@ public class NodeContext {
         this.store = store;
     }
 
-    public Scheduler getScheduler() {
+    public Scheduler scheduler() {
         return scheduler;
     }
 
@@ -81,7 +81,7 @@ public class NodeContext {
         this.scheduler = scheduler;
     }
 
-    public NodeMode getMode() {
+    public NodeMode mode() {
         return mode;
     }
 
@@ -89,7 +89,7 @@ public class NodeContext {
         this.mode = mode;
     }
 
-    public NodeConfig getConfig() {
+    public NodeConfig config() {
         return config;
     }
 
@@ -97,7 +97,7 @@ public class NodeContext {
         this.config = config;
     }
 
-    public EventBus getEventBus() {
+    public EventBus eventBus() {
         return eventBus;
     }
 
@@ -105,7 +105,7 @@ public class NodeContext {
         this.eventBus = eventBus;
     }
 
-    public TaskExecutor getTaskExecutor() {
+    public TaskExecutor taskExecutor() {
         return taskExecutor;
     }
 
@@ -113,7 +113,7 @@ public class NodeContext {
         this.taskExecutor = taskExecutor;
     }
 
-    public TaskExecutor getGroupConfigChangeTaskExecutor() {
+    public TaskExecutor groupConfigChangeTaskExecutor() {
         return groupConfigChangeTaskExecutor;
     }
 

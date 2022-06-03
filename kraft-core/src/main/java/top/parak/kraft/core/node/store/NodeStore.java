@@ -33,7 +33,7 @@ public interface NodeStore {
      * @return voted for
      */
     @Nullable
-    NodeId getNotedFor();
+    NodeId getVotedFor();
 
     /**
      * Set voted for.

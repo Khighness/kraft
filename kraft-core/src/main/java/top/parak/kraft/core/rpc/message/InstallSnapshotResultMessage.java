@@ -16,7 +16,7 @@ public class InstallSnapshotResultMessage {
      */
     private final InstallSnapshotResult result;
     /**
-     * Follower id, receiver id.
+     * Leader id, invoker id.
      */
     private final NodeId sourceId;
     /**

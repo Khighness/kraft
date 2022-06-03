@@ -9,7 +9,7 @@ import top.parak.kraft.core.log.entry.Entry;
  * @since 2022-04-07
  * @email parakovo@gmail.com
  */
-class AbstractEntryEvent<T extends Entry> {
+public class AbstractEntryEvent<T extends Entry> {
 
     protected final T entry;
 

@@ -40,7 +40,7 @@ public class AppendEntriesRpc implements Serializable {
     private int prevLogTerm;
     /**
      * The log entries to store.
-     * <p>Empty for heartbeat</p>
+     * <p>Empty for heartbeat.</p>
      * <p>May send more than one for efficiency.</p>
      */
     private List<Entry> entries = Collections.emptyList();
@@ -103,6 +103,10 @@ public class AppendEntriesRpc implements Serializable {
 
     public void setLeaderCommit(int leaderCommit) {
         this.leaderCommit = leaderCommit;
+    }
+
+    public int getLastEntryIndex() {
+        return this.entries.isEmpty() ? this.prevLogIndex : this.entries.get(this.entries.size() - 1).getIndex();
     }
 
     @Override

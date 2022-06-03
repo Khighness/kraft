@@ -12,7 +12,7 @@ import javax.annotation.concurrent.Immutable;
  * @email parakovo@gmail.com
  */
 @Immutable
-class EntryIndexItem {
+public class EntryIndexItem {
 
     private final int index;
     private final long offset;
