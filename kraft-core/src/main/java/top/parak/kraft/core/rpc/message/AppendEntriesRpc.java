@@ -118,6 +118,7 @@ public class AppendEntriesRpc implements Serializable {
                 ", prevLogIndex=" + prevLogIndex +
                 ", prevLogTerm=" + prevLogTerm +
                 ", entries.size=" + entries.size() +
+                 ", entries=" + entries +
                 ", leaderCommit=" + leaderCommit +
                 '}';
     }

@@ -181,7 +181,7 @@ public class NodeImpl implements Node {
         try {
             newNodeCatchUpTaskResult = newNodeCatchUpTask.call();
             switch (newNodeCatchUpTaskResult.getState()) {
-                case REPLICATED_FAILED:
+                case REPLICATION_FAILED:
                     return new FixedResultGroupConfigTaskReference(GroupConfigChangeTaskResult.REPLICATION_FAILED);
                 case TIMEOUT:
                     return new FixedResultGroupConfigTaskReference(GroupConfigChangeTaskResult.TIMEOUT);
@@ -568,7 +568,7 @@ public class NodeImpl implements Node {
      * @param result request vote result
      * @return future
      */
-    private Future<?> processRequestVoteResult(RequestVoteResult result) {
+    protected Future<?> processRequestVoteResult(RequestVoteResult result) {
         return context.taskExecutor().submit(() -> doProcessRequestVoteResult(result));
     }
 
@@ -597,7 +597,7 @@ public class NodeImpl implements Node {
 
         int currentVotedCount = ((CandidateNodeRole) role).getVotesCount() + 1;
         int countOfMajor = context.group().getCountOfMajor();
-        logger.debug("votes count {}, major node count{}", currentVotedCount, countOfMajor);
+        logger.debug("vote node count {}, major node count {}", currentVotedCount, countOfMajor);
         // cancel old role's task
         role.cancelTimeoutOrTask();
         if (currentVotedCount > countOfMajor / 2) {

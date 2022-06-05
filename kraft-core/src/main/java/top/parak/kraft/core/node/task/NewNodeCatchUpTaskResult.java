@@ -12,7 +12,7 @@ public class NewNodeCatchUpTaskResult {
     public static enum State {
         OK,
         TIMEOUT,
-        REPLICATED_FAILED
+        REPLICATION_FAILED
     }
 
     private final State state;

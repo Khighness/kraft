@@ -23,7 +23,7 @@ public class CandidateNodeRole extends AbstractNodeRole {
     }
 
     public CandidateNodeRole(int term, int votesCount, ElectionTimeout electionTimeout) {
-        super(RoleName.FOLLOWER, term);
+        super(RoleName.CANDIDATE, term);
         this.votesCount = votesCount;
         this.electionTimeout = electionTimeout;
     }

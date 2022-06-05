@@ -28,11 +28,11 @@ public class GroupMember {
      */
     private boolean removing = false;
 
-    GroupMember(NodeEndpoint endpoint) {
+    public GroupMember(NodeEndpoint endpoint) {
         this(endpoint, null, true);
     }
 
-    GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState, boolean major) {
+    public GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState, boolean major) {
         this.endpoint = endpoint;
         this.replicatingState = replicatingState;
         this.major = major;

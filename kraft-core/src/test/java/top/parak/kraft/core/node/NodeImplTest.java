@@ -9,9 +9,11 @@ import top.parak.kraft.core.log.entry.EntryMeta;
 import top.parak.kraft.core.node.role.RoleName;
 import top.parak.kraft.core.node.role.RoleState;
 import top.parak.kraft.core.node.store.MemoryNodeStore;
+import top.parak.kraft.core.node.task.GroupConfigChangeTaskReference;
 import top.parak.kraft.core.rpc.ConnectorAdapter;
 import top.parak.kraft.core.rpc.MockConnector;
 import top.parak.kraft.core.rpc.message.AppendEntriesRpc;
+import top.parak.kraft.core.rpc.message.RequestVoteResult;
 import top.parak.kraft.core.rpc.message.RequestVoteRpc;
 import top.parak.kraft.core.schedule.NullScheduler;
 import top.parak.kraft.core.support.task.DirectTaskExecutor;
@@ -21,9 +23,13 @@ import top.parak.kraft.core.support.task.TaskExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class NodeImplTest {
 
@@ -32,7 +38,7 @@ public class NodeImplTest {
         private boolean sent = false;
 
         @Override
-        public void sendAppendEntries(@Nonnull AppendEntriesRpc rpc, @Nonnull NodeEndpoint destinationEndpoint) {
+        public synchronized void sendAppendEntries(@Nonnull AppendEntriesRpc rpc, @Nonnull NodeEndpoint destinationEndpoint) {
             appendEntriesRpcSent();
         }
 
@@ -51,6 +57,7 @@ public class NodeImplTest {
         void reset() {
             sent = false;
         }
+
     }
 
     private static TaskExecutor taskExecutor;
@@ -84,8 +91,7 @@ public class NodeImplTest {
         taskExecutor = new SingleThreadTaskExecutor("node-test");
         groupConfigChangeTaskExecutor = new SingleThreadTaskExecutor("group-config-change-test");
         cachedThreadTaskExecutor = new ListeningTaskExecutor(Executors.newCachedThreadPool(r ->
-                new Thread("cached-thread-" + cachedThreadId.incrementAndGet()))
-        );
+                new Thread(r, "cached-thread-" + cachedThreadId.incrementAndGet())));
     }
 
     @Test
@@ -194,7 +200,8 @@ public class NodeImplTest {
 
     @Test
     public void testElectionTimeoutWHenCandidate() {
-        NodeImpl node = (NodeImpl) newNodeBuilder(NodeId.of("A"),
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
                 new NodeEndpoint("A", "127.0.0.1", 2333),
                 new NodeEndpoint("B", "127.0.0.1", 2334),
                 new NodeEndpoint("C", "127.0.0.1", 2335)
@@ -226,6 +233,161 @@ public class NodeImplTest {
         Assert.assertEquals(0, node.getContext().log().getCommitIndex());
         node.replicateLog();
         Assert.assertEquals(1, node.getContext().log().getCommitIndex());
+    }
+
+    @Test
+    public void testReplicateLog() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.electionTimeout();
+        node.onReceiveRequestVoteResult(new RequestVoteResult(1, true));
+        node.replicateLog();
+
+        MockConnector mockConnector = (MockConnector) node.getContext().connector();
+        Assert.assertEquals(3, mockConnector.getMessageCount());
+
+        // check destination node id
+        List<MockConnector.Message> messages = mockConnector.getMessages();
+        // request vote rpc + append entries rpc * 2
+        Assert.assertEquals(3, messages.size());
+        Set<NodeId> destinationIds = messages.subList(1, 3).stream()
+                .map(MockConnector.Message::getDestinationNodeId)
+                .collect(Collectors.toSet());
+        Assert.assertEquals(2, destinationIds.size());
+        Assert.assertTrue(destinationIds.contains(NodeId.of("B")));
+        Assert.assertTrue(destinationIds.contains(NodeId.of("C")));
+
+        AppendEntriesRpc rpc = (AppendEntriesRpc) messages.get(2).getRpc();
+        Assert.assertEquals(1, rpc.getTerm());
+    }
+
+    @Test
+    public void testReplicateLogSkipReplicating() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.electionTimeout();
+        node.onReceiveRequestVoteResult(new RequestVoteResult(1, true));
+        node.getContext().group().findMember(NodeId.of("B")).replicatedNow();
+        node.replicateLog();
+
+        MockConnector mockConnector = (MockConnector) node.getContext().connector();
+        // request vote rpc + append entries rpc
+        Assert.assertEquals(2, mockConnector.getMessageCount());
+    }
+
+    @Test(expected = NotLeaderException.class)
+    public void testAppendLogWhenFollower() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.appendLog("test".getBytes());
+    }
+
+    @Test(expected = NotLeaderException.class)
+    public void testAppendLogWhenCandidate() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.electionTimeout();
+        node.appendLog("test".getBytes());
+    }
+
+    @Test
+    public void testAppendLog() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.electionTimeout();
+        node.onReceiveRequestVoteResult(new RequestVoteResult(1, true));
+        node.appendLog("test".getBytes());
+
+        MockConnector mockConnector = (MockConnector) node.getContext().connector();
+        // request vote rpc + append entries rpc(no-op entry, general entry)
+        Assert.assertEquals(3, mockConnector.getMessageCount());
+    }
+
+    @Test(expected = NotLeaderException.class)
+    public void testAddNodeWhenFollower() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.addNode(new NodeEndpoint("D", "127.0.0.1", 2336));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddNodeSelf() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335)
+        ).build();
+        node.start();
+        node.electionTimeout();
+        node.onReceiveRequestVoteResult(new RequestVoteResult(1, true));
+        node.addNode(new NodeEndpoint("A", "127.0.0.1", 2333));
+    }
+
+    private AtomicInteger id;
+    private ListeningTaskExecutor listeningExecutor;
+
+    @Test
+    public void testAddNodeSampleNode() throws Throwable {
+        WaitConnector connector = new WaitConnector();
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "127.0.0.1", 2333),
+                new NodeEndpoint("B", "127.0.0.1", 2334),
+                new NodeEndpoint("C", "127.0.0.1", 2335))
+                .setConnector(connector)
+                .setTaskExecutor(taskExecutor)
+                .setGroupConfigChangeTaskExecutor(groupConfigChangeTaskExecutor)
+                .build();
+        node.start();
+        node.electionTimeout();
+        node.processRequestVoteResult(new RequestVoteResult(1, true)).get();
+
+        Future<GroupConfigChangeTaskReference> future = cachedThreadTaskExecutor.submit(() ->
+                node.addNode(new NodeEndpoint("D", "127.0.0.1", 2336))
+        );
+        connector.awaitAppendEntriesRpc();
+        try {
+            node.addNode(new NodeEndpoint("D", "127.0.0.1", 2336));
+            Assert.fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        future.cancel(true);
+    }
+
+    @Test
+    public void testAddNode() throws Throwable {
+
     }
 
 }

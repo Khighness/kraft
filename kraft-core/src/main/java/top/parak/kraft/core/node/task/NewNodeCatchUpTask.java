@@ -54,8 +54,8 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
     }
 
     @Override
-    public NewNodeCatchUpTaskResult call() throws Exception {
-        logger.debug("task start");
+    public synchronized NewNodeCatchUpTaskResult call() throws Exception {
+        logger.debug("node {} start catch up task", nodeId);
         setState(State.START);
         context.replicateLog(endpoint);
         lastReplicatedAt = System.currentTimeMillis();
@@ -71,7 +71,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
                 break;
             }
         }
-        logger.debug("task done");
+        logger.debug("node {} done catch up task", nodeId);
         context.done(this);
         return null;
     }
@@ -81,14 +81,14 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
             case REPLICATION_CATCH_UP:
                 return new NewNodeCatchUpTaskResult(nextIndex, matchIndex);
             case REPLICATION_FAILED:
-                return new NewNodeCatchUpTaskResult(NewNodeCatchUpTaskResult.State.REPLICATED_FAILED);
+                return new NewNodeCatchUpTaskResult(NewNodeCatchUpTaskResult.State.REPLICATION_FAILED);
             default:
                 return new NewNodeCatchUpTaskResult(NewNodeCatchUpTaskResult.State.TIMEOUT);
         }
     }
 
     private void setState(State state) {
-        logger.debug("state -> {}", state);
+        logger.debug("node {} state -> {}", nodeId, state);
         this.state = state;
     }
 
@@ -110,27 +110,27 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
             lastAdvanceAt = System.currentTimeMillis();
             // finish catching up
             if (nextIndex >= nextLogIndex) {
-                setStateANdNotify(State.REPLICATION_CATCH_UP);
+                setStateAndNotify(State.REPLICATION_CATCH_UP);
                 return;
             }
             // exceed max round
             if ((++round) > config.getNewNodeMaxRound()) {
-                logger.info("node {} cannot catch up within max round", nodeId);
-                setStateANdNotify(State.TIMEOUT);
+                logger.info("node {} can't catch up within max round", nodeId);
+                setStateAndNotify(State.TIMEOUT);
                 return;
             }
         } else {
             // cannot continue to catch up
             if (nextIndex <= 1) {
-                logger.warn("node {} cannot back off next index more, stop replication", nodeId);
-                setStateANdNotify(State.REPLICATION_FAILED);
+                logger.warn("node {} can't back off next index more, stop replication", nodeId);
+                setStateAndNotify(State.REPLICATION_FAILED);
                 return;
             }
             nextIndex--;
             // slow network
             if (System.currentTimeMillis() - lastAdvanceAt >= config.getNewNodeAdvanceTimeout()) {
-                logger.debug("node {} cannot make progress within timeout", nodeId);
-                setStateANdNotify(State.TIMEOUT);
+                logger.debug("node {} can't make progress within timeout", nodeId);
+                setStateAndNotify(State.TIMEOUT);
                 return;
             }
         }
@@ -150,7 +150,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
             nextIndex = rpc.getLastIndex() + 1;
             lastAdvanceAt = System.currentTimeMillis();
             if (nextIndex >= nextLogIndex) {
-                setStateANdNotify(State.REPLICATION_CATCH_UP);
+                setStateAndNotify(State.REPLICATION_CATCH_UP);
                 return;
             }
             round++;
@@ -162,7 +162,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
         notify();
     }
 
-    private void setStateANdNotify(State state) {
+    private void setStateAndNotify(State state) {
         setState(state);
         done = true;
         notify();

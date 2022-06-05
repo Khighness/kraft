@@ -17,7 +17,7 @@ public interface Node {
 
     /**
      * Register state machine to node.
-     * <p>State machine should be registered before node start, or it may not task effect.</p>
+     * <p>State machine should be registered before node starts, or it may not task effect.</p>
      *
      * @param stateMachine state machine
      */

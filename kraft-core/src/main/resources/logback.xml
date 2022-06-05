@@ -2,8 +2,8 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <property name="PROJECT" value="kraft-core" />
     <property name="LOG_DIR" value="../logs" />
-    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level [%thread] %-40.40logger{39} - %msg%n" />
-    <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %boldRed(%-5level) %yellow([%thread]) %cyan(%-40.40logger{39}) - %msg%n"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level [%-10thread] %-40.40logger{39} - %msg%n" />
+    <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %boldRed(%-5level) %yellow([%-10.10thread{9}]) %cyan(%-40.40logger{39}) - %msg%n"/>
 
     <contextName>${PROJECT}</contextName>
 
