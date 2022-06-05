@@ -18,24 +18,24 @@ public class InstallSnapshotResultMessage {
     /**
      * Leader id, invoker id.
      */
-    private final NodeId sourceId;
+    private final NodeId sourceNodeId;
     /**
      * InstallSnapshot RPC arguments.
      */
     private final InstallSnapshotRpc rpc;
 
-    public InstallSnapshotResultMessage(InstallSnapshotResult result, NodeId sourceId, InstallSnapshotRpc rpc) {
+    public InstallSnapshotResultMessage(InstallSnapshotResult result, NodeId sourceNodeId, InstallSnapshotRpc rpc) {
         this.result = result;
-        this.sourceId = sourceId;
+        this.sourceNodeId = sourceNodeId;
         this.rpc = rpc;
     }
 
-    public InstallSnapshotResult getResult() {
+    public InstallSnapshotResult get() {
         return result;
     }
 
-    public NodeId getSourceId() {
-        return sourceId;
+    public NodeId getSourceNodeId() {
+        return sourceNodeId;
     }
 
     public InstallSnapshotRpc getRpc() {
@@ -46,7 +46,7 @@ public class InstallSnapshotResultMessage {
     public String toString() {
         return "InstallSnapshotResultMessage{" +
                 "result=" + result +
-                ", sourceId=" + sourceId +
+                ", sourceNodeId=" + sourceNodeId +
                 ", rpc=" + rpc +
                 '}';
     }

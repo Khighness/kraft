@@ -232,9 +232,7 @@ abstract class AbstractLog implements Log {
     private void appendEntryFromLeader(Entry leaderEntry) {
         entrySequence.append(leaderEntry);
         if (leaderEntry instanceof GroupConfigEntry) {
-            eventBus.post(new GroupConfigEntryFromLeaderAppendEvent(
-                    (GroupConfigEntry) leaderEntry)
-            );
+            eventBus.post(new GroupConfigEntryFromLeaderAppendEvent((GroupConfigEntry) leaderEntry));
         }
     }
 

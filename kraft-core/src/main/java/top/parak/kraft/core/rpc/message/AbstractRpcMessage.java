@@ -22,7 +22,7 @@ public abstract class AbstractRpcMessage<T> {
         this.channel = channel;
     }
 
-    public T getRpc() {
+    public T get() {
         return rpc;
     }
 

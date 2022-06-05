@@ -42,7 +42,6 @@ public class NewNodeCatchUpTaskGroup {
     /**
      * Invoke <code>onReceiveAppendEntriesResult</code> on task.
      *
-     *
      * @param resultMessage result message
      * @param nextLogIndex  index of next log
      * @return true if invoked, false if no task for node
@@ -64,7 +63,7 @@ public class NewNodeCatchUpTaskGroup {
      * @return true if invoked, false if no task for node
      */
     public boolean onReceiveInstallResult(InstallSnapshotResultMessage resultMessage, int nextLogIndex) {
-        NewNodeCatchUpTask task = taskMap.get(resultMessage.getSourceId());
+        NewNodeCatchUpTask task = taskMap.get(resultMessage.getSourceNodeId());
         if (task == null) {
             return false;
         }

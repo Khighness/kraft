@@ -56,7 +56,7 @@ public abstract class AbstractNodeRole {
     public abstract NodeId getLeaderId(NodeId selfId);
 
     /**
-     * Cancel election time out cancel log replication task.
+     * Cancel election timeout or log replication task.
      */
     public abstract void cancelTimeoutOrTask();
 

@@ -28,7 +28,7 @@ public class ToRemoteHandler extends AbstractHandler {
      */
     public ToRemoteHandler(EventBus eventBus, NodeId remoteId, NodeId selfId) {
         super(eventBus);
-        this.remotedId = remoteId;
+        this.remoteId = remoteId;
         this.selfId = selfId;
     }
 
@@ -47,7 +47,7 @@ public class ToRemoteHandler extends AbstractHandler {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        logger.debug("receive {} from {}", msg, remotedId);
+        logger.debug("receive {} from {}", msg, remoteId);
         super.channelRead(ctx, msg);
     }
 

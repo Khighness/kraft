@@ -108,22 +108,26 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
             matchIndex = lastEntryIndex;
             nextIndex = lastEntryIndex + 1;
             lastAdvanceAt = System.currentTimeMillis();
-            if (nextIndex >= nextLogIndex) { // catch up
+            // finish catching up
+            if (nextIndex >= nextLogIndex) {
                 setStateANdNotify(State.REPLICATION_CATCH_UP);
                 return;
             }
+            // exceed max round
             if ((++round) > config.getNewNodeMaxRound()) {
                 logger.info("node {} cannot catch up within max round", nodeId);
                 setStateANdNotify(State.TIMEOUT);
                 return;
             }
         } else {
+            // cannot continue to catch up
             if (nextIndex <= 1) {
                 logger.warn("node {} cannot back off next index more, stop replication", nodeId);
                 setStateANdNotify(State.REPLICATION_FAILED);
                 return;
             }
             nextIndex--;
+            // slow network
             if (System.currentTimeMillis() - lastAdvanceAt >= config.getNewNodeAdvanceTimeout()) {
                 logger.debug("node {} cannot make progress within timeout", nodeId);
                 setStateANdNotify(State.TIMEOUT);
@@ -136,7 +140,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
     }
 
     synchronized void onReceiveInstallSnapshotResult(InstallSnapshotResultMessage resultMessage, int nextLogIndex) {
-        assert nodeId.equals(resultMessage.getSourceId());
+        assert nodeId.equals(resultMessage.getSourceNodeId());
         if (state != State.REPLICATING) {
             throw new IllegalStateException("receive append entries result when state is not replicating");
         }

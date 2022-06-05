@@ -30,9 +30,9 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
      */
     protected final EventBus eventBus;
     /**
-     * The if of remote node.
+     * The id of remote node.
      */
-    NodeId remotedId;
+    NodeId remoteId;
     /**
      * RPC channel between remote node and self.
      */
@@ -52,12 +52,12 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        assert remotedId != null;
+        assert remoteId != null;
         assert channel != null;
 
         if (msg instanceof RequestVoteRpc) {
             RequestVoteRpc rpc = (RequestVoteRpc) msg;
-            eventBus.post(new RequestVoteRpcMessage(rpc, remotedId, channel));
+            eventBus.post(new RequestVoteRpcMessage(rpc, remoteId, channel));
         } else if (msg instanceof RequestVoteResult) {
             eventBus.post(msg);
         } else if (msg instanceof AppendEntriesRpc) {
@@ -71,17 +71,17 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
                     logger.warn("incorrect append entries rpc message id {}, excepted {}",
                             result.getRpcMessageId(), lastAppendEntriesRpc.getMessageId());
                 } else {
-                    eventBus.post(new AppendEntriesResultMessage(result, remotedId, lastAppendEntriesRpc));
+                    eventBus.post(new AppendEntriesResultMessage(result, remoteId, lastAppendEntriesRpc));
                     lastAppendEntriesRpc = null;
                 }
             }
         } else if (msg instanceof InstallSnapshotRpc) {
             InstallSnapshotRpc rpc = (InstallSnapshotRpc) msg;
-            eventBus.post(new InstallSnapshotRpcMessage(rpc, remotedId, channel));
+            eventBus.post(new InstallSnapshotRpcMessage(rpc, remoteId, channel));
         } else if (msg instanceof InstallSnapshotResult) {
             InstallSnapshotResult result = (InstallSnapshotResult) msg;
             assert lastAppendEntriesRpc != null;
-            eventBus.post(new InstallSnapshotResultMessage(result, remotedId, lastInstallSnapshotRpc));
+            eventBus.post(new InstallSnapshotResultMessage(result, remoteId, lastInstallSnapshotRpc));
             lastAppendEntriesRpc = null;
         }
     }

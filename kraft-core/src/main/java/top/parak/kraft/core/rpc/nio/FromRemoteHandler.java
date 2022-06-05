@@ -38,13 +38,13 @@ public class FromRemoteHandler extends AbstractHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // receive the first message: id of remote node
         if (msg instanceof NodeId) {
-            remotedId = (NodeId) msg;
+            remoteId = (NodeId) msg;
             NioChannel nioChannel = new NioChannel(ctx.channel());
-            channelGroup.add(remotedId, nioChannel);
+            channelGroup.add(remoteId, nioChannel);
             return;
         }
 
-        logger.debug("receive {} from {}", msg, remotedId);
+        logger.debug("receive {} from {}", msg, remoteId);
         super.channelRead(ctx, msg);
     }
 
