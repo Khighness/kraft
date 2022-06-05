@@ -58,9 +58,7 @@ public class NodeId {
 
     @Override
     public String toString() {
-        return "NodeId{" +
-                "value='" + value + '\'' +
-                '}';
+        return this.value;
     }
 
 }

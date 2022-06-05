@@ -114,7 +114,7 @@ public class NodeBuilder {
      * @param endpoints endpoints
      * @param selfId    self id
      */
-    private NodeBuilder(@Nonnull Collection<NodeEndpoint> endpoints, @Nonnull NodeId selfId) {
+    public NodeBuilder(@Nonnull Collection<NodeEndpoint> endpoints, @Nonnull NodeId selfId) {
         Preconditions.checkNotNull(endpoints);
         Preconditions.checkNotNull(selfId);
         this.group = new NodeGroup(endpoints, selfId);
@@ -251,6 +251,16 @@ public class NodeBuilder {
     }
 
     /**
+     * Build node.
+     *
+     * @return node
+     */
+    @Nonnull
+    public Node build() {
+        return new NodeImpl(buildContext());
+    }
+
+    /**
      * Build context for node.
      *
      * @return node context
@@ -258,14 +268,15 @@ public class NodeBuilder {
     @Nonnull
     private NodeContext buildContext() {
         NodeContext nodeContext = new NodeContext();
-        nodeContext.setConfig(config);
+        nodeContext.setGroup(group);
         nodeContext.setMode(evaluateMode());
+        nodeContext.setStore(store != null ? store : new MemoryNodeStore());
         nodeContext.setLog(log != null ? log : new MemoryLog(eventBus));
         nodeContext.setSelfId(selfId);
         nodeContext.setConfig(config);
         nodeContext.setEventBus(eventBus);
         nodeContext.setScheduler(scheduler != null ? scheduler : new DefaultScheduler(config));
-        nodeContext.setConnector(connector != null ? connector : createNioCreator());
+        nodeContext.setConnector(connector != null ? connector : createNioConnector());
         nodeContext.setTaskExecutor(taskExecutor != null ? taskExecutor : new ListeningTaskExecutor(
                 Executors.newSingleThreadExecutor(r -> new Thread(r, "node"))
         ));
@@ -297,7 +308,7 @@ public class NodeBuilder {
      * @return nio connector
      */
     @Nonnull
-    private NioConnector createNioCreator() {
+    private NioConnector createNioConnector() {
         int port = group.findSelf().getEndpoint().getPort();
         if (workerGroup != null) {
             return new NioConnector(workerGroup, selfId, eventBus, port, config.getLogReplicationInterval());

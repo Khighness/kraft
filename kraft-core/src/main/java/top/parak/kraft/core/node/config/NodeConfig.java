@@ -62,11 +62,6 @@ public class NodeConfig {
     private int snapshotDataLength = 1024;
 
     /**
-     * Worker thread count in nio connector.
-     */
-    private int nioWorkerThreads = 0;
-
-    /**
      * Max round for new node to catch up.
      */
     private int newNodeMaxRound = 10;
@@ -97,6 +92,11 @@ public class NodeConfig {
      * </p>
      */
     private int previousGroupConfigChangeTimeout = 0;
+
+    /**
+     * Worker thread count in nio connector.
+     */
+    private int nioWorkerThreads = 0;
 
     public int getMinElectionTimeout() {
         return minElectionTimeout;
@@ -162,14 +162,6 @@ public class NodeConfig {
         this.snapshotDataLength = snapshotDataLength;
     }
 
-    public int getNioWorkerThreads() {
-        return nioWorkerThreads;
-    }
-
-    public void setNioWorkerThreads(int nioWorkerThreads) {
-        this.nioWorkerThreads = nioWorkerThreads;
-    }
-
     public int getNewNodeMaxRound() {
         return newNodeMaxRound;
     }
@@ -200,6 +192,14 @@ public class NodeConfig {
 
     public void setPreviousGroupConfigChangeTimeout(int previousGroupConfigChangeTimeout) {
         this.previousGroupConfigChangeTimeout = previousGroupConfigChangeTimeout;
+    }
+
+    public int getNioWorkerThreads() {
+        return nioWorkerThreads;
+    }
+
+    public void setNioWorkerThreads(int nioWorkerThreads) {
+        this.nioWorkerThreads = nioWorkerThreads;
     }
 
 }

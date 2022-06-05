@@ -257,6 +257,20 @@ public class NodeImpl implements Node {
     }
 
     /**
+     * Ensure leader status.
+     *
+     * @throws NotLeaderException if current node isn't a leader
+     */
+    private void ensureLeader() {
+        RoleNameANdLeaderId result = role.getRoleNameANdLeaderId(context.selfId());
+        if (result.getRoleName() == RoleName.LEADER) {
+            return;
+        }
+        NodeEndpoint endpoint = result.getLeaderId() != null ? context.group().findMember(result.getLeaderId()).getEndpoint() : null;
+        throw new NotLeaderException(result.getRoleName(), endpoint);
+    }
+
+    /**
      * Change role.
      *
      * @param newRole new role
@@ -328,7 +342,7 @@ public class NodeImpl implements Node {
      * Source: scheduler.
      * </p>
      */
-    private void electionTimeout() {
+    protected void electionTimeout() {
         context.taskExecutor().submit(this::doProcessElectionTimeout, LOGGING_FUTURE_CALLBACK);
     }
 
@@ -337,7 +351,7 @@ public class NodeImpl implements Node {
      */
     private void doProcessElectionTimeout() {
         if (role.getName() == RoleName.LEADER) {
-            logger.warn("node {}, current role is leader, ignore election timeout", context.selfId());
+            logger.warn("node {} current role is leader, ignore election timeout", context.selfId());
             return;
         }
 
@@ -386,7 +400,7 @@ public class NodeImpl implements Node {
      * Source: scheduler.
      * </p>
      */
-    private void replicateLog() {
+    protected void replicateLog() {
         context.taskExecutor().submit(this::doReplicateLog, LOGGING_FUTURE_CALLBACK);
     }
 
@@ -429,20 +443,6 @@ public class NodeImpl implements Node {
      */
     private void resetReplicatingStates() {
         context.group().resetReplicatingStates(context.log().getNextIndex());
-    }
-
-    /**
-     * Ensure leader status.
-     *
-     * @throws NotLeaderException if current node isn't a leader
-     */
-    private void ensureLeader() {
-        RoleNameANdLeaderId result = role.getRoleNameANdLeaderId(context.selfId());
-        if (result.getRoleName() == RoleName.LEADER) {
-            return;
-        }
-        NodeEndpoint endpoint = result.getLeaderId() != null ? context.group().findMember(result.getLeaderId()).getEndpoint() : null;
-        throw new NotLeaderException(result.getRoleName(), endpoint);
     }
 
     /**

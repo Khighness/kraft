@@ -7,6 +7,9 @@ import javax.annotation.Nonnull;
 
 /**
  * Null scheduler.
+ * <p>
+ * Used to test.
+ * </p>
  *
  * @author KHighness
  * @email parakovo@gmail.com

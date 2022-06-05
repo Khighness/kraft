@@ -67,6 +67,12 @@ public abstract class AbstractNodeRole {
      */
     public abstract RoleState getState();
 
+    /**
+     * Compare role's state.
+     *
+     * @param that role to be compared
+     * @return true if equal, otherwise false
+     */
     public boolean stateEquals(AbstractNodeRole that) {
         if (this.name != that.name || this.term != that.term) {
             return false;
@@ -74,6 +80,12 @@ public abstract class AbstractNodeRole {
         return doStateEquals(that);
     }
 
+    /**
+     * Do compare rols's state.
+     *
+     * @param role role to be compared
+     * @return true if equal, otherwise false
+     */
     protected abstract boolean doStateEquals(AbstractNodeRole role);
 
 }

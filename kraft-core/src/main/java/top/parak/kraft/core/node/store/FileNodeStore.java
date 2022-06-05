@@ -30,6 +30,7 @@ import java.io.IOException;
  * @email parakovo@gmail.com
  */
 public class FileNodeStore implements NodeStore {
+
     /**
      * The name of file used to store node's status.
      */
