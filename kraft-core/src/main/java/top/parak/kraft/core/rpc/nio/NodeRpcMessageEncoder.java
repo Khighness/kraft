@@ -48,7 +48,7 @@ public class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
             RequestVoteResult result = (RequestVoteResult) msg;
             Protos.RequestVoteResult protoResult = Protos.RequestVoteResult.newBuilder()
                     .setTerm(result.getTerm())
-                    .setVoteGranted(result.isVotedGranted())
+                    .setVoteGranted(result.isVoteGranted())
                     .build();
             this.writeMessage(out, MessageConstants.MSG_TYPE_REQUEST_VOTE_RESULT, protoResult);
         } else if (msg instanceof AppendEntriesRpc) {

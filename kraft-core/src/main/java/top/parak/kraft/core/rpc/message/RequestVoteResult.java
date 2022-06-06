@@ -34,7 +34,7 @@ public class RequestVoteResult implements Serializable {
         this.term = term;
     }
 
-    public boolean isVotedGranted() {
+    public boolean isVoteGranted() {
         return votedGranted;
     }
 

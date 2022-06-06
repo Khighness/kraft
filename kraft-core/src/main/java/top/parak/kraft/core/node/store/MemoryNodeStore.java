@@ -44,7 +44,7 @@ public class MemoryNodeStore implements NodeStore {
     }
 
     @Override
-    public void setVotedFor(NodeId nodeId) {
+    public void setVotedFor(NodeId votedFor) {
         this.votedFor = votedFor;
     }
 

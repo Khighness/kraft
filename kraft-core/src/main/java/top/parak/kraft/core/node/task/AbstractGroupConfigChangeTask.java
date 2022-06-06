@@ -29,14 +29,14 @@ public abstract class AbstractGroupConfigChangeTask implements GroupConfigChange
 
     @Override
     public synchronized GroupConfigChangeTaskResult call() throws Exception {
-        logger.debug("task start");
+        logger.debug("start group config change task");
         setState(State.START);
         // append group config log entry
         appendGroupConfig();
         // wait for log append to complete
         setState(State.GROUP_CONFIG_APPENDED);
         wait();
-        logger.debug("task done");
+        logger.debug("done group config change task");
         context.done();
         return mapResult(state);
     }
@@ -51,7 +51,7 @@ public abstract class AbstractGroupConfigChangeTask implements GroupConfigChange
     }
 
     protected void setState(State state) {
-        logger.debug("state -> {}", state);
+        logger.debug("group config change task state -> {}", state);
         this.state = state;
     }
 

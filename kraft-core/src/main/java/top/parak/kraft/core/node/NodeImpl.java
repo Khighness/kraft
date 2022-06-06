@@ -217,6 +217,7 @@ public class NodeImpl implements Node {
     }
 
     @Override
+    @Nonnull
     public GroupConfigChangeTaskReference removeNode(@Nonnull NodeId id) {
         Preconditions.checkNotNull(id);
         ensureLeader();
@@ -362,16 +363,16 @@ public class NodeImpl implements Node {
 
         if (context.group().isStandalone()) {
             if (context.mode() == NodeMode.STANDBY) {
-                logger.info("start with standby mode, skip election");
+                logger.info("node {} start with standby mode, skip election", context.selfId());
             } else {
                 // become leader
-                logger.info("become leader, term {}", newTerm);
+                logger.info("node {} become leader, term {}", context.selfId(), newTerm);
                 resetReplicatingStates();
                 changeToRole(new LeaderNodeRole(newTerm, scheduleLogReplicationTask()));
                 context.log().appendEntry(newTerm);
             }
         } else {
-            logger.info("start election");
+            logger.info("node {} start election", context.selfId());
             changeToRole(new CandidateNodeRole(newTerm, scheduleElectionTimeout()));
 
             // request vote
@@ -413,7 +414,7 @@ public class NodeImpl implements Node {
             context.log().advanceCommitIndex(context.log().getNextIndex() - 1, role.getTerm());
             return;
         }
-        logger.debug("replicate log");
+        logger.debug("leader {} replicate log", context.selfId());
         for (GroupMember member : context.group().listReplicationTarget()) {
             if (member.shouldReplicate(context.config().getLogReplicationReadTimeout())) {
                 doReplicateLog(member, context.config().getMaxReplicationEntries());
@@ -427,7 +428,7 @@ public class NodeImpl implements Node {
      * Do replicate log.
      */
     private void doReplicateLog(GroupMember member, int maxEntries) {
-        member.replicatedNow();
+        member.replicateNow();
         try {
             AppendEntriesRpc rpc = context.log().createAppendEntriesRpc(role.getTerm(), context.selfId(), member.getNextIndex(), maxEntries);
             context.connector().sendAppendEntries(rpc, member.getEndpoint());
@@ -468,7 +469,7 @@ public class NodeImpl implements Node {
     /**
      * Cancel current group config change task.
      */
-    private synchronized void cancelGroupConfigChangeTask() {
+    protected synchronized void cancelGroupConfigChangeTask() {
         if (groupConfigChangeTaskHolder.isEmpty()) {
             return;
         }
@@ -591,7 +592,7 @@ public class NodeImpl implements Node {
         }
 
         // do nothing if not vote granted
-        if (!result.isVotedGranted()) {
+        if (!result.isVoteGranted()) {
             return;
         }
 
@@ -639,7 +640,7 @@ public class NodeImpl implements Node {
             return new AppendEntriesResult(rpc.getMessageId(), role.getTerm(), false);
         }
 
-        //step down if rpc term ifs larger than current term
+        // step down if rpc term is larger than current term
         if (rpc.getTerm() > role.getTerm()) {
             becomeFollower(rpc.getTerm(), null, rpc.getLeaderId(), true);
             return new AppendEntriesResult(rpc.getMessageId(), rpc.getTerm(), appendEntries(rpc));
@@ -653,7 +654,7 @@ public class NodeImpl implements Node {
             case CANDIDATE:
                 // more than one candidate but another node won the election
                 becomeFollower(rpc.getTerm(), null, rpc.getLeaderId(), true);
-                return new AppendEntriesResult(rpc.getMessageId(), rpc.getTerm(), false);
+                return new AppendEntriesResult(rpc.getMessageId(), rpc.getTerm(), appendEntries(rpc));
             case FOLLOWER:
                 // reset election timeout and append entries
                 becomeFollower(rpc.getTerm(), ((FollowerNodeRole) role).getVotedFor(), rpc.getLeaderId(), true);
@@ -667,7 +668,7 @@ public class NodeImpl implements Node {
      * Append entries and advance commit index if possible.
      *
      * @param rpc append entries rpc
-     * @return true if lg appended, false if previous log check failed
+     * @return true if log appended, false if previous log check failed
      */
     private boolean appendEntries(AppendEntriesRpc rpc) {
         boolean result = context.log().appendEntriesFromLeader(rpc.getPrevLogIndex(), rpc.getPrevLogTerm(), rpc.getEntries());
@@ -688,6 +689,19 @@ public class NodeImpl implements Node {
                 () -> doProcessAppendEntriesResult(resultMessage),
                 LOGGING_FUTURE_CALLBACK
         );
+    }
+
+    /**
+     * Receive {@link AppendEntriesResultMessage} and return future.
+     * <p>
+     * Used to test.
+     * </p>
+     *
+     * @param resultMessage append entries result message
+     * @return future
+     */
+    protected Future<?> processAppendEntriesResult(AppendEntriesResultMessage resultMessage) {
+        return context.taskExecutor().submit(() -> doProcessAppendEntriesResult(resultMessage));
     }
 
     /**
@@ -864,7 +878,7 @@ public class NodeImpl implements Node {
      * @param event group config entry from leader append event
      */
     @Subscribe
-    public void obGroupConfigEntryFromLeaderAppend(GroupConfigEntryFromLeaderAppendEvent event) {
+    public void onGroupConfigEntryFromLeaderAppend(GroupConfigEntryFromLeaderAppendEvent event) {
         context.taskExecutor().submit(() -> {
             GroupConfigEntry entry = event.getEntry();
             if (entry.getKind() == Entry.KIND_REMOVE_NODE

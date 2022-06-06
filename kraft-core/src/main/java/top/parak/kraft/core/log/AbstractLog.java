@@ -107,7 +107,7 @@ abstract class AbstractLog implements Log {
         } else {
             // (1) if entry sequence is empty,
             //     snapshot.lastIncludedIndex + 1 == nextLogIndex
-            //     So it has been rejected at the first line.
+            //     so it has been rejected at the first line.
             //
             // (2) if entry sequence is not empty,
             //     snapshot.lastIncludedIndex + 1 < nextIndex <= nextLogIndex
@@ -117,7 +117,7 @@ abstract class AbstractLog implements Log {
             //     firstLogIndex < nextLogIndex <= lastLogIndex + 1
             //     firstLogIndex + 1 <= nextLogIndex <= lastLogIndex + 1
             //     firstLogIndex <= nextLogIndex - 1 <= lastLogIndex
-            //     So it is ok to get entry without null check
+            //     so it is ok to get entry without null check
             Entry entry = entrySequence.getEntry(nextIndex - 1);
             assert entry != null;
             rpc.setPrevLogIndex(entry.getIndex());

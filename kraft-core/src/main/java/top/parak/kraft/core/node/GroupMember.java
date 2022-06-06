@@ -50,6 +50,10 @@ public class GroupMember {
         this.replicatingState = replicatingState;
     }
 
+    public boolean isReplicationStateSet() {
+        return replicatingState != null;
+    }
+
     public boolean isMajor() {
         return major;
     }
@@ -97,7 +101,7 @@ public class GroupMember {
         return ensureReplicatingState().backOffNextIndex();
     }
 
-    public void replicatedNow() {
+    public void replicateNow() {
         replicateAt(System.currentTimeMillis());
     }
 

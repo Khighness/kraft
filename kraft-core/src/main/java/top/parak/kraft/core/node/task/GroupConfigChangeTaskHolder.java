@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 @Immutable
 public class GroupConfigChangeTaskHolder {
 
-    private static final Logger logger = LoggerFactory.getLogger(GroupConfigChangeTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(GroupConfigChangeTaskHolder.class);
     private final GroupConfigChangeTask task;
     private final GroupConfigChangeTaskReference reference;
 

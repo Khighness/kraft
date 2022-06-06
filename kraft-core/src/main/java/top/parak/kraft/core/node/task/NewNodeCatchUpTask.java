@@ -73,7 +73,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
         }
         logger.debug("node {} done catch up task", nodeId);
         context.done(this);
-        return null;
+        return mapResult(state);
     }
 
     private NewNodeCatchUpTaskResult mapResult(State state) {
@@ -88,7 +88,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
     }
 
     private void setState(State state) {
-        logger.debug("node {} state -> {}", nodeId, state);
+        logger.debug("node {} catch up state -> {}", nodeId, state);
         this.state = state;
     }
 

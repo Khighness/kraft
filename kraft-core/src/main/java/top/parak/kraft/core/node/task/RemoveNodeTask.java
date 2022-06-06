@@ -32,6 +32,16 @@ public class RemoveNodeTask extends AbstractGroupConfigChangeTask {
     }
 
     @Override
+    public synchronized void onLogCommitted() {
+        if (state != State.GROUP_CONFIG_APPENDED) {
+            throw new IllegalStateException("log committed before log appended");
+        }
+        setState(State.GROUP_CONFIG_COMMITTED);
+        context.removeNode(nodeId);
+        notify();
+    }
+
+    @Override
     public String toString() {
         return "RemoveNodeTask{" +
                 "nodeId=" + nodeId +
