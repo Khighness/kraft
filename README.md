@@ -22,3 +22,8 @@ A distributed KV based on [raft](https://raft.github.io/raft.pdf) protocol.
 ## core architecture
 
 ![kraft-core-architecture](images/kraft-core-architecture.png)
+
+
+## mit license
+
+Khighness's kraft is open-sourced software licensed under the [MIT license](https://github.com/Khighness/kraft/blob/master/LICENSE).
