@@ -4,7 +4,7 @@ A distributed KV based on [raft](https://raft.github.io/raft.pdf) protocol.
 
 
 
-## completed feature
+## Completed Feature
 
 - [x] leader election
 - [x] append log entry
@@ -19,11 +19,12 @@ A distributed KV based on [raft](https://raft.github.io/raft.pdf) protocol.
 
 
 
-## core architecture
+## Core Architecture
 
 ![kraft-core-architecture](images/kraft-core-architecture.png)
 
 
-## mit license
 
-Khighness's kraft is open-sourced software licensed under the [MIT license](https://github.com/Khighness/kraft/blob/master/LICENSE).
+## Mit License
+
+Khighness's kraft is open-sourced system licensed under the [MIT license](https://github.com/Khighness/kraft/blob/master/LICENSE).
