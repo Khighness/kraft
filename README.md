@@ -21,8 +21,9 @@ A distributed KV based on [raft](https://raft.github.io/raft.pdf) protocol.
 
 ## Core Architecture
 
-![kraft-core-architecture](images/kraft-core-architecture.png)
-
+<p align="center">
+<img src="images/kraft-core-architecture.png" alt="kraft-core-architecture" />
+</p>
 
 
 ## Mit License
