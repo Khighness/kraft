@@ -1,58 +1,52 @@
 package top.parak.kraft.core.node.config;
 
 import top.parak.kraft.core.log.Log;
+import top.parak.kraft.core.node.NodeBuilder;
 
 /**
  * Node configuration.
  * <p>
- * Node configuration should not change after initialization.
+ * Node configuration should not change after initialization. e.g {@link NodeBuilder}.
  * </p>
- *
- * @author KHighness
- * @since 2022-03-19
- * @email parakovo@gmail.com
  */
 public class NodeConfig {
 
     /**
-     * Minimum election timeout.
+     * Minimum election timeout
      */
     private int minElectionTimeout = 3000;
 
     /**
-     * Maximum election timeout.
+     * Maximum election timeout
      */
-    private int maxElectionTimeout = 6000;
+    private int maxElectionTimeout = 4000;
 
     /**
-     * Delay for first log replication after becoming leader.
+     * Delay for first log replication after becoming leader
      */
     private int logReplicationDelay = 0;
 
     /**
      * Interval for log replication task.
-     * <p>
      * More specifically, interval for heartbeat rpc.
-     * Append entries rpc maybe less than this interval.
-     * </p>
+     * Append entries rpc may be sent less than this interval.
+     * e.g after receiving append entries result from followers.
      */
     private int logReplicationInterval = 1000;
 
     /**
      * Read timeout to receive response from follower.
-     * <p>
      * If no response received from follower, resend log replication rpc.
-     * </p>
      */
     private int logReplicationReadTimeout = 900;
 
     /**
-     * Max entries to send when replicating log to followers
+     * Max entries to send when replicate log to followers
      */
     private int maxReplicationEntries = Log.ALL_ENTRIES;
 
     /**
-     * Max entries to send when replicating log to new node.
+     * Max entries to send when replicate log to new node
      */
     private int maxReplicationEntriesForNewNode = Log.ALL_ENTRIES;
 
@@ -62,41 +56,33 @@ public class NodeConfig {
     private int snapshotDataLength = 1024;
 
     /**
+     * Worker thread count in nio connector.
+     */
+    private int nioWorkerThreads = 0;
+
+    /**
      * Max round for new node to catch up.
      */
     private int newNodeMaxRound = 10;
 
     /**
-     * Read timeout to receive response form new node.
-     * <p>
-     * Default is election timeout.
-     * </p>
+     * Read timeout to receive response from new node.
+     * Default to election timeout.
      */
     private int newNodeReadTimeout = 3000;
 
     /**
      * Timeout for new node to make progress.
-     * <p>
-     * If new node cannot make progress after this timeout, it cannot be added to group and reply TIMEOUT.
-     * </p>
-     * <p>
-     * Default to election timeout.
-     * </p>
+     * If new node cannot make progress after this timeout, new node cannot be added and reply TIMEOUT.
+     * Default to election timeout
      */
     private int newNodeAdvanceTimeout = 3000;
 
     /**
      * Timeout to wait for previous group config change to complete.
-     * <p>
      * Default is {@code 0}, forever.
-     * </p>
      */
     private int previousGroupConfigChangeTimeout = 0;
-
-    /**
-     * Worker thread count in nio connector.
-     */
-    private int nioWorkerThreads = 0;
 
     public int getMinElectionTimeout() {
         return minElectionTimeout;
@@ -162,6 +148,14 @@ public class NodeConfig {
         this.snapshotDataLength = snapshotDataLength;
     }
 
+    public int getNioWorkerThreads() {
+        return nioWorkerThreads;
+    }
+
+    public void setNioWorkerThreads(int nioWorkerThreads) {
+        this.nioWorkerThreads = nioWorkerThreads;
+    }
+
     public int getNewNodeMaxRound() {
         return newNodeMaxRound;
     }
@@ -178,14 +172,6 @@ public class NodeConfig {
         this.newNodeReadTimeout = newNodeReadTimeout;
     }
 
-    public int getNewNodeAdvanceTimeout() {
-        return newNodeAdvanceTimeout;
-    }
-
-    public void setNewNodeAdvanceTimeout(int newNodeAdvanceTimeout) {
-        this.newNodeAdvanceTimeout = newNodeAdvanceTimeout;
-    }
-
     public int getPreviousGroupConfigChangeTimeout() {
         return previousGroupConfigChangeTimeout;
     }
@@ -194,12 +180,12 @@ public class NodeConfig {
         this.previousGroupConfigChangeTimeout = previousGroupConfigChangeTimeout;
     }
 
-    public int getNioWorkerThreads() {
-        return nioWorkerThreads;
+    public int getNewNodeAdvanceTimeout() {
+        return newNodeAdvanceTimeout;
     }
 
-    public void setNioWorkerThreads(int nioWorkerThreads) {
-        this.nioWorkerThreads = nioWorkerThreads;
+    public void setNewNodeAdvanceTimeout(int newNodeAdvanceTimeout) {
+        this.newNodeAdvanceTimeout = newNodeAdvanceTimeout;
     }
 
 }

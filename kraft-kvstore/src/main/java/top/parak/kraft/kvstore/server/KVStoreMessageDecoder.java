@@ -31,12 +31,10 @@ public class KVStoreMessageDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (in.readableBytes() < 8) {
-            return;
-        }
+        if (in.readableBytes() < 8) return;
 
         in.markReaderIndex();
-        int massageType = in.readInt();
+        int messageType = in.readInt();
         int messageLength = in.readInt();
         if (in.readableBytes() < messageLength) {
             in.resetReaderIndex();
@@ -45,7 +43,7 @@ public class KVStoreMessageDecoder extends ByteToMessageDecoder {
 
         byte[] message = new byte[messageLength];
         in.readBytes(message);
-        switch (massageType) {
+        switch (messageType) {
             case MessageConstants.MSG_TYPE_SUCCESS:
                 out.add(Success.INSTANCE);
                 break;
@@ -58,12 +56,12 @@ public class KVStoreMessageDecoder extends ByteToMessageDecoder {
                 out.add(new Redirect(protoRedirect.getLeaderId()));
                 break;
             case MessageConstants.MSG_TYPE_ADD_SERVER_COMMAND:
-                Protos.AddNodeCommand protoAddNodeCommand = Protos.AddNodeCommand.parseFrom(message);
-                out.add(new AddNodeCommand(protoAddNodeCommand.getNodeId(), protoAddNodeCommand.getHost(), protoAddNodeCommand.getPort()));
+                Protos.AddNodeCommand protoAddServerCommand = Protos.AddNodeCommand.parseFrom(message);
+                out.add(new AddNodeCommand(protoAddServerCommand.getNodeId(), protoAddServerCommand.getHost(), protoAddServerCommand.getPort()));
                 break;
             case MessageConstants.MSG_TYPE_REMOVE_SERVER_COMMAND:
-                Protos.RemoveNodeCommand protoRemoveNodeCommand = Protos.RemoveNodeCommand.parseFrom(message);
-                out.add(new RemoveNodeCommand(protoRemoveNodeCommand.getNodeId()));
+                Protos.RemoveNodeCommand protoRemoveServerCommand = Protos.RemoveNodeCommand.parseFrom(message);
+                out.add(new RemoveNodeCommand(protoRemoveServerCommand.getNodeId()));
                 break;
             case MessageConstants.MSG_TYPE_GET_COMMAND:
                 Protos.GetCommand protoGetCommand = Protos.GetCommand.parseFrom(message);
@@ -78,7 +76,7 @@ public class KVStoreMessageDecoder extends ByteToMessageDecoder {
                 out.add(new SetCommand(protoSetCommand.getKey(), protoSetCommand.getValue().toByteArray()));
                 break;
             default:
-                throw new IllegalStateException("unexpected message type: " + massageType);
+                throw new IllegalStateException("unexpected message type " + messageType);
         }
     }
 

@@ -3,7 +3,7 @@ package top.parak.kraft.kvstore.client.cmd;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * KVStoreSet command.
+ * <code>kvstore-set</code> command.
  *
  * @author KHighness
  * @since 2022-05-30
@@ -18,16 +18,11 @@ public class KVStoreSetCommand implements Command {
 
     @Override
     public void execute(String arguments, CommandContext context) {
-        String[] pieces = arguments.split("\\s");
-        if (pieces.length != 2) {
+        int index = arguments.indexOf(' ');
+        if (index <= 0 || index == arguments.length() - 1) {
             throw new IllegalArgumentException("usage: " + getName() + " <key> <value>");
         }
-
-        String key = pieces[0];
-        String value = pieces[1];
-
-        byte[] valueBytes = value.getBytes();
-        context.getClient().set(key, valueBytes);
+        context.getClient().set(arguments.substring(0, index), arguments.substring(index + 1).getBytes());
     }
 
 }

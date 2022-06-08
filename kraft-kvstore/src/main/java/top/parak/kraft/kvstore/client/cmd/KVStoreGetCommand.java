@@ -4,7 +4,7 @@ import top.parak.kraft.core.service.NoAvailableServerException;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * KVStoreGet command.
+ * <code>kvstore-get</code> command.
  *
  * @author KHighness
  * @since 2022-05-30
@@ -20,9 +20,8 @@ public class KVStoreGetCommand implements Command {
     @Override
     public void execute(String arguments, CommandContext context) {
         if (arguments.isEmpty()) {
-            throw new IllegalArgumentException("Usage: " + getName() + "  <key>");
+            throw new IllegalArgumentException("usage: " + getName() + " <key>");
         }
-
 
         byte[] valueBytes;
         try {

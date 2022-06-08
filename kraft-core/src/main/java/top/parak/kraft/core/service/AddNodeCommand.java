@@ -2,11 +2,6 @@ package top.parak.kraft.core.service;
 
 import top.parak.kraft.core.node.NodeEndpoint;
 
-/**
- * @author KHighness
- * @since 2022-03-30
- * @email parakovo@gmail.com
- */
 public class AddNodeCommand {
 
     private final String nodeId;

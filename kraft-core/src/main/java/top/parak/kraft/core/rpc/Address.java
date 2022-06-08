@@ -1,14 +1,12 @@
 package top.parak.kraft.core.rpc;
 
+import com.google.common.base.Preconditions;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Node address.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
+ * Address.
  */
 @Immutable
 public class Address {
@@ -17,12 +15,13 @@ public class Address {
     private final int port;
 
     /**
-     * Create Address.
+     * Create.
      *
      * @param host host
      * @param port port
      */
-    public Address(@Nonnull  String host, int port) {
+    public Address(@Nonnull String host, int port) {
+        Preconditions.checkNotNull(host);
         this.host = host;
         this.port = port;
     }
@@ -32,6 +31,7 @@ public class Address {
      *
      * @return host
      */
+    @Nonnull
     public String getHost() {
         return host;
     }

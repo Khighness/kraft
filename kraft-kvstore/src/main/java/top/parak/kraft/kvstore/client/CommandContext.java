@@ -15,14 +15,28 @@ import java.util.Map;
  */
 public class CommandContext {
 
+    /**
+     * Map to store server' id and address.
+     * <p>
+     * Key: {@link NodeId}, Value: {@link Address}.
+     * </p>
+     */
     private final Map<NodeId, Address> serverMap;
+    /**
+     * KV-store client.
+     */
     private KVStoreClient client;
+    /**
+     * Running status.
+     */
     private boolean running = false;
 
     /**
-     * Create CommandContext.
+     * Command context.
      *
-     * @param serverMap server map
+     * @author KHighness
+     * @since 2022-05-29
+     * @email parakovo@gmail.com
      */
     public CommandContext(Map<NodeId, Address> serverMap) {
         this.serverMap = serverMap;
@@ -30,12 +44,12 @@ public class CommandContext {
     }
 
     private ServerRouter buildServerRouter(Map<NodeId, Address> serverMap) {
-        ServerRouter serverRouter = new ServerRouter();
+        ServerRouter router = new ServerRouter();
         for (NodeId nodeId : serverMap.keySet()) {
             Address address = serverMap.get(nodeId);
-            serverRouter.add(nodeId, new KVStoreClientSocketChannel(address.getHost(), address.getPort()));
+            router.add(nodeId, new KVStoreClientSocketChannel(address.getHost(), address.getPort()));
         }
-        return serverRouter;
+        return router;
     }
 
     /**
@@ -57,28 +71,19 @@ public class CommandContext {
     }
 
     /**
-     * Get leader.
-     *
-     * @return leader
-     */
-    public NodeId getClientLeader() {
-        return client.getServerRouter().getLeaderId();
-    }
-
-    /**
-     * Set leader.
+     * Set leader's id.
      *
      * @param nodeId leader's id.
      */
-    public void setClientLeader(NodeId nodeId) {
+    public void setClientLeaderId(NodeId nodeId) {
         client.getServerRouter().setLeaderId(nodeId);
     }
 
     /**
      * Add KVStoreServer.
      *
-     * @param nodeId node's id
-     * @param host   node's host
+     * @param nodeId      node's id
+     * @param host        node's host
      * @param servicePort node's KV service port
      */
     public void clientAddServer(String nodeId, String host, int servicePort) {
@@ -111,7 +116,7 @@ public class CommandContext {
     }
 
     /**
-     * Get running status
+     * Get running status.
      *
      * @return running
      */
@@ -122,7 +127,7 @@ public class CommandContext {
     /**
      * Print server list.
      */
-    public void printServerList() {
+    public void printSeverList() {
         for (NodeId nodeId : serverMap.keySet()) {
             Address address = serverMap.get(nodeId);
             System.out.println(nodeId + "," + address.getHost() + "," + address.getPort());

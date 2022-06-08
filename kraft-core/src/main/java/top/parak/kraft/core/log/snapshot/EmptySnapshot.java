@@ -9,13 +9,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 
-/**
- * Empty snapshot.
- *
- * @author KHighness
- * @since 2022-04-06
- * @email parakovo@gmail.com
- */
 @Immutable
 public class EmptySnapshot implements Snapshot {
 
@@ -41,6 +34,7 @@ public class EmptySnapshot implements Snapshot {
     }
 
     @Override
+    @Nonnull
     public SnapshotChunk readData(int offset, int length) {
         if (offset == 0) {
             return new SnapshotChunk(new byte[0], true);
@@ -48,15 +42,14 @@ public class EmptySnapshot implements Snapshot {
         throw new IllegalArgumentException("offset > 0");
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public InputStream getDataStream() {
         return new ByteArrayInputStream(new byte[0]);
     }
 
     @Override
     public void close() {
-        // it seems nothing to do
     }
 
 }

@@ -2,7 +2,6 @@ package top.parak.kraft.kvstore.server;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,40 +26,35 @@ import top.parak.kraft.kvstore.message.SetCommand;
  */
 public class KVStoreServerHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChannelInboundHandlerAdapter.class);
+    private static final Logger logger = LoggerFactory.getLogger(KVStoreServerHandler.class);
 
-    private final KVStoreServerService service;
+    private final KVStoreServerService KVStoreServerService;
 
-    public KVStoreServerHandler(KVStoreServerService service) {
-        this.service = service;
+    public KVStoreServerHandler(KVStoreServerService KVStoreServerService) {
+        this.KVStoreServerService = KVStoreServerService;
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        try {
-            if (msg instanceof AddNodeCommand) {
-                service.addNode(new CommandRequest<>((AddNodeCommand) msg, ctx.channel()));
-            } else if (msg instanceof RemoveNodeCommand) {
-                service.removeNode(new CommandRequest<>((RemoveNodeCommand) msg, ctx.channel()));
-            } else if (msg instanceof GetCommand) {
-                service.get(new CommandRequest<>((GetCommand) msg, ctx.channel()));
-            } else if (msg instanceof SetCommand) {
-                service.set(new CommandRequest<>((SetCommand) msg, ctx.channel()));
-            }
-        } finally {
-            // Ensure that ByteBuf is released, otherwise there maybe memory leaks
-            ReferenceCountUtil.release(msg);
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        if (msg instanceof AddNodeCommand) {
+            KVStoreServerService.addNode(new CommandRequest<>((AddNodeCommand) msg, ctx.channel()));
+        } else if (msg instanceof RemoveNodeCommand) {
+            KVStoreServerService.removeNode(new CommandRequest<>((RemoveNodeCommand) msg, ctx.channel()));
+        } else if (msg instanceof GetCommand) {
+            KVStoreServerService.get(new CommandRequest<>((GetCommand) msg, ctx.channel()));
+        } else if (msg instanceof SetCommand) {
+            KVStoreServerService.set(new CommandRequest<>((SetCommand) msg, ctx.channel()));
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        logger.info("kv-store client {} connected", ctx.channel().remoteAddress().toString());
+        logger.info("kv-store client [{}] connected", ctx.channel().remoteAddress().toString());
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("kv-store client connect exception: {}", cause.getMessage());
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("kv-store client [{}] occurs exception: {}", ctx.channel().remoteAddress().toString(), cause.getMessage());
         ctx.close();
     }
 

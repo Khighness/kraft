@@ -1,9 +1,6 @@
 package top.parak.kraft.core.log;
 
 import com.google.common.eventbus.EventBus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import top.parak.kraft.core.log.entry.*;
 import top.parak.kraft.core.log.event.GroupConfigEntryBatchRemovedEvent;
 import top.parak.kraft.core.log.event.GroupConfigEntryCommittedEvent;
@@ -19,67 +16,33 @@ import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.AppendEntriesRpc;
 import top.parak.kraft.core.rpc.message.InstallSnapshotRpc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Abstract log.
- *
- * @author KHighness
- * @since 2022-04-01
- * @email parakovo@gmail.com
- */
 abstract class AbstractLog implements Log {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractLog.class);
 
-    /**
-     * Event bus.
-     */
     protected final EventBus eventBus;
-    /**
-     * Snapshot.
-     */
     protected Snapshot snapshot;
-    /**
-     * Entry sequence.
-     */
     protected EntrySequence entrySequence;
-    /**
-     * Snapshot builder.
-     */
+
     protected SnapshotBuilder snapshotBuilder = new NullSnapshotBuilder();
-    /**
-     * Membership-change entry list.
-     */
     protected GroupConfigEntryList groupConfigEntryList = new GroupConfigEntryList();
-    /**
-     * Context of state machine.
-     */
     private final StateMachineContext stateMachineContext = new StateMachineContextImpl();
-    /**
-     * State machine.
-     */
     protected StateMachine stateMachine = new EmptyStateMachine();
-    /**
-     * commitIndex.
-     */
     protected int commitIndex = 0;
 
-    /**
-     * Create AbstractLog.
-     *
-     * @param eventBus event bus
-     */
     AbstractLog(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public EntryMeta getLastEntryMeta() {
         if (entrySequence.isEmpty()) {
             return new EntryMeta(Entry.KIND_NO_OP, snapshot.getLastIncludedIndex(), snapshot.getLastIncludedTerm());
@@ -105,19 +68,18 @@ abstract class AbstractLog implements Log {
             rpc.setPrevLogIndex(snapshot.getLastIncludedIndex());
             rpc.setPrevLogTerm(snapshot.getLastIncludedTerm());
         } else {
-            // (1) if entry sequence is empty,
-            //     snapshot.lastIncludedIndex + 1 == nextLogIndex
-            //     so it has been rejected at the first line.
+            // if entry sequence is empty,
+            // snapshot.lastIncludedIndex + 1 == nextLogIndex,
+            // so it has been rejected at the first line.
             //
-            // (2) if entry sequence is not empty,
-            //     snapshot.lastIncludedIndex + 1 < nextIndex <= nextLogIndex
-            //     snapshot.lastIncludedIndex + 1 = firstLogIndex
+            // if entry sequence is not empty,
+            // snapshot.lastIncludedIndex + 1 < nextIndex <= nextLogIndex
+            // and snapshot.lastIncludedIndex + 1 = firstLogIndex
             //     nextLogIndex = lastLogIndex + 1
-            //     then
-            //     firstLogIndex < nextLogIndex <= lastLogIndex + 1
-            //     firstLogIndex + 1 <= nextLogIndex <= lastLogIndex + 1
-            //     firstLogIndex <= nextLogIndex - 1 <= lastLogIndex
-            //     so it is ok to get entry without null check
+            // then firstLogIndex < nextIndex <= lastLogIndex + 1
+            //      firstLogIndex + 1 <= nextIndex <= lastLogIndex + 1
+            //      firstLogIndex <= nextIndex - 1 <= lastLogIndex
+            // it is ok to get entry without null check
             Entry entry = entrySequence.getEntry(nextIndex - 1);
             assert entry != null;
             rpc.setPrevLogIndex(entry.getIndex());
@@ -148,7 +110,6 @@ abstract class AbstractLog implements Log {
         return rpc;
     }
 
-    @Nullable
     @Override
     public GroupConfigEntry getLastUncommittedGroupConfigEntry() {
         GroupConfigEntry lastEntry = groupConfigEntryList.getLast();
@@ -168,7 +129,7 @@ abstract class AbstractLog implements Log {
     @Override
     public boolean isNewerThan(int lastLogIndex, int lastLogTerm) {
         EntryMeta lastEntryMeta = getLastEntryMeta();
-        logger.debug("last entry ({}, {}), leader ({}, {})", lastEntryMeta.getIndex(), lastEntryMeta.getTerm(), lastLogIndex, lastLogTerm);
+        logger.debug("last entry ({}, {}), candidate ({}, {})", lastEntryMeta.getIndex(), lastEntryMeta.getTerm(), lastLogIndex, lastLogTerm);
         return lastEntryMeta.getTerm() > lastLogTerm || lastEntryMeta.getIndex() > lastLogIndex;
     }
 
@@ -204,16 +165,16 @@ abstract class AbstractLog implements Log {
 
     @Override
     public boolean appendEntriesFromLeader(int prevLogIndex, int prevLogTerm, List<Entry> leaderEntries) {
-        // check previous log's index and term
+        // check previous log
         if (!checkIfPreviousLogMatches(prevLogIndex, prevLogTerm)) {
             return false;
         }
-        // if leaderEntries is null, if represents heart-beat
+        // heartbeat
         if (leaderEntries.isEmpty()) {
             return true;
         }
         assert prevLogIndex + 1 == leaderEntries.get(0).getIndex();
-        EntrySequenceView newEntries = removedUnmatchedLog(new EntrySequenceView(leaderEntries));
+        EntrySequenceView newEntries = removeUnmatchedLog(new EntrySequenceView(leaderEntries));
         appendEntriesFromLeader(newEntries);
         return true;
     }
@@ -231,39 +192,13 @@ abstract class AbstractLog implements Log {
     private void appendEntryFromLeader(Entry leaderEntry) {
         entrySequence.append(leaderEntry);
         if (leaderEntry instanceof GroupConfigEntry) {
-            eventBus.post(new GroupConfigEntryFromLeaderAppendEvent((GroupConfigEntry) leaderEntry));
+            eventBus.post(new GroupConfigEntryFromLeaderAppendEvent(
+                    (GroupConfigEntry) leaderEntry)
+            );
         }
     }
 
-    private boolean checkIfPreviousLogMatches(int prevLogIndex, int prevLogTerm) {
-        int lastIncludedIndex = snapshot.getLastIncludedIndex();
-        if (prevLogIndex < lastIncludedIndex) {
-            logger.debug("previous log index {} < snapshot's last included index {}", prevLogIndex, lastIncludedIndex);
-            return false;
-        }
-        if (prevLogIndex == lastIncludedIndex) {
-            int lastIncludedTerm = snapshot.getLastIncludedTerm();
-            if (prevLogTerm != lastIncludedTerm) {
-                logger.debug("previous log index matches snapshot's last included index " +
-                        "but term not matches (expected {}, actual {})", lastIncludedTerm, prevLogTerm);
-                return false;
-            }
-            return true;
-        }
-        Entry entry = entrySequence.getEntry(prevLogIndex);
-        if (entry == null) {
-            logger.debug("previous log {} not found", prevLogIndex);
-            return false;
-        }
-        int term = entry.getTerm();
-        if (term != prevLogTerm) {
-            logger.debug("different term of previous log, local {}, remote {}", term, prevLogTerm);
-            return false;
-        }
-        return true;
-    }
-
-    private EntrySequenceView removedUnmatchedLog(EntrySequenceView leaderEntries) {
+    private EntrySequenceView removeUnmatchedLog(EntrySequenceView leaderEntries) {
         assert !leaderEntries.isEmpty();
         int firstUnmatched = findFirstUnmatchedLog(leaderEntries);
         removeEntriesAfter(firstUnmatched - 1);
@@ -282,6 +217,34 @@ abstract class AbstractLog implements Log {
             }
         }
         return leaderEntries.getLastLogIndex() + 1;
+    }
+
+    private boolean checkIfPreviousLogMatches(int prevLogIndex, int prevLogTerm) {
+        int lastIncludedIndex = snapshot.getLastIncludedIndex();
+        if (prevLogIndex < lastIncludedIndex) {
+            logger.debug("previous log index {} < snapshot's last included index {}", prevLogIndex, lastIncludedIndex);
+            return false;
+        }
+        if (prevLogIndex == lastIncludedIndex) {
+            int lastIncludedTerm = snapshot.getLastIncludedTerm();
+            if (prevLogTerm != lastIncludedTerm) {
+                logger.debug("previous log index matches snapshot's last included index, " +
+                        "but term not (expected {}, actual {})", lastIncludedTerm, prevLogTerm);
+                return false;
+            }
+            return true;
+        }
+        Entry entry = entrySequence.getEntry(prevLogIndex);
+        if (entry == null) {
+            logger.debug("previous log {} not found", prevLogIndex);
+            return false;
+        }
+        int term = entry.getTerm();
+        if (term != prevLogTerm) {
+            logger.debug("different term of previous log, local {}, remote {}", term, prevLogTerm);
+            return false;
+        }
+        return true;
     }
 
     private void removeEntriesAfter(int index) {
@@ -307,8 +270,38 @@ abstract class AbstractLog implements Log {
         }
     }
 
-    private boolean isApplicable(Entry entry) {
-        return entry.getKind() == Entry.KIND_GENERAL;
+    @Override
+    public void advanceCommitIndex(int newCommitIndex, int currentTerm) {
+        if (!validateNewCommitIndex(newCommitIndex, currentTerm)) {
+            return;
+        }
+        logger.debug("advance commit index from {} to {}", commitIndex, newCommitIndex);
+        entrySequence.commit(newCommitIndex);
+        groupConfigsCommitted(newCommitIndex);
+        commitIndex = newCommitIndex;
+
+        advanceApplyIndex();
+    }
+
+    @Override
+    public void generateSnapshot(int lastIncludedIndex, Set<NodeEndpoint> groupConfig) {
+        logger.info("generate snapshot, last included index {}", lastIncludedIndex);
+        EntryMeta lastAppliedEntryMeta = entrySequence.getEntryMeta(lastIncludedIndex);
+        replaceSnapshot(generateSnapshot(lastAppliedEntryMeta, groupConfig));
+    }
+
+    private void advanceApplyIndex() {
+        // start up and snapshot exists
+        int lastApplied = stateMachine.getLastApplied();
+        int lastIncludedIndex = snapshot.getLastIncludedIndex();
+        if (lastApplied == 0 && lastIncludedIndex > 0) {
+            assert commitIndex >= lastIncludedIndex;
+            applySnapshot(snapshot);
+            lastApplied = lastIncludedIndex;
+        }
+        for (Entry entry : entrySequence.subList(lastApplied + 1, commitIndex + 1)) {
+            applyEntry(entry);
+        }
     }
 
     private void applySnapshot(Snapshot snapshot) {
@@ -320,16 +313,21 @@ abstract class AbstractLog implements Log {
         }
     }
 
-    @Override
-    public void advanceCommitIndex(int newCommitIndex, int currentTerm) {
-        if (!validateNewCommitIndex(newCommitIndex, currentTerm)) {
-            return;
+    private void applyEntry(Entry entry) {
+        // skip no-op entry and membership-change entry
+        if (isApplicable(entry)) {
+            stateMachine.applyLog(stateMachineContext, entry.getIndex(), entry.getCommandBytes(), entrySequence.getFirstLogIndex());
         }
-        logger.debug("advance commit index from {} to {}", commitIndex, newCommitIndex);
-        entrySequence.commit(newCommitIndex);
-        groupConfigsCommitted(newCommitIndex);
-        commitIndex = newCommitIndex;
-        advanceApplyIndex();
+    }
+
+    private boolean isApplicable(Entry entry) {
+        return entry.getKind() == Entry.KIND_GENERAL;
+    }
+
+    private void groupConfigsCommitted(int newCommitIndex) {
+        for (GroupConfigEntry groupConfigEntry : groupConfigEntryList.subList(commitIndex + 1, newCommitIndex + 1)) {
+            eventBus.post(new GroupConfigEntryCommittedEvent(groupConfigEntry));
+        }
     }
 
     private boolean validateNewCommitIndex(int newCommitIndex, int currentTerm) {
@@ -348,31 +346,7 @@ abstract class AbstractLog implements Log {
         return true;
     }
 
-    private void groupConfigsCommitted(int newCommitIndex) {
-        for (GroupConfigEntry groupConfigEntry : groupConfigEntryList.subList(commitIndex + 1, newCommitIndex + 1)) {
-            eventBus.post(new GroupConfigEntryCommittedEvent(groupConfigEntry));
-        }
-    }
-
-    private void advanceApplyIndex() {
-        int lastApplied = stateMachine.getLastApplied();
-        int lastIncludedIndex = snapshot.getLastIncludedIndex();
-        if (lastApplied == 0 && lastIncludedIndex > 0) {
-            assert commitIndex >= lastIncludedIndex;
-            applySnapshot(snapshot);
-            lastApplied = lastIncludedIndex;
-        }
-        for (Entry entry : entrySequence.subList(lastApplied + 1, commitIndex + 1)) {
-            applyEntry(entry);
-        }
-    }
-
-    private void applyEntry(Entry entry) {
-        // skip no-operation entry and membership-change entry
-        if (isApplicable(entry)) {
-            stateMachine.applyLog(stateMachineContext, entry.getIndex(), entry.getCommandBytes(), entrySequence.getFirstLogIndex());
-        }
-    }
+    protected abstract Snapshot generateSnapshot(EntryMeta lastAppliedEntryMeta, Set<NodeEndpoint> groupConfig);
 
     @Override
     public InstallSnapshotState installSnapshot(InstallSnapshotRpc rpc) {
@@ -401,18 +375,9 @@ abstract class AbstractLog implements Log {
         return new InstallSnapshotState(InstallSnapshotState.StateName.INSTALLED, newSnapshot.getLastConfig());
     }
 
-    @Override
-    public void generateSnapshot(int lastIncludedIndex, Set<NodeEndpoint> groupConfig) {
-        logger.info("generate snapshot, last included index {}", lastIncludedIndex);
-        EntryMeta lastAppliedEntryMeta = entrySequence.getEntryMeta(lastIncludedIndex);
-        replaceSnapshot(generateSnapshot(lastAppliedEntryMeta, groupConfig));
-    }
-
     protected abstract SnapshotBuilder newSnapshotBuilder(InstallSnapshotRpc firstRpc);
 
     protected abstract void replaceSnapshot(Snapshot newSnapshot);
-
-    protected abstract Snapshot generateSnapshot(EntryMeta lastAppliedEntryMeta, Set<NodeEndpoint> groupConfig);
 
     @Override
     public void setStateMachine(StateMachine stateMachine) {
@@ -442,7 +407,7 @@ abstract class AbstractLog implements Log {
         private int firstLogIndex;
         private int lastLogIndex;
 
-        private EntrySequenceView(List<Entry> entries) {
+        EntrySequenceView(List<Entry> entries) {
             this.entries = entries;
             if (!entries.isEmpty()) {
                 firstLogIndex = entries.get(0).getIndex();
@@ -479,9 +444,11 @@ abstract class AbstractLog implements Log {
         }
 
         @Override
+        @Nonnull
         public Iterator<Entry> iterator() {
             return entries.iterator();
         }
+
     }
 
 }

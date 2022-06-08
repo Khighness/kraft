@@ -4,16 +4,9 @@ import top.parak.kraft.core.node.NodeEndpoint;
 
 import java.util.Set;
 
-/**
- * Install snapshot state.
- *
- * @author KHighness
- * @since 2022-04-07
- * @email parakovo@gmail.com
- */
 public class InstallSnapshotState {
 
-    public enum  StateName {
+    public enum StateName {
         ILLEGAL_INSTALL_SNAPSHOT_RPC,
         INSTALLING,
         INSTALLED

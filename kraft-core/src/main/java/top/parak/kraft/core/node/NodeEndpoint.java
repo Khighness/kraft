@@ -1,5 +1,6 @@
 package top.parak.kraft.core.node;
 
+import com.google.common.base.Preconditions;
 import top.parak.kraft.core.rpc.Address;
 
 import javax.annotation.Nonnull;
@@ -8,10 +9,6 @@ import java.util.Objects;
 
 /**
  * Node endpoint.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
  */
 @Immutable
 public class NodeEndpoint {
@@ -20,20 +17,9 @@ public class NodeEndpoint {
     private final Address address;
 
     /**
-     * Create NodeEndpoint.
+     * Create.
      *
-     * @param id      nodeId
-     * @param address address
-     */
-    public NodeEndpoint(NodeId id, Address address) {
-        this.id = id;
-        this.address = address;
-    }
-
-    /**
-     * Create NodeEndpoint.
-     *
-     * @param id   node id
+     * @param id node id
      * @param host host
      * @param port port
      */
@@ -42,22 +28,26 @@ public class NodeEndpoint {
     }
 
     /**
-     * Get node id.
+     * Create.
+     *
+     * @param id id
+     * @param address address
+     */
+    public NodeEndpoint(@Nonnull NodeId id, @Nonnull Address address) {
+        Preconditions.checkNotNull(id);
+        Preconditions.checkNotNull(address);
+        this.id = id;
+        this.address = address;
+    }
+
+    /**
+     * Get id.
      *
      * @return id
      */
     @Nonnull
     public NodeId getId() {
         return this.id;
-    }
-
-    /**
-     * Get address.
-     *
-     * @return address
-     */
-    public Address getAddress() {
-        return address;
     }
 
     /**
@@ -79,25 +69,32 @@ public class NodeEndpoint {
         return this.address.getPort();
     }
 
+    /**
+     * Get address.
+     *
+     * @return address
+     */
+    @Nonnull
+    public Address getAddress() {
+        return this.address;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof NodeEndpoint)) return false;
         NodeEndpoint that = (NodeEndpoint) o;
-        return id.equals(that.id) && address.equals(that.address);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, address);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return "NodeEndpoint{" +
-                "id=" + id +
-                ", address=" + address +
-                '}';
+        return "NodeEndpoint{id=" + id + ", address=" + address + '}';
     }
 
 }

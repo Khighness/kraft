@@ -3,7 +3,7 @@ package top.parak.kraft.kvstore.client.cmd;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * Exit command.
+ * <code>exit</code> command.
  *
  * @author KHighness
  * @since 2022-05-30

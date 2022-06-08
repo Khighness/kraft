@@ -1,44 +1,29 @@
 package top.parak.kraft.core.service;
 
+import top.parak.kraft.core.node.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.node.NodeId;
-
 import java.util.*;
 
-/**
- * Server router.
- *
- * @author KHighness
- * @since 2022-05-01
- * @email parakovo@gmail.com
- */
 public class ServerRouter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerRouter.class);
+    private static Logger logger = LoggerFactory.getLogger(ServerRouter.class);
     private final Map<NodeId, Channel> availableServers = new HashMap<>();
     private NodeId leaderId;
 
-    /**
-     * Send message to server.
-     *
-     * @param message message
-     * @return result
-     * @throws NoAvailableServerException if no available server
-     */
-    public Object send(Object message) {
+    public Object send(Object payload) {
         for (NodeId nodeId : getCandidateNodeIds()) {
             try {
-                Object result = doSend(nodeId, message);
+                Object result = doSend(nodeId, payload);
                 this.leaderId = nodeId;
                 return result;
             } catch (RedirectException e) {
-                logger.warn("not a leader server, redirect to server {}", e.getLeaderId());
+                logger.debug("not a leader server, redirect to server {}", e.getLeaderId());
                 this.leaderId = e.getLeaderId();
-                return doSend(e.getLeaderId(), message);
+                return doSend(e.getLeaderId(), payload);
             } catch (Exception e) {
-                logger.warn("failed to process with server " + nodeId + ", cause: " + e.getMessage(), e);
+                logger.debug("failed to process with server " + nodeId + ", cause " + e.getMessage());
             }
         }
         throw new NoAvailableServerException("no available server");
@@ -63,13 +48,13 @@ public class ServerRouter {
         return availableServers.keySet();
     }
 
-    private Object doSend(NodeId id, Object message) {
+    private Object doSend(NodeId id, Object payload) {
         Channel channel = this.availableServers.get(id);
         if (channel == null) {
             throw new IllegalStateException("no such channel to server " + id);
         }
         logger.debug("send request to server {}", id);
-        return channel.send(message);
+        return channel.send(payload);
     }
 
     public void add(NodeId id, Channel channel) {

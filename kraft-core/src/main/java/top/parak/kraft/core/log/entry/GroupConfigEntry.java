@@ -4,22 +4,8 @@ import top.parak.kraft.core.node.NodeEndpoint;
 
 import java.util.Set;
 
-/**
- * Group config entry.
- * <ul>
- * <li>{@link AddNodeEntry}</li>
- * <li>{@link RemoveNodeEntry}</li>
- * </ul>
- *
- * @author KHighness
- * @since 2022-03-31
- * @email parakovo@gmail.com
- */
 public abstract class GroupConfigEntry extends AbstractEntry {
 
-    /**
-     * The endpoints of the nodes in group
-     */
     private final Set<NodeEndpoint> nodeEndpoints;
 
     protected GroupConfigEntry(int kind, int index, int term, Set<NodeEndpoint> nodeEndpoints) {
@@ -34,4 +20,3 @@ public abstract class GroupConfigEntry extends AbstractEntry {
     public abstract Set<NodeEndpoint> getResultNodeEndpoints();
 
 }
-

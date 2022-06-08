@@ -6,13 +6,6 @@ import top.parak.kraft.core.schedule.ElectionTimeout;
 import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
 
-/**
- * Follower node role.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
- */
 @Immutable
 public class FollowerNodeRole extends AbstractNodeRole {
 
@@ -20,14 +13,6 @@ public class FollowerNodeRole extends AbstractNodeRole {
     private final NodeId leaderId;
     private final ElectionTimeout electionTimeout;
 
-    /**
-     * Create FollowerNodeRole.
-     *
-     * @param term            term
-     * @param votedFor        voted for
-     * @param leaderId        leader id
-     * @param electionTimeout election timeout
-     */
     public FollowerNodeRole(int term, NodeId votedFor, NodeId leaderId, ElectionTimeout electionTimeout) {
         super(RoleName.FOLLOWER, term);
         this.votedFor = votedFor;
@@ -35,20 +20,10 @@ public class FollowerNodeRole extends AbstractNodeRole {
         this.electionTimeout = electionTimeout;
     }
 
-    /**
-     * Get voted for.
-     *
-     * @return voted for
-     */
     public NodeId getVotedFor() {
         return votedFor;
     }
 
-    /**
-     * Get leader id.
-     *
-     * @return leader id
-     */
     public NodeId getLeaderId() {
         return leaderId;
     }
@@ -74,18 +49,16 @@ public class FollowerNodeRole extends AbstractNodeRole {
     @Override
     protected boolean doStateEquals(AbstractNodeRole role) {
         FollowerNodeRole that = (FollowerNodeRole) role;
-        return Objects.equals(this.votedFor, that.votedFor)
-                && Objects.equals(this.leaderId, that.leaderId);
+        return Objects.equals(this.votedFor, that.votedFor) && Objects.equals(this.leaderId, that.leaderId);
     }
 
     @Override
     public String toString() {
         return "FollowerNodeRole{" +
                 "term=" + term +
-                ", votedFor=" + votedFor +
                 ", leaderId=" + leaderId +
+                ", votedFor=" + votedFor +
                 ", electionTimeout=" + electionTimeout +
                 '}';
     }
-
 }

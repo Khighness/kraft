@@ -2,6 +2,7 @@ package top.parak.kraft.core.support.task;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
+import top.parak.kraft.core.support.task.AbstractTaskExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -9,18 +10,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-/**
- * Direct task executor.
- *
- * @author KHighness
- * @since 2022-04-02
- * @email parakovo@gmail.com
- */
 public class DirectTaskExecutor extends AbstractTaskExecutor {
 
-    /**
-     * True means that the task will be discard if execution fails.
-     */
     private final boolean throwWhenFailed;
 
     public DirectTaskExecutor() {
@@ -32,17 +23,19 @@ public class DirectTaskExecutor extends AbstractTaskExecutor {
     }
 
     @Override
+    @Nonnull
     public Future<?> submit(@Nonnull Runnable task) {
         Preconditions.checkNotNull(task);
-        FutureTask<Object> futureTask = new FutureTask<>(task, null);
+        FutureTask<?> futureTask = new FutureTask<>(task, null);
         futureTask.run();
         return futureTask;
     }
 
     @Override
+    @Nonnull
     public <V> Future<V> submit(@Nonnull Callable<V> task) {
         Preconditions.checkNotNull(task);
-        FutureTask<V> futureTask = new FutureTask<>(task);
+        FutureTask<V> futureTask = new FutureTask<V>(task);
         futureTask.run();
         return futureTask;
     }
@@ -64,7 +57,6 @@ public class DirectTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     public void shutdown() throws InterruptedException {
-        // it seems nothing to do
     }
 
 }

@@ -1484,7 +1484,7 @@ public class NodeImplTest {
                 new NodeEndpoint("C", "127.0.0.1", 2335),
                 new NodeEndpoint("D", "127.0.0.1", 2336)
         ), NodeId.of("D"));
-        node.onGroupConfigEntryBatchedRemoved(new GroupConfigEntryBatchRemovedEvent(groupConfigEntry));
+        node.onGroupConfigEntryBatchRemoved(new GroupConfigEntryBatchRemovedEvent(groupConfigEntry));
         Assert.assertEquals(4, node.getContext().group().getCountOfMajor());
     }
 

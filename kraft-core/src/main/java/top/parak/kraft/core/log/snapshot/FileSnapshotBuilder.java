@@ -6,30 +6,11 @@ import top.parak.kraft.core.rpc.message.InstallSnapshotRpc;
 
 import java.io.IOException;
 
-/**
- * File-based snapshot builder.
- *
- * @author KHighness
- * @since 2022-04-07
- * @email parakovo@gmail.com
- */
 public class FileSnapshotBuilder extends AbstractSnapshotBuilder<FileSnapshot> {
 
-    /**
-     * The log directory.
-     */
     private final LogDir logDir;
-    /**
-     * The writer of snapshot file.
-     */
     private FileSnapshotWriter writer;
 
-    /**
-     * Create FileSnapshotBuilder.
-     *
-     * @param firstRpc the first installSnapshotRpc
-     * @param logDir  the log directory
-     */
     public FileSnapshotBuilder(InstallSnapshotRpc firstRpc, LogDir logDir) {
         super(firstRpc);
         this.logDir = logDir;

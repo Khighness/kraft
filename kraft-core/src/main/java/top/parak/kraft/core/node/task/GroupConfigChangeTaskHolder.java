@@ -1,22 +1,14 @@
 package top.parak.kraft.core.node.task;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import top.parak.kraft.core.log.entry.AddNodeEntry;
 import top.parak.kraft.core.log.entry.GroupConfigEntry;
 import top.parak.kraft.core.log.entry.RemoveNodeEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.concurrent.TimeoutException;
 
-/**
- * Holder for {@link GroupConfigChangeTask}.
- *
- * @author KHighness
- * @since 2022-06-02
- * @email parakovo@gmail.com
- */
 @Immutable
 public class GroupConfigChangeTaskHolder {
 
@@ -33,7 +25,7 @@ public class GroupConfigChangeTaskHolder {
         this.reference = reference;
     }
 
-    public void awaitOne(long timeout) throws InterruptedException, TimeoutException {
+    public void awaitDone(long timeout) throws TimeoutException, InterruptedException {
         if (timeout == 0) {
             reference.getResult();
         } else {

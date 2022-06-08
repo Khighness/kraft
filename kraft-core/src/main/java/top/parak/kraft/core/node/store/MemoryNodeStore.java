@@ -2,16 +2,8 @@ package top.parak.kraft.core.node.store;
 
 import top.parak.kraft.core.node.NodeId;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
-/**
- * Store node status via memory.
- *
- * @author KHighness
- * @since 2022-05-24
- * @email parakovo@gmail.com
- */
 @NotThreadSafe
 public class MemoryNodeStore implements NodeStore {
 
@@ -37,7 +29,6 @@ public class MemoryNodeStore implements NodeStore {
         this.term = term;
     }
 
-    @Nullable
     @Override
     public NodeId getVotedFor() {
         return votedFor;

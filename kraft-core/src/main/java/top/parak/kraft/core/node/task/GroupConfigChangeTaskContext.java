@@ -5,10 +5,6 @@ import top.parak.kraft.core.node.NodeId;
 
 /**
  * Task context for {@link GroupConfigChangeTask}.
- *
- * @author KHighness
- * @since 2022-06-01
- * @email parakovo@gmail.com
  */
 public interface GroupConfigChangeTaskContext {
 
@@ -17,11 +13,11 @@ public interface GroupConfigChangeTaskContext {
      * <p>
      * Process will be run in node task executor.
      * </p>
-     * <ol>
+     * <ul>
      * <li>add node to group</li>
      * <li>append log entry</li>
      * <li>replicate</li>
-     * </ol>
+     * </ul>
      *
      * @param endpoint   endpoint
      * @param nextIndex  next index
@@ -34,23 +30,23 @@ public interface GroupConfigChangeTaskContext {
      * <p>
      * Process will be run in node task executor.
      * </p>
-     * <ol>
+     * <ul>
      * <li>downgrade node</li>
      * <li>append log entry</li>
      * <li>replicate</li>
-     * </ol>
+     * </ul>
      *
-     * @param nodeId node id
+     * @param nodeId node id to downgrade
      */
     void downgradeNode(NodeId nodeId);
 
     /**
-     * Remove node.
+     * Remove node from group.
      * <p>
-     * Process will be run in node task executor
+     * Process will be run in node task executor.
      * </p>
      * <p>
-     * If node id is self id, step down.
+     * if node id is self id, step down.
      * </p>
      *
      * @param nodeId node id

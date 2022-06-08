@@ -6,32 +6,16 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Netty Handler to deal with remote node's connection.
- *
- * @author KHighness
- * @since 2022-05-24
- * @email parakovo@gmail.com
- */
-public class FromRemoteHandler extends AbstractHandler {
+class FromRemoteHandler extends AbstractHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(FromRemoteHandler.class);
     private final InboundChannelGroup channelGroup;
 
-    /**
-     * Create FromRemoteHandler.
-     *
-     * @param eventBus     eventBus
-     * @param channelGroup inbound channel group
-     */
     FromRemoteHandler(EventBus eventBus, InboundChannelGroup channelGroup) {
         super(eventBus);
         this.channelGroup = channelGroup;
     }
 
-    /**
-     * Receive message from remote node.
-     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof NodeId) {

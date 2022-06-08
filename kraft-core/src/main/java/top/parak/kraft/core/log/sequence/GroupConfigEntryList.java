@@ -2,45 +2,31 @@ package top.parak.kraft.core.log.sequence;
 
 import top.parak.kraft.core.log.entry.GroupConfigEntry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Group config entry list.
- *
- * @author KHighness
- * @since 2022-04-01
- * @email parakovo@gmail.com
- */
+@NotThreadSafe
 public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
 
     private final LinkedList<GroupConfigEntry> entries = new LinkedList<>();
 
-    /**
-     * Get last group config entry.
-     *
-     * @return last group config entry
-     */
     public GroupConfigEntry getLast() {
         return entries.isEmpty() ? null : entries.getLast();
     }
 
-    /**
-     * Add a group config entry.
-     *
-     * @param entry the group config entry
-     */
     public void add(GroupConfigEntry entry) {
         entries.add(entry);
     }
 
     /**
-     * Remove entries whose index is greater than the specified index.
+     * Remove entries whose index is greater than {@code entryIndex}.
      *
-     * @param entryIndex the specified index
-     * @return the first removed entry, {@code null} if no entry removed
+     * @param entryIndex entry index
+     * @return first removed entry, {@code null} if no entry removed
      */
     public GroupConfigEntry removeAfter(int entryIndex) {
         Iterator<GroupConfigEntry> iterator = entries.iterator();
@@ -48,7 +34,7 @@ public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
         while (iterator.hasNext()) {
             GroupConfigEntry entry = iterator.next();
             if (entry.getIndex() > entryIndex) {
-                if (entry.getIndex() > entryIndex) {
+                if (firstRemovedEntry == null) {
                     firstRemovedEntry = entry;
                 }
                 iterator.remove();
@@ -57,13 +43,6 @@ public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
         return firstRemovedEntry;
     }
 
-    /**
-     * Return entries whose index is greater than {@code fromIndex} and less than {@code toIndex}.
-     *
-     * @param fromIndex from index
-     * @param toIndex   to index
-     * @return entries [fromIndex, toIndex)
-     */
     public List<GroupConfigEntry> subList(int fromIndex, int toIndex) {
         if (fromIndex > toIndex) {
             throw new IllegalArgumentException("from index > to index");
@@ -74,15 +53,14 @@ public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
     }
 
     @Override
+    @Nonnull
     public Iterator<GroupConfigEntry> iterator() {
         return entries.iterator();
     }
 
     @Override
     public String toString() {
-        return "GroupConfigEntryList{" +
-                "entries=" + entries +
-                '}';
+        return "GroupConfigEntryList{" + entries + '}';
     }
 
 }

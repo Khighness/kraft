@@ -1,6 +1,10 @@
 package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.eventbus.EventBus;
+import top.parak.kraft.core.node.NodeId;
+import top.parak.kraft.core.rpc.Address;
+import top.parak.kraft.core.rpc.ChannelConnectException;
+import top.parak.kraft.core.rpc.ChannelException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
@@ -8,22 +12,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.node.NodeId;
-import top.parak.kraft.core.rpc.Address;
-import top.parak.kraft.core.rpc.ChannelConnectException;
-import top.parak.kraft.core.rpc.ChannelException;
-
 import javax.annotation.concurrent.ThreadSafe;
 import java.net.ConnectException;
 import java.util.concurrent.*;
 
-/**
- * The container to manage outbound channels (channels to remote channels).
- *
- * @author KHighness
- * @since 2022-05-25
- * @email parakovo@gmail.com
- */
 @ThreadSafe
 class OutboundChannelGroup {
 
@@ -41,14 +33,6 @@ class OutboundChannelGroup {
         this.connectTimeoutMillis = logReplicationInterval / 2;
     }
 
-    /**
-     * Get channel to remote node.
-     * If channel doesn't exist, it will be created.
-     *
-     * @param nodeId  id of remote node
-     * @param address address of remote node
-     * @return nio channel to remote node
-     */
     NioChannel getOrConnect(NodeId nodeId, Address address) {
         Future<NioChannel> future = channelMap.get(nodeId);
         if (future == null) {
@@ -66,7 +50,7 @@ class OutboundChannelGroup {
             if (e instanceof ExecutionException) {
                 Throwable cause = e.getCause();
                 if (cause instanceof ConnectException) {
-                    throw new ChannelConnectException("failed to connect to node " + nodeId +
+                    throw new ChannelConnectException("failed to get channel to node " + nodeId +
                             ", cause " + cause.getMessage(), cause);
                 }
             }
@@ -74,14 +58,6 @@ class OutboundChannelGroup {
         }
     }
 
-    /**
-     * Connect to remote node and return the channel.
-     *
-     * @param nodeId  id of remote node
-     * @param address address of remote node
-     * @return nio channel to remote node
-     * @throws InterruptedException if interrupted
-     */
     private NioChannel connect(NodeId nodeId, Address address) throws InterruptedException {
         Bootstrap bootstrap = new Bootstrap()
                 .group(workerGroup)
@@ -104,17 +80,14 @@ class OutboundChannelGroup {
         logger.debug("channel OUTBOUND-{} connected", nodeId);
         Channel nettyChannel = future.channel();
         nettyChannel.closeFuture().addListener((ChannelFutureListener) cf -> {
-            logger.info("channel OUTBOUND-{} disconnected", nodeId);
+            logger.debug("channel OUTBOUND-{} disconnected", nodeId);
             channelMap.remove(nodeId);
         });
         return new NioChannel(nettyChannel);
     }
 
-    /**
-     * Close all channels.
-     */
     void closeAll() {
-        logger.info("close all outbound channels");
+        logger.debug("close all outbound channels");
         channelMap.forEach((nodeId, nioChannelFuture) -> {
             try {
                 nioChannelFuture.get().close();

@@ -5,7 +5,7 @@ import com.google.common.annotations.Beta;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * ClientGetLeader command.
+ * <code>client-get-leader</code> command.
  *
  * @author KHighness
  * @since 2022-05-30

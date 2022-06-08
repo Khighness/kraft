@@ -1,9 +1,9 @@
 package top.parak.kraft.core.schedule;
 
+import com.google.common.base.Preconditions;
+import top.parak.kraft.core.node.config.NodeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import top.parak.kraft.core.node.config.NodeConfig;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -13,13 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Default scheduler.
- *
- * @author KHighness
- * @since 2022-03-19
- * @email parakovo@gmail.com
- */
 @ThreadSafe
 public class DefaultScheduler implements Scheduler {
 
@@ -27,7 +20,7 @@ public class DefaultScheduler implements Scheduler {
     private final int minElectionTimeout;
     private final int maxElectionTimeout;
     private final int logReplicationDelay;
-    private final int logReplicationInternal;
+    private final int logReplicationInterval;
     private final Random electionTimeoutRandom;
     private final ScheduledExecutorService scheduledExecutorService;
 
@@ -36,34 +29,36 @@ public class DefaultScheduler implements Scheduler {
                 config.getLogReplicationInterval());
     }
 
-    public DefaultScheduler(int minElectionTimeout, int maxElectionTimeout, int logReplicationDelay, int logReplicationInternal) {
+    public DefaultScheduler(int minElectionTimeout, int maxElectionTimeout, int logReplicationDelay, int logReplicationInterval) {
         if (minElectionTimeout <= 0 || maxElectionTimeout <= 0 || minElectionTimeout > maxElectionTimeout) {
-            throw new IllegalArgumentException("election timeout is negative or zero, or min > max");
+            throw new IllegalArgumentException("election timeout should not be 0 or min > max");
         }
-        if (logReplicationDelay < 0 || logReplicationInternal <= 0) {
-            throw new IllegalArgumentException("log replication delay is negative, or log replication interval is negative or zero");
+        if (logReplicationDelay < 0 || logReplicationInterval <= 0) {
+            throw new IllegalArgumentException("log replication delay < 0 or log replication interval <= 0");
         }
         this.minElectionTimeout = minElectionTimeout;
         this.maxElectionTimeout = maxElectionTimeout;
         this.logReplicationDelay = logReplicationDelay;
-        this.logReplicationInternal = logReplicationInternal;
-        this.electionTimeoutRandom = new Random();
-        this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "scheduler"));
+        this.logReplicationInterval = logReplicationInterval;
+        electionTimeoutRandom = new Random();
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "scheduler"));
     }
 
     @Override
+    @Nonnull
     public LogReplicationTask scheduleLogReplicationTask(@Nonnull Runnable task) {
-        logger.trace("schedule log replication task");
+        Preconditions.checkNotNull(task);
+        logger.debug("schedule log replication task");
         ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleWithFixedDelay(
-                task, logReplicationDelay, logReplicationInternal, TimeUnit.MILLISECONDS
-        );
+                task, logReplicationDelay, logReplicationInterval, TimeUnit.MILLISECONDS);
         return new LogReplicationTask(scheduledFuture);
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public ElectionTimeout scheduleElectionTimeout(@Nonnull Runnable task) {
-        logger.trace("schedule election timeout");
+        Preconditions.checkNotNull(task);
+        logger.debug("schedule election timeout");
         int timeout = electionTimeoutRandom.nextInt(maxElectionTimeout - minElectionTimeout) + minElectionTimeout;
         ScheduledFuture<?> scheduledFuture = scheduledExecutorService.schedule(task, timeout, TimeUnit.MILLISECONDS);
         return new ElectionTimeout(scheduledFuture);
@@ -71,7 +66,7 @@ public class DefaultScheduler implements Scheduler {
 
     @Override
     public void stop() throws InterruptedException {
-        logger.info("stop scheduler");
+        logger.debug("stop scheduler");
         scheduledExecutorService.shutdown();
         scheduledExecutorService.awaitTermination(1, TimeUnit.SECONDS);
     }

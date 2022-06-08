@@ -6,25 +6,10 @@ import top.parak.kraft.core.rpc.message.InstallSnapshotRpc;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-/**
- * Memory-based snapshot builder.
- *
- * @author KHighness
- * @since 2022-04-07
- * @email parakovo@gmail.com
- */
 public class MemorySnapshotBuilder extends AbstractSnapshotBuilder<MemorySnapshot> {
 
-    /**
-     * The writer of the snapshot.
-     */
     private final ByteArrayOutputStream output;
 
-    /**
-     * Create MemorySnapshotBuilder.
-     *
-     * @param firstRpc the first installSnapshotRpc
-     */
     public MemorySnapshotBuilder(InstallSnapshotRpc firstRpc) {
         super(firstRpc);
         output = new ByteArrayOutputStream();
@@ -48,7 +33,6 @@ public class MemorySnapshotBuilder extends AbstractSnapshotBuilder<MemorySnapsho
 
     @Override
     public void close() {
-        // it seems nothing to do
     }
 
 }

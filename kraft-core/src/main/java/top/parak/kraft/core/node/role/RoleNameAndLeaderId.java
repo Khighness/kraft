@@ -1,29 +1,29 @@
 package top.parak.kraft.core.node.role;
 
+import com.google.common.base.Preconditions;
 import top.parak.kraft.core.node.NodeId;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * Role name and leader id.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
  */
 @Immutable
-public class RoleNameANdLeaderId {
+public class RoleNameAndLeaderId {
 
     private final RoleName roleName;
     private final NodeId leaderId;
 
     /**
-     * Create RoleNameANdLeaderId.
+     * Create.
      *
      * @param roleName role name
      * @param leaderId leader id
      */
-    public RoleNameANdLeaderId(RoleName roleName, NodeId leaderId) {
+    public RoleNameAndLeaderId(@Nonnull RoleName roleName, @Nullable NodeId leaderId) {
+        Preconditions.checkNotNull(roleName);
         this.roleName = roleName;
         this.leaderId = leaderId;
     }
@@ -31,16 +31,19 @@ public class RoleNameANdLeaderId {
     /**
      * Get role name.
      *
-     * @return role name.
+     * @return role name
      */
+    @Nonnull
     public RoleName getRoleName() {
         return roleName;
     }
 
     /**
      * Get leader id.
-     * @return leader id.
+     *
+     * @return leader id
      */
+    @Nullable
     public NodeId getLeaderId() {
         return leaderId;
     }

@@ -3,14 +3,9 @@ package top.parak.kraft.core.node.role;
 import top.parak.kraft.core.node.NodeId;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Default role state.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
  */
 public class DefaultRoleState implements RoleState {
 
@@ -20,19 +15,13 @@ public class DefaultRoleState implements RoleState {
     private NodeId votedFor;
     private NodeId leaderId;
 
-    /**
-     * Create DefaultRoleState.
-     *
-     * @param roleName role name
-     * @param term term
-     */
     public DefaultRoleState(RoleName roleName, int term) {
         this.roleName = roleName;
         this.term = term;
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public RoleName getRoleName() {
         return roleName;
     }
@@ -51,7 +40,6 @@ public class DefaultRoleState implements RoleState {
         this.votesCount = votesCount;
     }
 
-    @Nullable
     @Override
     public NodeId getVotedFor() {
         return votedFor;
@@ -61,7 +49,6 @@ public class DefaultRoleState implements RoleState {
         this.votedFor = votedFor;
     }
 
-    @Nullable
     @Override
     public NodeId getLeaderId() {
         return leaderId;
@@ -71,14 +58,12 @@ public class DefaultRoleState implements RoleState {
         this.leaderId = leaderId;
     }
 
-
-    @Override
     public String toString() {
         switch (this.roleName) {
             case FOLLOWER:
-                return "Follower{term}" + this.term + ", votedFor=" + this.votedFor + ", leaderId=" + this.leaderId + "}";
+                return "Follower{term=" + this.term + ", votedFor=" + this.votedFor + ", leaderId=" + this.leaderId + "}";
             case CANDIDATE:
-                return "Candidate{term=" + this.term + ", votedCount=" + this.votesCount + "}";
+                return "Candidate{term=" + this.term + ", votesCount=" + this.votesCount + "}";
             case LEADER:
                 return "Leader{term=" + this.term + "}";
             default:

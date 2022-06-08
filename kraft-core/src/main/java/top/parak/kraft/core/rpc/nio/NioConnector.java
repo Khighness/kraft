@@ -2,6 +2,12 @@ package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import top.parak.kraft.core.node.NodeEndpoint;
+import top.parak.kraft.core.node.NodeId;
+import top.parak.kraft.core.rpc.Channel;
+import top.parak.kraft.core.rpc.ChannelConnectException;
+import top.parak.kraft.core.rpc.Connector;
+import top.parak.kraft.core.rpc.message.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -11,26 +17,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.node.NodeEndpoint;
-import top.parak.kraft.core.node.NodeId;
-import top.parak.kraft.core.rpc.Channel;
-import top.parak.kraft.core.rpc.ChannelConnectException;
-import top.parak.kraft.core.rpc.Connector;
-import top.parak.kraft.core.rpc.message.*;
-
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * NIO connector.
- *
- * @author KHighness
- * @since 2022-05-25
- * @email parakovo@gmail.com
- */
+// TODO add test
 @ThreadSafe
 public class NioConnector implements Connector {
 
@@ -68,6 +61,7 @@ public class NioConnector implements Connector {
         outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfNodeId, logReplicationInterval);
     }
 
+    // should not call more than once
     @Override
     public void initialize() {
         ServerBootstrap serverBootstrap = new ServerBootstrap()
@@ -82,7 +76,7 @@ public class NioConnector implements Connector {
                         pipeline.addLast(new FromRemoteHandler(eventBus, inboundChannelGroup));
                     }
                 });
-        logger.info("raft rpc service is listening on port {}", port);
+        logger.debug("node listen on port {}", port);
         try {
             serverBootstrap.bind(port).sync();
         } catch (InterruptedException e) {
@@ -177,7 +171,7 @@ public class NioConnector implements Connector {
 
     @Override
     public void close() {
-        logger.info("close connector");
+        logger.debug("close connector");
         inboundChannelGroup.closeAll();
         outboundChannelGroup.closeAll();
         bossNioEventLoopGroup.shutdownGracefully();

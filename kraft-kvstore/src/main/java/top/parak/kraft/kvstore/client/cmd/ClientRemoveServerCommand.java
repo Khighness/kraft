@@ -5,7 +5,7 @@ import com.google.common.annotations.Beta;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * ClientRemoveServer command.
+ * <code>client-remove-server</code> command.
  *
  * @author KHighness
  * @since 2022-05-30
@@ -26,9 +26,9 @@ public class ClientRemoveServerCommand implements Command {
         }
 
         if (context.clientRemoveServer(arguments)) {
-            context.printServerList();
+            context.printSeverList();
         } else {
-            System.out.println("no such server [" + arguments + "]");
+            System.err.println("no such server [" + arguments + "]");
         }
     }
 

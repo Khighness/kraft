@@ -49,51 +49,47 @@ public class KVStoreMessageEncoder extends MessageToByteEncoder<Object> {
                     .build();
             this.writeMessage(MessageConstants.MSG_TYPE_REDIRECT, protoRedirect, out);
         } else if (msg instanceof AddNodeCommand) {
-            AddNodeCommand addNodeCommand = (AddNodeCommand) msg;
-            Protos.AddNodeCommand protoAddNodeCommand = Protos.AddNodeCommand.newBuilder()
-                    .setNodeId(addNodeCommand.getNodeId())
-                    .setHost(addNodeCommand.getHost())
-                    .setPort(addNodeCommand.getPort())
+            AddNodeCommand command = (AddNodeCommand) msg;
+            Protos.AddNodeCommand protoCommand = Protos.AddNodeCommand.newBuilder()
+                    .setNodeId(command.getNodeId())
+                    .setHost(command.getHost())
+                    .setPort(command.getPort())
                     .build();
-            this.writeMessage(MessageConstants.MSG_TYPE_ADD_SERVER_COMMAND, protoAddNodeCommand, out);
+            this.writeMessage(MessageConstants.MSG_TYPE_ADD_SERVER_COMMAND, protoCommand, out);
         } else if (msg instanceof RemoveNodeCommand) {
-            RemoveNodeCommand removeNodeCommand = (RemoveNodeCommand) msg;
-            Protos.RemoveNodeCommand protoRemoveNodeCommand = Protos.RemoveNodeCommand.newBuilder()
-                    .setNodeId(removeNodeCommand.getNodeId().getValue())
+            RemoveNodeCommand command = (RemoveNodeCommand) msg;
+            Protos.RemoveNodeCommand protoCommand = Protos.RemoveNodeCommand.newBuilder()
+                    .setNodeId(command.getNodeId().getValue())
                     .build();
-            this.writeMessage(MessageConstants.MSG_TYPE_REMOVE_SERVER_COMMAND, protoRemoveNodeCommand, out);
+            this.writeMessage(MessageConstants.MSG_TYPE_REMOVE_SERVER_COMMAND, protoCommand, out);
         } else if (msg instanceof GetCommand) {
-            GetCommand getCommand = (GetCommand) msg;
+            GetCommand command = (GetCommand) msg;
             Protos.GetCommand protoGetCommand = Protos.GetCommand.newBuilder()
-                    .setKey(getCommand.getKey())
+                    .setKey(command.getKey())
                     .build();
             this.writeMessage(MessageConstants.MSG_TYPE_GET_COMMAND, protoGetCommand, out);
         } else if (msg instanceof GetCommandResponse) {
-            GetCommandResponse getCommandResponse = (GetCommandResponse) msg;
-            byte[] value = getCommandResponse.getValue();
-            Protos.GetCommandResponse protoGetCommandResponse = Protos.GetCommandResponse.newBuilder()
-                    .setFound(getCommandResponse.isFound())
+            GetCommandResponse response = (GetCommandResponse) msg;
+            byte[] value = response.getValue();
+            Protos.GetCommandResponse protoResponse = Protos.GetCommandResponse.newBuilder()
+                    .setFound(response.isFound())
                     .setValue(value != null ? ByteString.copyFrom(value) : ByteString.EMPTY)
                     .build();
-            this.writeMessage(MessageConstants.MSG_TYPE_GET_COMMAND_RESPONSE, protoGetCommandResponse, out);
+            this.writeMessage(MessageConstants.MSG_TYPE_GET_COMMAND_RESPONSE, protoResponse, out);
         } else if (msg instanceof SetCommand) {
-            SetCommand setCommand = (SetCommand) msg;
+            SetCommand command = (SetCommand) msg;
             Protos.SetCommand protoSetCommand = Protos.SetCommand.newBuilder()
-                    .setKey(setCommand.getKey())
-                    .setValue(ByteString.copyFrom(setCommand.getValue()))
+                    .setKey(command.getKey())
+                    .setValue(ByteString.copyFrom(command.getValue()))
                     .build();
             this.writeMessage(MessageConstants.MSG_TYPE_SET_COMMAND, protoSetCommand, out);
         }
     }
 
     private void writeMessage(int messageType, MessageLite message, ByteBuf out) throws IOException {
-        // 1. write message type (4 bytes)
         out.writeInt(messageType);
-        // 2. write message
         byte[] bytes = message.toByteArray();
-        // 2.1 write message length (4 bytes)
         out.writeInt(bytes.length);
-        // 2.2 write message content (unfixed bytes)
         out.writeBytes(bytes);
     }
 

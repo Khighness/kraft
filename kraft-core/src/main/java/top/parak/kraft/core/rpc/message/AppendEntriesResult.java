@@ -2,28 +2,10 @@ package top.parak.kraft.core.rpc.message;
 
 import java.io.Serializable;
 
-/**
- * AppendEntries RPC result.
- *
- * @author KHighness
- * @since 2022-03-31
- * @email parakovo@gmail.com
- */
 public class AppendEntriesResult implements Serializable {
 
-    /**
-     * RPC message id.
-     */
     private final String rpcMessageId;
-    /**
-     * Current term.
-     * <p>Help leader update term.</p>
-     */
     private final int term;
-    /**
-     * True if the follower has appended the log entries or already has the log entries,
-     * otherwise false.
-     */
     private final boolean success;
 
     public AppendEntriesResult(String rpcMessageId, int term, boolean success) {
@@ -48,8 +30,8 @@ public class AppendEntriesResult implements Serializable {
     public String toString() {
         return "AppendEntriesResult{" +
                 "rpcMessageId='" + rpcMessageId + '\'' +
-                ", term=" + term +
                 ", success=" + success +
+                ", term=" + term +
                 '}';
     }
 

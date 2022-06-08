@@ -7,63 +7,39 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * {@link SeekableFile} implementation based on byte array.
- *
- * @author KHighness
- * @since 2022-04-02
- * @email parakovo@gmail.com
- */
 public class ByteArraySeekableFile implements SeekableFile {
 
-    /**
-     * The container to store bytes.
-     */
     private byte[] content;
-    /**
-     * The size of file.
-     */
     private int size;
-    /**
-     * The file-pointer.
-     */
     private int position;
 
-    /**
-     * Create ByteArraySeekableFile.
-     */
     public ByteArraySeekableFile() {
         this(new byte[0]);
     }
 
-    /**
-     * Create ByteArraySeekableFile.
-     *
-     * @param content content
-     */
     public ByteArraySeekableFile(byte[] content) {
         this.content = content;
         this.size = content.length;
         this.position = 0;
     }
 
-    /**
-     * Check position.
-     *
-     * @param position position
-     * @throws IllegalArgumentException if position is less than 0 or position is greater than size
-     */
+    @Override
+    public void seek(long position) throws IOException {
+        checkPosition(position);
+        this.position = (int) position;
+    }
+
     private void checkPosition(long position) {
         if (position < 0 || position > size) {
             throw new IllegalArgumentException("offset < 0 or offset > size");
         }
     }
 
-    /**
-     * Ensure capacity.
-     *
-     * @param capacity capacity
-     */
+    @Override
+    public void writeInt(int i) throws IOException {
+        write(Ints.toByteArray(i));
+    }
+
     private void ensureCapacity(int capacity) {
         int oldLength = content.length;
         if (position + capacity <= oldLength) {
@@ -73,26 +49,10 @@ public class ByteArraySeekableFile implements SeekableFile {
             content = new byte[capacity];
             return;
         }
-        int newLength = (oldLength >= capacity ? oldLength << 1 : oldLength + capacity);
+        int newLength = (oldLength >= capacity ? oldLength * 2 : oldLength + capacity);
         byte[] newContent = new byte[newLength];
         System.arraycopy(content, 0, newContent, 0, oldLength);
         content = newContent;
-    }
-
-    @Override
-    public long position() throws IOException {
-        return position;
-    }
-
-    @Override
-    public void seek(long position) throws IOException {
-        checkPosition(position);
-        this.position = (int) position;
-    }
-
-    @Override
-    public void writeInt(int i) throws IOException {
-        write(Ints.toByteArray(i));
     }
 
     @Override
@@ -151,18 +111,21 @@ public class ByteArraySeekableFile implements SeekableFile {
 
     @Override
     public InputStream inputStream(long start) throws IOException {
-        checkPosition(position);
+        checkPosition(start);
         return new ByteArrayInputStream(content, (int) start, (int) (size - start));
     }
 
     @Override
+    public long position() {
+        return position;
+    }
+
+    @Override
     public void flush() throws IOException {
-        // it seems nothing to do
     }
 
     @Override
     public void close() throws IOException {
-        // it seems nothing to do
     }
 
 }

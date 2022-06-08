@@ -4,11 +4,7 @@ import javax.annotation.Nonnull;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Task reference for {@link GroupConfigChangeTask}.
- *
- * @author KHighness
- * @since 2022-03-31
- * @email parakovo@gmail.com
+ * Reference for group config change task.
  */
 public interface GroupConfigChangeTaskReference {
 
@@ -27,7 +23,7 @@ public interface GroupConfigChangeTaskReference {
      * @param timeout timeout
      * @return result
      * @throws InterruptedException if interrupted
-     * @throws TimeoutException     if timeout
+     * @throws TimeoutException if timeout
      */
     @Nonnull
     GroupConfigChangeTaskResult getResult(long timeout) throws InterruptedException, TimeoutException;

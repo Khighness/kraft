@@ -1,56 +1,27 @@
 package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.eventbus.EventBus;
+import top.parak.kraft.core.node.NodeId;
+import top.parak.kraft.core.rpc.Channel;
+import top.parak.kraft.core.rpc.message.*;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.node.NodeId;
-import top.parak.kraft.core.rpc.Channel;
-import top.parak.kraft.core.rpc.message.*;
-
 import java.util.Objects;
 
-/**
- * Abstract handler.
- *
- * @author KHighness
- * @since 2022-04-13
- * @email parakovo@gmail.com
- */
-public abstract class AbstractHandler extends ChannelDuplexHandler {
+abstract class AbstractHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
-
-    /**
-     * EventBus is a pub-sub component used to publish event to subscribers.
-     * This decouples the RAFT algorithm component and RPC implementation component.
-     */
     protected final EventBus eventBus;
-
-    /**
-     * The id of remote node.
-     */
     NodeId remoteId;
-
-    /**
-     * RPC channel between remote node and self.
-     */
     protected Channel channel;
-
-    /**
-     * RPC channel between remote node and self.
-     */
     private AppendEntriesRpc lastAppendEntriesRpc;
-
-    /**
-     * The last {@link InstallSnapshotRpc}.
-     */
     private InstallSnapshotRpc lastInstallSnapshotRpc;
 
-    public AbstractHandler(EventBus eventBus) {
+    AbstractHandler(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
@@ -102,7 +73,7 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("{} {}", ctx.channel().remoteAddress().toString(), cause.getMessage());
+        logger.warn(cause.getMessage(), cause);
         ctx.close();
     }
 

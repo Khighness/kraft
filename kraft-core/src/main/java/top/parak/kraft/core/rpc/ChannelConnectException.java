@@ -1,12 +1,5 @@
 package top.parak.kraft.core.rpc;
 
-/**
- * Thrown when channel connection occur exception.
- *
- * @author KHighness
- * @since 2022-04-13
- * @email parakovo@gmail.com
- */
 public class ChannelConnectException extends ChannelException {
 
     public ChannelConnectException(Throwable cause) {

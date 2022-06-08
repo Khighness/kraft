@@ -15,80 +15,79 @@ import java.util.Set;
 /**
  * Log.
  *
- * @author KHighness
- * @since 2022-03-19
- * @email parakovo@gmail.com
+ * @see top.parak.kraft.core.log.sequence.EntrySequence
+ * @see top.parak.kraft.core.log.snapshot.Snapshot
  */
 public interface Log {
 
     int ALL_ENTRIES = -1;
 
     /**
-     * Get the metadata of the last log entry.
+     * Get meta of last entry.
      *
-     * @return the metadata of the last log entry
+     * @return entry meta
      */
     @Nonnull
     EntryMeta getLastEntryMeta();
 
     /**
-     * Create rpc request to append log entries from log.
+     * Create append entries rpc from log.
      *
      * @param term       current term
      * @param selfId     self node id
      * @param nextIndex  next index
      * @param maxEntries max entries
-     * @return rpc request to append log entries
+     * @return append entries rpc
      */
     AppendEntriesRpc createAppendEntriesRpc(int term, NodeId selfId, int nextIndex, int maxEntries);
 
     /**
-     * Create rpc request to install snapshot from log.
+     * Create install snapshot rpc from log.
      *
-     * @param term    current term
-     * @param selfId  self node id
-     * @param offset  data offset
-     * @param length  data length
-     * @return rpc request to install snapshot
+     * @param term   current term
+     * @param selfId self node id
+     * @param offset data offset
+     * @param length data length
+     * @return install snapshot rpc
      */
     InstallSnapshotRpc createInstallSnapshotRpc(int term, NodeId selfId, int offset, int length);
 
     /**
-     * Get the last uncommitted group config entry.
+     * Get last uncommitted group config entry.
      *
-     * @return the last uncommitted group config entry, maybe {@code null}
+     * @return last committed group config entry, maybe {@code null}
      */
     @Nullable
     GroupConfigEntry getLastUncommittedGroupConfigEntry();
 
     /**
-     * Get the index of the log entry to be appended next time.
+     * Get next log index.
      *
-     * @return nextIndex
+     * @return next log index
      */
     int getNextIndex();
 
     /**
-     * Get commitIndex.
+     * Get commit index.
      *
-     * @return commitIndex
+     * @return commit index
      */
     int getCommitIndex();
 
     /**
-     * Return if the candidate's last log entry is newer than the leader's last log entry.
+     * Test if last log self is new than last log of leader.
      *
-     * @param lastLogIndex the index of the leader's last log entry
-     * @param lastLogTerm  the term of the leader's last log entry
-     * @return true if the candidate's last log entry is newer than the leader's last log, otherwise false
+     * @param lastLogIndex last log index
+     * @param lastLogTerm  last log term
+     * @return true if last log self is newer than last log of leader, otherwise false
      */
     boolean isNewerThan(int lastLogIndex, int lastLogTerm);
 
     /**
-     * Append a no-operation log entry.
+     * Append a NO-OP log entry.
      *
      * @param term current term
-     * @return no-operation log entry
+     * @return no-op entry
      */
     NoOpEntry appendEntry(int term);
 
@@ -96,8 +95,8 @@ public interface Log {
      * Append a general log entry.
      *
      * @param term    current term
-     * @param command command bytes
-     * @return general log entry
+     * @param command command in bytes
+     * @return general entry
      */
     GeneralEntry appendEntry(int term, byte[] command);
 
@@ -107,7 +106,7 @@ public interface Log {
      * @param term            current term
      * @param nodeEndpoints   current node configs
      * @param newNodeEndpoint new node config
-     * @return log entry for adding node
+     * @return add node entry
      */
     AddNodeEntry appendEntryForAddNode(int term, Set<NodeEndpoint> nodeEndpoints, NodeEndpoint newNodeEndpoint);
 
@@ -116,29 +115,30 @@ public interface Log {
      *
      * @param term          current term
      * @param nodeEndpoints current node configs
-     * @param nodeToRemove  id of node to be removed
-     * @return log entry for removing node
+     * @param nodeToRemove  node to remove
+     * @return remove node entry
      */
     RemoveNodeEntry appendEntryForRemoveNode(int term, Set<NodeEndpoint> nodeEndpoints, NodeId nodeToRemove);
 
     /**
-     * Append log entries to log.
+     * Append entries to log.
      *
-     * @param prevLogIndex  expected index of previous log entry
-     * @param prevLogTerm   expected term of previous log entry
-     * @param leaderEntries log entries from leader to be appended
-     * @return true if succeeded, false if previous log check failed
+     * @param prevLogIndex expected index of previous log entry
+     * @param prevLogTerm  expected term of previous log entry
+     * @param entries      entries to append
+     * @return true if success, false if previous log check failed
      */
-    boolean appendEntriesFromLeader(int prevLogIndex, int prevLogTerm, List<Entry> leaderEntries);
+    boolean appendEntriesFromLeader(int prevLogIndex, int prevLogTerm, List<Entry> entries);
 
     /**
-     * Advance commitIndex.
+     * Advance commit index.
+     *
      * <p>
-     * The log entry with new {@code commitIndex} must be the same term sa the one in parameter,
+     * The log entry with new commit index must be the same term as the one in parameter,
      * otherwise commit index will not change.
      * </p>
      *
-     * @param newCommitIndex new commitIndex
+     * @param newCommitIndex new commit index
      * @param currentTerm    current term
      */
     void advanceCommitIndex(int newCommitIndex, int currentTerm);
@@ -155,15 +155,14 @@ public interface Log {
      * Generate snapshot.
      *
      * @param lastIncludedIndex last included index
-     * @param groupConfig        group config
+     * @param groupConfig       group config
      */
     void generateSnapshot(int lastIncludedIndex, Set<NodeEndpoint> groupConfig);
 
     /**
      * Set state machine.
      * <p>
-     * It will be called in the following cases
-     * </p>
+     * It will be called when
      * <ul>
      * <li>apply the log entry</li>
      * <li>generate snapshot</li>

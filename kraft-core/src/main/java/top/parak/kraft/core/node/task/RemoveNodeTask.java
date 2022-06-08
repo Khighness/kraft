@@ -1,16 +1,9 @@
 package top.parak.kraft.core.node.task;
 
+import top.parak.kraft.core.node.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.parak.kraft.core.node.NodeId;
 
-/**
- * RemoveNode task.
- *
- * @author KHighness
- * @since 2022-06-02
- * @email parakovo@gmail.com
- */
 public class RemoveNodeTask extends AbstractGroupConfigChangeTask {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoveNodeTask.class);
@@ -22,13 +15,13 @@ public class RemoveNodeTask extends AbstractGroupConfigChangeTask {
     }
 
     @Override
-    protected void appendGroupConfig() {
-        context.downgradeNode(nodeId);
+    public boolean isTargetNode(NodeId nodeId) {
+        return this.nodeId.equals(nodeId);
     }
 
     @Override
-    public boolean isTargetNode(NodeId nodeId) {
-        return this.nodeId.equals(nodeId);
+    protected void appendGroupConfig() {
+        context.downgradeNode(nodeId);
     }
 
     @Override

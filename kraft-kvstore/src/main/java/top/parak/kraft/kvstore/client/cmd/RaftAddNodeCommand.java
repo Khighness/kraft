@@ -4,7 +4,7 @@ import top.parak.kraft.core.service.NoAvailableServerException;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * RaftAddNode command.
+ * <code>raft-add-node</code> command.
  *
  * @author KHighness
  * @since 2022-05-30
@@ -19,23 +19,23 @@ public class RaftAddNodeCommand implements Command {
 
     @Override
     public void execute(String arguments, CommandContext context) {
-        // <node-id> <host> <raft-rpc-port>
+        // <node-id> <host> <port-raft-node>
         String[] pieces = arguments.split("\\s");
         if (pieces.length != 3) {
-            throw new IllegalArgumentException("usage: " + getName() + " <node-id> <host> <raft-rpc-port>");
+            throw new IllegalArgumentException("usage " + getName() + " <node-id> <host> <port-raft-node>");
         }
 
         String nodeId = pieces[0];
         String host = pieces[1];
-        int servicePort;
+        int port;
         try {
-            servicePort = Integer.parseInt(pieces[2]);
+            port = Integer.parseInt(pieces[2]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("illegal port " + pieces[2] + "]");
+            throw new IllegalArgumentException("illegal port [" + pieces[2] + "]");
         }
 
         try {
-            context.getClient().addNode(nodeId, host, servicePort);
+            context.getClient().addNode(nodeId, host, port);
         } catch (NoAvailableServerException e) {
             System.err.println(e.getMessage());
         }

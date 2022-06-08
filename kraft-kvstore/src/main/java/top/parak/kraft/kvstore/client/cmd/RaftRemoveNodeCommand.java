@@ -4,7 +4,7 @@ import top.parak.kraft.core.service.NoAvailableServerException;
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * RaftRemoveNode command.
+ * <code>raft-remove-node</code> command.
  *
  * @author KHighness
  * @since 2022-05-30

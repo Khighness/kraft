@@ -9,10 +9,6 @@ import java.util.concurrent.Future;
 
 /**
  * Task executor.
- *
- * @author KHighness
- * @since 2022-03-31
- * @email parakovo@gmail.com
  */
 public interface TaskExecutor {
 
@@ -22,6 +18,7 @@ public interface TaskExecutor {
      * @param task task
      * @return future
      */
+    @Nonnull
     Future<?> submit(@Nonnull Runnable task);
 
     /**
@@ -31,6 +28,7 @@ public interface TaskExecutor {
      * @param <V>  result type
      * @return future
      */
+    @Nonnull
     <V> Future<V> submit(@Nonnull Callable<V> task);
 
     /**
@@ -44,7 +42,7 @@ public interface TaskExecutor {
     /**
      * Submit task with callbacks.
      *
-     * @param task      task
+     * @param task task
      * @param callbacks callbacks, should not be empty
      */
     void submit(@Nonnull Runnable task, @Nonnull Collection<FutureCallback<Object>> callbacks);

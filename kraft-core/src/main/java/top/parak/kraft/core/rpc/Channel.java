@@ -5,58 +5,54 @@ import top.parak.kraft.core.rpc.message.*;
 import javax.annotation.Nonnull;
 
 /**
- * Channel between two nodes.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
+ * Channel between nodes.
  */
 public interface Channel {
 
     /**
-     * Write RequestVote RPC.
+     * Write request vote rpc.
      *
      * @param rpc rpc
      */
     void writeRequestVoteRpc(@Nonnull RequestVoteRpc rpc);
 
     /**
-     * Write RequestVote result.
+     * Write request vote result.
      *
      * @param result result
      */
     void writeRequestVoteResult(@Nonnull RequestVoteResult result);
 
     /**
-     * Write AppendEntries RPC.
+     * Write append entries rpc.
      *
      * @param rpc rpc
      */
     void writeAppendEntriesRpc(@Nonnull AppendEntriesRpc rpc);
 
     /**
-     * Write AppendEntries result.
+     * Write append entries result.
      *
      * @param result result
      */
     void writeAppendEntriesResult(@Nonnull AppendEntriesResult result);
 
     /**
-     * Write InstallSnapshot RPC.
+     * Write install snapshot rpc.
      *
      * @param rpc rpc
      */
     void writeInstallSnapshotRpc(@Nonnull InstallSnapshotRpc rpc);
 
     /**
-     * Write InstallSnapshot result.
+     * Write install snapshot result.
      *
      * @param result result
      */
     void writeInstallSnapshotResult(@Nonnull InstallSnapshotResult result);
 
     /**
-     * Close the channel.
+     * Close channel.
      */
     void close();
 

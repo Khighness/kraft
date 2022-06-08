@@ -6,18 +6,10 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Log replication task.
- *
- * @author KHighness
- * @since 2022-03-18
- * @email parakovo@gmail.com
- */
 public class LogReplicationTask {
 
     public static final LogReplicationTask NONE = new LogReplicationTask(new NullScheduledFuture());
-    public static final Logger logger = LoggerFactory.getLogger(LogReplicationTask.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(LogReplicationTask.class);
     private final ScheduledFuture<?> scheduledFuture;
 
     public LogReplicationTask(ScheduledFuture<?> scheduledFuture) {
@@ -31,9 +23,7 @@ public class LogReplicationTask {
 
     @Override
     public String toString() {
-        return "LogReplicationTask{delay{delay=" +
-                scheduledFuture.getDelay(TimeUnit.MILLISECONDS) +
-                "ms}";
+        return "LogReplicationTask{delay=" + scheduledFuture.getDelay(TimeUnit.MILLISECONDS) + "}";
     }
 
 }

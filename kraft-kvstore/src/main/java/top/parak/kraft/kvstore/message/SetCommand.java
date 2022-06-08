@@ -29,18 +29,6 @@ public class SetCommand {
         this.value = value;
     }
 
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public byte[] getValue() {
-        return value;
-    }
-
     public static SetCommand fromBytes(byte[] bytes) {
         try {
             Protos.SetCommand protoCommand = Protos.SetCommand.parseFrom(bytes);
@@ -52,6 +40,18 @@ public class SetCommand {
         } catch (InvalidProtocolBufferException e) {
             throw new IllegalStateException("failed to deserialize set command", e);
         }
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public byte[] getValue() {
+        return value;
     }
 
     public byte[] toBytes() {

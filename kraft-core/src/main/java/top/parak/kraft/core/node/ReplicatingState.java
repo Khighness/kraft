@@ -1,144 +1,48 @@
 package top.parak.kraft.core.node;
 
 /**
- * Replicating State.
- * <p>
- * In order to track the replication progress of each follower, the leader
- * needs to record the index of the next log entry to be replicated which
- * is defined as {@link ReplicatingState#nextIndex} and the index of the
- * matched logs which is defined as {@link ReplicatingState#matchIndex}.
- * </p>
- * <p>
- * In the entire log replication process, the leader's {@code commitIndex}
- * is determined by the follower's {@code #matchIndex}. Among the {@code matchIndex}
- * of all followers, more than half of the {@code matchIndex} will become
- * leader's new {@code commitIndex}.
- * </p>
- *
- * @author KHighness
- * @since 2022-03-19
- * @email parakovo@gmail.com
+ * Replicating state.
  */
-public class ReplicatingState {
+class ReplicatingState {
 
-    /**
-     * The index of the next log entry that needs to be sent to the follower.
-     */
     private int nextIndex;
-
-    /**
-     * The index of the last log entry that has been replicated to the follower.
-     */
     private int matchIndex;
-
-    /**
-     * The replicating status.
-     */
     private boolean replicating = false;
-
-    /**
-     * The last replicated timestamp.
-     */
     private long lastReplicatedAt = 0;
 
-    /**
-     * Create ReplicatingState.
-     *
-     * @param nextIndex next index
-     */
-    public ReplicatingState(int nextIndex) {
+    ReplicatingState(int nextIndex) {
         this(nextIndex, 0);
     }
 
-    /**
-     * Create ReplicatingState.
-     *
-     * @param nextIndex  next index
-     * @param matchIndex match index
-     */
-    public ReplicatingState(int nextIndex, int matchIndex) {
+    ReplicatingState(int nextIndex, int matchIndex) {
         this.nextIndex = nextIndex;
-        this.matchIndex= matchIndex;
-    }
-
-    /**
-     * Get the index of the next log entry that needs to be sent to the follower.
-     *
-     * @return next index
-     */
-    public int getNextIndex() {
-        return nextIndex;
-    }
-
-    /**
-     * Set the index of the next log entry that needs to be sent to the follower.
-     *
-     * @param nextIndex the index of the next log that needs to be sent to the follower
-     */
-    public void setNextIndex(int nextIndex) {
-        this.nextIndex = nextIndex;
-    }
-
-    /**
-     * Get the index of the last log entry that has been replicated to the follower.
-     *
-     * @return match index
-     */
-    public int getMatchIndex() {
-        return matchIndex;
-    }
-
-    /**
-     * Set the index of the last log entry that has been replicated to the follower.
-     *
-     * @param matchIndex match index
-     */
-    public void setMatchIndex(int matchIndex) {
         this.matchIndex = matchIndex;
     }
 
     /**
-     * Test if replicating.
+     * Get next index.
      *
-     * @return true if replicating, otherwise false
+     * @return next index
      */
-    public boolean isReplicating() {
-        return replicating;
+    int getNextIndex() {
+        return nextIndex;
     }
 
     /**
-     * Set replicating.
+     * Get match index.
      *
-     * @param replicating replicating
+     * @return match index
      */
-    public void setReplicating(boolean replicating) {
-        this.replicating = replicating;
-    }
-
-    /**
-     * Get the last replicated timestamp.
-     *
-     * @return last replicated timestamp
-     */
-    public long getLastReplicatedAt() {
-        return lastReplicatedAt;
-    }
-
-    /**
-     * Set the last replicated timestamp.
-     *
-     * @param lastReplicatedAt last replicated timestamp
-     */
-    public void setLastReplicatedAt(long lastReplicatedAt) {
-        this.lastReplicatedAt = lastReplicatedAt;
+    int getMatchIndex() {
+        return matchIndex;
     }
 
     /**
      * Back off next index, in other word, decrease.
      *
-     * @return true if decrease successfully
+     * @return true if decrease successfully, false if next index is less than or equal to {@code 1}
      */
-    public boolean backOffNextIndex() {
+    boolean backOffNextIndex() {
         if (nextIndex > 1) {
             nextIndex--;
             return true;
@@ -152,7 +56,7 @@ public class ReplicatingState {
      * @param lastEntryIndex last entry index
      * @return true if advanced, false if no change
      */
-    public boolean advance(int lastEntryIndex) {
+    boolean advance(int lastEntryIndex) {
         // changed
         boolean result = (matchIndex != lastEntryIndex || nextIndex != (lastEntryIndex + 1));
 
@@ -160,6 +64,42 @@ public class ReplicatingState {
         nextIndex = lastEntryIndex + 1;
 
         return result;
+    }
+
+    /**
+     * Test if replicating.
+     *
+     * @return true if replicating, otherwise false
+     */
+    boolean isReplicating() {
+        return replicating;
+    }
+
+    /**
+     * Set replicating.
+     *
+     * @param replicating replicating
+     */
+    void setReplicating(boolean replicating) {
+        this.replicating = replicating;
+    }
+
+    /**
+     * Get last replicated timestamp.
+     *
+     * @return last replicated timestamp
+     */
+    long getLastReplicatedAt() {
+        return lastReplicatedAt;
+    }
+
+    /**
+     * Set last replicated timestamp.
+     *
+     * @param lastReplicatedAt last replicated timestamp
+     */
+    void setLastReplicatedAt(long lastReplicatedAt) {
+        this.lastReplicatedAt = lastReplicatedAt;
     }
 
     @Override

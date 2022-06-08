@@ -2,23 +2,17 @@ package top.parak.kraft.core.support.task;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
+import top.parak.kraft.core.support.task.AbstractTaskExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.concurrent.*;
 
-/**
- * Asynchronous single-threaded task executor.
- *
- * @author KHighness
- * @since 2022-03-31
- * @email parakovo@gmail.com
- */
 public class SingleThreadTaskExecutor extends AbstractTaskExecutor {
 
     private final ExecutorService executorService;
 
-    private SingleThreadTaskExecutor() {
+    public SingleThreadTaskExecutor() {
         this(Executors.defaultThreadFactory());
     }
 
@@ -31,12 +25,14 @@ public class SingleThreadTaskExecutor extends AbstractTaskExecutor {
     }
 
     @Override
+    @Nonnull
     public Future<?> submit(@Nonnull Runnable task) {
         Preconditions.checkNotNull(task);
         return executorService.submit(task);
     }
 
     @Override
+    @Nonnull
     public <V> Future<V> submit(@Nonnull Callable<V> task) {
         Preconditions.checkNotNull(task);
         return executorService.submit(task);
@@ -47,12 +43,12 @@ public class SingleThreadTaskExecutor extends AbstractTaskExecutor {
         Preconditions.checkNotNull(task);
         Preconditions.checkNotNull(callbacks);
         executorService.submit(() -> {
-           try {
-               task.run();
-               callbacks.forEach(c -> c.onSuccess(null));
-           } catch (Exception e) {
-               callbacks.forEach(c -> c.onFailure(e));
-           }
+            try {
+                task.run();
+                callbacks.forEach(c -> c.onSuccess(null));
+            } catch (Exception e) {
+                callbacks.forEach(c -> c.onFailure(e));
+            }
         });
     }
 

@@ -1,40 +1,25 @@
 package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.eventbus.EventBus;
+import top.parak.kraft.core.node.NodeId;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.node.NodeId;
-
-/**
- * Netty Handler to connect remote node.
- *
- * @author KHighness
- * @since 2022-05-24
- * @email parakovo@gmail.com
- */
-public class ToRemoteHandler extends AbstractHandler {
+class ToRemoteHandler extends AbstractHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ToRemoteHandler.class);
-    private final NodeId selfId;
+    private final NodeId selfNodeId;
 
-    /**
-     * Create ToRemoteHandler.
-     *
-     * @param eventBus eventBus
-     * @param remoteId id of remote node
-     * @param selfId   self id
-     */
-    public ToRemoteHandler(EventBus eventBus, NodeId remoteId, NodeId selfId) {
+    ToRemoteHandler(EventBus eventBus, NodeId remoteId, NodeId selfNodeId) {
         super(eventBus);
         this.remoteId = remoteId;
-        this.selfId = selfId;
+        this.selfNodeId = selfNodeId;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        ctx.write(selfId);
+        ctx.write(selfNodeId);
         channel = new NioChannel(ctx.channel());
     }
 

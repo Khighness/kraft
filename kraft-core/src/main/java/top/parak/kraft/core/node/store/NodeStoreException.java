@@ -1,16 +1,12 @@
 package top.parak.kraft.core.node.store;
 
 /**
- * Thrown when failing to store state into store.
- *
- * @author KHighness
- * @since 2022-03-20
- * @email parakovo@gmail.com
+ * Thrown when failed to store state into store.
  */
 public class NodeStoreException extends RuntimeException {
 
     /**
-     * Create NodeStoreException.
+     * Create.
      *
      * @param cause cause
      */
@@ -19,7 +15,7 @@ public class NodeStoreException extends RuntimeException {
     }
 
     /**
-     * Create NodeStoreException.
+     * Create.
      *
      * @param message message
      * @param cause cause

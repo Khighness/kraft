@@ -3,39 +3,21 @@ package top.parak.kraft.core.log.sequence;
 import top.parak.kraft.core.log.entry.Entry;
 import top.parak.kraft.core.log.entry.GroupConfigEntry;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Memory-based log entry sequence.
- *
- * @author KHighness
- * @since 2022-04-02
- * @email parakovo@gmail.com
- */
+@NotThreadSafe
 public class MemoryEntrySequence extends AbstractEntrySequence {
 
-    /**
-     * The list to store the log entries.
-     */
     private final List<Entry> entries = new ArrayList<>();
-    /**
-     * The initial commitIndex defined in RAFT is {@code 0}, regardless
-     * of whether the log is persistent or not.
-     */
-    private int commitIndex = 0;
 
     public MemoryEntrySequence() {
-        super(1);
+        this(1);
     }
 
     public MemoryEntrySequence(int logIndexOffset) {
         super(logIndexOffset);
-    }
-
-    @Override
-    protected Entry doGetEntry(int index) {
-        return entries.get(index - logIndexOffset);
     }
 
     @Override
@@ -44,8 +26,34 @@ public class MemoryEntrySequence extends AbstractEntrySequence {
     }
 
     @Override
+    protected Entry doGetEntry(int index) {
+        return entries.get(index - logIndexOffset);
+    }
+
+    @Override
     protected void doAppend(Entry entry) {
         entries.add(entry);
+    }
+
+    @Override
+    public void commit(int index) {
+    }
+
+    @Override
+    public int getCommitIndex() {
+        // TODO implement me
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public GroupConfigEntryList buildGroupConfigEntryList() {
+        GroupConfigEntryList list = new GroupConfigEntryList();
+        for (Entry entry : entries) {
+            if (entry instanceof GroupConfigEntry) {
+                list.add((GroupConfigEntry) entry);
+            }
+        }
+        return list;
     }
 
     @Override
@@ -60,29 +68,7 @@ public class MemoryEntrySequence extends AbstractEntrySequence {
     }
 
     @Override
-    public GroupConfigEntryList buildGroupConfigEntryList() {
-        GroupConfigEntryList list = new GroupConfigEntryList();
-        entries.stream()
-                .filter(entry -> entry instanceof GroupConfigEntry)
-                .forEach(entry -> {
-                   list.add((GroupConfigEntry) entry);
-                });
-        return list;
-    }
-
-    @Override
-    public void commit(int index) {
-        this.commitIndex = index;
-    }
-
-    @Override
-    public int getCommitIndex() {
-        return commitIndex;
-    }
-
-    @Override
     public void close() {
-        // it seems nothing to do
     }
 
     @Override

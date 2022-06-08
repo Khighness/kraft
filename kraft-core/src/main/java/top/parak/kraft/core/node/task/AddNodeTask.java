@@ -3,13 +3,6 @@ package top.parak.kraft.core.node.task;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 
-/**
- * AddNode task.
- *
- * @author KHighness
- * @since 2022-05-31
- * @email parakovo@gmail.com
- */
 public class AddNodeTask extends AbstractGroupConfigChangeTask {
 
     private final NodeEndpoint endpoint;
@@ -28,22 +21,22 @@ public class AddNodeTask extends AbstractGroupConfigChangeTask {
     }
 
     @Override
-    protected void appendGroupConfig() {
-        context.addNode(endpoint, nextIndex, matchIndex);
-    }
-
-    @Override
     public boolean isTargetNode(NodeId nodeId) {
         return endpoint.getId().equals(nodeId);
     }
 
     @Override
+    protected void appendGroupConfig() {
+        context.addNode(endpoint, nextIndex, matchIndex);
+    }
+
+    @Override
     public String toString() {
         return "AddNodeTask{" +
-                "endpoint=" + endpoint +
+                "state=" + state +
+                ", endpoint=" + endpoint +
                 ", nextIndex=" + nextIndex +
                 ", matchIndex=" + matchIndex +
-                ", state=" + state +
                 '}';
     }
 

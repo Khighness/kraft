@@ -5,48 +5,15 @@ import top.parak.kraft.core.node.NodeId;
 
 import java.util.Set;
 
-/**
- * InstallSnapshot RPC arguments.
- * <p>Invoker: Leader</p>
- * <p>Receiver: Follower</p>
- *
- * @author KHighness
- * @since 2022-04-06
- * @email parakovo@gmail.com
- */
 public class InstallSnapshotRpc {
 
-    /**
-     * The leader's term.
-     */
     private int term;
-    /**
-     * The id of leader, so follower can redirect clients.
-     */
     private NodeId leaderId;
-    /**
-     * The snapshot replaces all entries up through and including this index.
-     */
     private int lastIndex;
-    /**
-     * The term of lastIndex.
-     */
     private int lastTerm;
-    /**
-     * Current node configs.
-     */
     private Set<NodeEndpoint> lastConfig;
-    /**
-     * The byte offset where chunk id position in the snapshot file.
-     */
     private int offset;
-    /**
-     * The raw bytes of the snapshot chunk, starting at offset.
-     */
     private byte[] data;
-    /**
-     * True if this is the last chunk.
-     */
     private boolean done;
 
     public int getTerm() {
@@ -102,7 +69,7 @@ public class InstallSnapshotRpc {
     }
 
     public int getDataLength() {
-        return data.length;
+        return this.data.length;
     }
 
     public void setData(byte[] data) {
@@ -120,14 +87,13 @@ public class InstallSnapshotRpc {
     @Override
     public String toString() {
         return "InstallSnapshotRpc{" +
-                "term=" + term +
-                ", leaderId=" + leaderId +
+                "data.size=" + (data != null ? data.length : 0) +
+                ", done=" + done +
                 ", lastIndex=" + lastIndex +
                 ", lastTerm=" + lastTerm +
-                ", lastConfig=" + lastConfig +
+                ", leaderId=" + leaderId +
                 ", offset=" + offset +
-                ", data=" + new String(data) +
-                ", done=" + done +
+                ", term=" + term +
                 '}';
     }
 
