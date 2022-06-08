@@ -14,6 +14,7 @@ import top.parak.kraft.kvstore.message.SetCommand;
 
 /**
  * KV-store server handler.
+ *
  * <p><b>NOTE</b></p>
  * Custom {@link ChannelInboundHandlerAdapter} must release msg after invoking
  * {@link ChannelInboundHandlerAdapter#channelRead(ChannelHandlerContext, Object) channelRead}.
@@ -53,8 +54,13 @@ public class KVStoreServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        logger.info("kv-store client {} connected", ctx.channel().remoteAddress().toString());
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("connect exception: {}", cause.getMessage(), cause);
+        logger.error("kv-store client connect exception: {}", cause.getMessage());
         ctx.close();
     }
 

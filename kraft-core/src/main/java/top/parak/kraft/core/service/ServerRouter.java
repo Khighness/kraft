@@ -20,6 +20,13 @@ public class ServerRouter {
     private final Map<NodeId, Channel> availableServers = new HashMap<>();
     private NodeId leaderId;
 
+    /**
+     * Send message to server.
+     *
+     * @param message message
+     * @return result
+     * @throws NoAvailableServerException if no available server
+     */
     public Object send(Object message) {
         for (NodeId nodeId : getCandidateNodeIds()) {
             try {
@@ -27,11 +34,11 @@ public class ServerRouter {
                 this.leaderId = nodeId;
                 return result;
             } catch (RedirectException e) {
-                logger.debug("not a leader server, redirect to server {}", e.getLeaderId());
+                logger.warn("not a leader server, redirect to server {}", e.getLeaderId());
                 this.leaderId = e.getLeaderId();
                 return doSend(e.getLeaderId(), message);
             } catch (Exception e) {
-                logger.debug("failed to process with server " + nodeId + ", cause: " + e.getMessage());
+                logger.warn("failed to process with server " + nodeId + ", cause: " + e.getMessage(), e);
             }
         }
         throw new NoAvailableServerException("no available server");

@@ -39,7 +39,6 @@ public class GeneralEntry extends AbstractEntry {
         return "GeneralEntry{" +
                 "index=" + index +
                 ", term=" + term +
-                ", command=" + new String(commandBytes) +
                 '}';
     }
 

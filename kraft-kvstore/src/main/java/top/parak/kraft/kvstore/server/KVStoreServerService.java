@@ -39,11 +39,21 @@ public class KVStoreServerService {
     private final ConcurrentHashMap<String, CommandRequest<?>> pendingCommands = new ConcurrentHashMap<>();
     private Map<String, byte[]> map = new HashMap<>();
 
+    /**
+     * Create KVStoreServerService.
+     *
+     * @param node node
+     */
     public KVStoreServerService(Node node) {
         this.node = node;
         this.node.registerStateMachine(new StateMachineImpl());
     }
 
+    /**
+     * Execute {@link AddNodeCommand}.
+     *
+     * @param commandRequest add node command request
+     */
     public void addNode(CommandRequest<AddNodeCommand> commandRequest) {
         Redirect redirect = checkLeadership();
         if (redirect != null) {
@@ -56,6 +66,11 @@ public class KVStoreServerService {
         awaitResult(taskReference, commandRequest);
     }
 
+    /**
+     * Execute {@link RemoveNodeCommand}.
+     *
+     * @param commandRequest remove node command request
+     */
     public void removeNode(CommandRequest<RemoveNodeCommand> commandRequest) {
         Redirect redirect = checkLeadership();
         if (redirect != null) {
@@ -68,6 +83,11 @@ public class KVStoreServerService {
         awaitResult(taskReference, commandRequest);
     }
 
+    /**
+     * Execute {@link SetCommand}.
+     *
+     * @param commandRequest set command request
+     */
     public void set(CommandRequest<SetCommand> commandRequest) {
         Redirect redirect = checkLeadership();
         if (redirect != null) {
@@ -76,19 +96,29 @@ public class KVStoreServerService {
         }
 
         SetCommand command = commandRequest.getCommand();
-        logger.debug("set {}", command.getKey());
+        logger.info("process command: [set {}]", command.getKey());
         this.pendingCommands.put(command.getKey(), commandRequest);
         commandRequest.addCloseListener(() -> pendingCommands.remove(command.getRequestId()));
         this.node.appendLog(command.toBytes());
     }
 
+    /**
+     * Execute {@link GetCommand}.
+     *
+     * @param commandRequest get command request
+     */
     public void get(CommandRequest<GetCommand> commandRequest) {
         String key = commandRequest.getCommand().getKey();
-        logger.debug("get {}", key);
+        logger.debug("process command: [get {}]", key);
         byte[] value = this.map.get(key);
         commandRequest.reply(new GetCommandResponse(value));
     }
 
+    /**
+     * Check current node's leadership.
+     *
+     * @return null if current node is leader, otherwise <code>Redirect</code>
+     */
     private Redirect checkLeadership() {
         RoleNameANdLeaderId state = node.getRoleNameANdLeaderId();
         if (state.getRoleName() != RoleName.LEADER) {
@@ -97,6 +127,13 @@ public class KVStoreServerService {
         return null;
     }
 
+    /**
+     * Await result.
+     *
+     * @param taskReference  task reference
+     * @param commandRequest command request
+     * @param <T> T
+     */
     private <T> void awaitResult(GroupConfigChangeTaskReference taskReference, CommandRequest<T> commandRequest) {
         try {
             switch (taskReference.getResult(3000L)) {
@@ -116,6 +153,13 @@ public class KVStoreServerService {
         }
     }
 
+    /**
+     * Transform map into output stream.
+     *
+     * @param map    map
+     * @param output output stream
+     * @throws IOException if IO exception occurs
+     */
     static void toSnapshot(Map<String, byte[]> map, OutputStream output) throws IOException {
         Protos.EntryList.Builder entryList = Protos.EntryList.newBuilder();
         map.forEach((key, value) -> entryList.addEntries(
@@ -128,12 +172,22 @@ public class KVStoreServerService {
         entryList.build().getSerializedSize();
     }
 
+    /**
+     * Transform input stream into map.
+     *
+     * @param input input stream
+     * @return map
+     * @throws IOException if IO exception occurs
+     */
     static Map<String, byte[]> fromSnapshot(InputStream input) throws IOException {
         Protos.EntryList entryList = Protos.EntryList.parseFrom(input);
         return entryList.getEntriesList().stream()
                 .collect(Collectors.toMap(Protos.EntryList.Entry::getKey, e -> e.getValue().toByteArray()));
     }
 
+    /**
+     * Implementation of statemachine.
+     */
     private class StateMachineImpl extends AbstractSingleThreadStateMachine {
 
         @Override

@@ -82,7 +82,7 @@ public class NioConnector implements Connector {
                         pipeline.addLast(new FromRemoteHandler(eventBus, inboundChannelGroup));
                     }
                 });
-        logger.debug("node listen on port {}", port);
+        logger.info("raft rpc service is listening on port {}", port);
         try {
             serverBootstrap.bind(port).sync();
         } catch (InterruptedException e) {

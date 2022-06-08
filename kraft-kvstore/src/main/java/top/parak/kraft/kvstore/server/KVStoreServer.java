@@ -78,10 +78,11 @@ public class KVStoreServer {
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(new KVStoreMessageEncoder());
                         p.addLast(new KVStoreMessageDecoder());
-                        p.addLast(handlerGroup, serverHandler);
+//                        p.addLast(handlerGroup, serverHandler);
+                        p.addLast(serverHandler);
                     }
                 });
-        logger.info("kv store server is serving at port {}", this.port);
+        logger.info("kv-store server is serving at port {}", this.port);
         serverBootstrap.bind(this.port);
     }
 

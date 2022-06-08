@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * KV-store message decoder.
  *
- * <p><b>Transport protocol between KV-server and KV-client</b></p>
+ * <p><b>Transport protocol between KV-store server and KV-store client</b></p>
  * <pre>
  *   |<-------(4)------>|<-------(4)------>|<--ContentLength->|
  *   +------------------+------------------+------------------+

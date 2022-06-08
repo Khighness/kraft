@@ -134,7 +134,8 @@ public class CommandServerLauncher {
                 .setDataDir(cmdLine.getOptionValue('d'))
                 .build();
         KVStoreServer server = new KVStoreServer(node, servicePort);
-        logger.info("node {} is serving at {}:{} as group member, group config {}", id, host, servicePort, nodeEndpoints);
+        logger.info("node {} is serving at [{}:{}] as group member", id, host, servicePort);
+        logger.info("group config: {}", nodeEndpoints);
         startServer(server);
     }
 

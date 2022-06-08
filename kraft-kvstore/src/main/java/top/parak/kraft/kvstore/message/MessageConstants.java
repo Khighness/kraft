@@ -16,6 +16,6 @@ public class MessageConstants {
     public static final int MSG_TYPE_REMOVE_SERVER_COMMAND = 11;
     public static final int MSG_TYPE_GET_COMMAND = 100;
     public static final int MSG_TYPE_GET_COMMAND_RESPONSE = 101;
-    public  static final int MSG_TYPE_SET_COMMAND = 102;
+    public static final int MSG_TYPE_SET_COMMAND = 102;
 
 }

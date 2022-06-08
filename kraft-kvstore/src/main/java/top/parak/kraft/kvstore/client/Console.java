@@ -1,5 +1,6 @@
 package top.parak.kraft.kvstore.client;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -69,7 +70,7 @@ public class Console {
                     continue;
                 }
                 dispatchCommand(line);
-            } catch (IllegalStateException e) {
+            } catch (IllegalArgumentException e) {
                 System.err.println(e.getMessage());
             } catch (EndOfFileException ignored) {
                 break;
