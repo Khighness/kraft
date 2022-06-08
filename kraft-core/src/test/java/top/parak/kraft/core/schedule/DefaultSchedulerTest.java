@@ -1,10 +1,25 @@
 package top.parak.kraft.core.schedule;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
+import top.parak.kraft.core.node.NodeBuilder;
+import top.parak.kraft.core.node.NodeEndpoint;
+import top.parak.kraft.core.node.NodeId;
+import top.parak.kraft.core.node.NodeImpl;
+import top.parak.kraft.core.node.config.NodeConfig;
+import top.parak.kraft.core.node.store.MemoryNodeStore;
+import top.parak.kraft.core.rpc.MockConnector;
+import top.parak.kraft.core.rpc.nio.NioConnector;
+import top.parak.kraft.core.support.task.DirectTaskExecutor;
+import top.parak.kraft.core.support.task.ListeningTaskExecutor;
+import top.parak.kraft.core.support.task.SingleThreadTaskExecutor;
+import top.parak.kraft.core.support.task.TaskExecutor;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DefaultSchedulerTest {
 
@@ -18,7 +33,6 @@ public class DefaultSchedulerTest {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-            System.out.println("呜呜呜");
             countDownLatch.countDown();
         });
 
@@ -59,6 +73,52 @@ public class DefaultSchedulerTest {
         bufferedReader.close();
         inputStreamReader.close();
         inputStream.close();
+    }
+
+    private static TaskExecutor taskExecutor;
+    private static TaskExecutor groupConfigChangeTaskExecutor;
+    private static TaskExecutor cachedThreadTaskExecutor;
+    private static final AtomicInteger cachedThreadId = new AtomicInteger(0);
+
+    @BeforeClass
+    public static void beforeClass() {
+        taskExecutor = new SingleThreadTaskExecutor("node-test");
+        groupConfigChangeTaskExecutor = new SingleThreadTaskExecutor("group-config-change-test");
+        cachedThreadTaskExecutor = new ListeningTaskExecutor(Executors.newCachedThreadPool(r ->
+                new Thread(r, "cached-thread-" + cachedThreadId.incrementAndGet())));
+    }
+
+    private NodeBuilder newNodeBuilder(NodeId selfId, NodeEndpoint... endpoints) {
+        return new NodeBuilder(Arrays.asList(endpoints), selfId);
+    }
+
+
+    @Test
+    public void testTwoNode() throws ExecutionException, InterruptedException {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        Future<NodeImpl> future1 = executorService.submit(() -> {
+            NodeImpl node = (NodeImpl) newNodeBuilder(
+                    NodeId.of("A"),
+                    new NodeEndpoint("A", "127.0.0.1", 2333),
+                    new NodeEndpoint("B", "127.0.0.1", 2334))
+                    .build();
+            node.start();
+
+            return node;
+        });
+        Future<NodeImpl> future2 = executorService.submit(() -> {
+            NodeImpl node = (NodeImpl) newNodeBuilder(
+                    NodeId.of("B"),
+                    new NodeEndpoint("A", "127.0.0.1", 2333),
+                    new NodeEndpoint("B", "127.0.0.1", 2334))
+                    .build();
+            node.start();
+
+            return node;
+        });
+
+        NodeImpl a = future1.get();
+        NodeImpl b = future2.get();
     }
 
 }

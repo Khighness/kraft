@@ -1050,7 +1050,6 @@ public class NodeImplTest {
         MockConnector connector = (MockConnector) node.getContext().connector();
         AppendEntriesResult result = (AppendEntriesResult) connector.getResult();
         Assert.assertEquals(2, result.getTerm());
-        System.out.println(result);
         Assert.assertTrue(result.isSuccess());
 
         RoleState state = node.getRoleState();

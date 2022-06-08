@@ -99,7 +99,7 @@ public class NodeImpl implements Node {
      *
      * @return context
      */
-    NodeContext getContext() {
+    public NodeContext getContext() {
         return context;
     }
 
@@ -277,8 +277,10 @@ public class NodeImpl implements Node {
      * @param newRole new role
      */
     private void changeToRole(AbstractNodeRole newRole) {
-        if (!isStableBetween(role, newRole)) {
-            logger.debug("node {} role state changed {} -> {}", context.selfId(), role, newRole);
+        if (isStableBetween(role, newRole)) {
+            logger.trace("node {} role stay -> {}", context.selfId(), role.getName());
+        } else {
+            logger.info("node {} role state changed {} -> {}", context.selfId(), role, newRole);
             RoleState state = newRole.getState();
 
             // update store
@@ -489,7 +491,9 @@ public class NodeImpl implements Node {
     @Subscribe
     public void onReceiveRequestVoteRpc(RequestVoteRpcMessage rpcMessage) {
         context.taskExecutor().submit(
-                () -> context.connector().replyRequestVote(doProcessRequestVoteRpc(rpcMessage), rpcMessage),
+                () -> {
+                    context.connector().replyRequestVote(doProcessRequestVoteRpc(rpcMessage), rpcMessage);
+                },
                 LOGGING_FUTURE_CALLBACK
         );
     }
@@ -527,6 +531,7 @@ public class NodeImpl implements Node {
                 return new RequestVoteResult(role.getTerm(), false);
             case CANDIDATE:
                 // voted for self
+                return new RequestVoteResult(role.getTerm(), false);
             case FOLLOWER:
                 FollowerNodeRole follower = (FollowerNodeRole) this.role;
                 NodeId votedFor = follower.getVotedFor();
@@ -619,6 +624,7 @@ public class NodeImpl implements Node {
      *
      * @param rpcMessage append entries rpc
      */
+    @Subscribe
     public void onReceiveAppendEntriesRpc(AppendEntriesRpcMessage rpcMessage) {
         context.taskExecutor().submit(
                 () -> context.connector().replyAppendEntries(doProcessAppendEntriesRpc(rpcMessage), rpcMessage),

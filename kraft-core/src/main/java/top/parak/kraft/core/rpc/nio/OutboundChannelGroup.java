@@ -13,7 +13,7 @@ import top.parak.kraft.core.rpc.Address;
 import top.parak.kraft.core.rpc.ChannelConnectException;
 import top.parak.kraft.core.rpc.ChannelException;
 
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 import java.net.ConnectException;
 import java.util.concurrent.*;
 
@@ -24,21 +24,21 @@ import java.util.concurrent.*;
  * @since 2022-05-25
  * @email parakovo@gmail.com
  */
-@NotThreadSafe
-public class OutboundChannelGroup {
+@ThreadSafe
+class OutboundChannelGroup {
 
     private static final Logger logger = LoggerFactory.getLogger(OutboundChannelGroup.class);
     private final EventLoopGroup workerGroup;
     private final EventBus eventBus;
-    private final NodeId selfId;
-    private final int connectTimeoutMills;
-    private final ConcurrentHashMap<NodeId, Future<NioChannel>> channelMap = new ConcurrentHashMap<>();
+    private final NodeId selfNodeId;
+    private final int connectTimeoutMillis;
+    private final ConcurrentMap<NodeId, Future<NioChannel>> channelMap = new ConcurrentHashMap<>();
 
-    public OutboundChannelGroup(EventLoopGroup workerGroup, EventBus eventBus, NodeId selfId, int connectTimeoutMills) {
+    OutboundChannelGroup(EventLoopGroup workerGroup, EventBus eventBus, NodeId selfNodeId, int logReplicationInterval) {
         this.workerGroup = workerGroup;
         this.eventBus = eventBus;
-        this.selfId = selfId;
-        this.connectTimeoutMills = connectTimeoutMills;
+        this.selfNodeId = selfNodeId;
+        this.connectTimeoutMillis = logReplicationInterval / 2;
     }
 
     /**
@@ -49,15 +49,15 @@ public class OutboundChannelGroup {
      * @param address address of remote node
      * @return nio channel to remote node
      */
-    public NioChannel getOrConnect(NodeId nodeId, Address address) {
+    NioChannel getOrConnect(NodeId nodeId, Address address) {
         Future<NioChannel> future = channelMap.get(nodeId);
         if (future == null) {
             FutureTask<NioChannel> newFuture = new FutureTask<>(() -> connect(nodeId, address));
-             future = channelMap.putIfAbsent(nodeId, newFuture);
-             if (future == null) {
-                 future = newFuture;
-                 newFuture.run();
-             }
+            future = channelMap.putIfAbsent(nodeId, newFuture);
+            if (future == null) {
+                future = newFuture;
+                newFuture.run();
+            }
         }
         try {
             return future.get();
@@ -66,7 +66,7 @@ public class OutboundChannelGroup {
             if (e instanceof ExecutionException) {
                 Throwable cause = e.getCause();
                 if (cause instanceof ConnectException) {
-                    throw new ChannelConnectException("failed to get channel to node " + nodeId +
+                    throw new ChannelConnectException("failed to connect to node " + nodeId +
                             ", cause " + cause.getMessage(), cause);
                 }
             }
@@ -87,24 +87,24 @@ public class OutboundChannelGroup {
                 .group(workerGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMills)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        p.addLast(new NodeRpcMessageDecoder());
-                        p.addLast(new NodeRpcMessageEncoder());
-                        p.addLast(new ToRemoteHandler(eventBus, nodeId, selfId));
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new NodeRpcMessageDecoder());
+                        pipeline.addLast(new NodeRpcMessageEncoder());
+                        pipeline.addLast(new ToRemoteHandler(eventBus, nodeId, selfNodeId));
                     }
                 });
         ChannelFuture future = bootstrap.connect(address.getHost(), address.getPort()).sync();
         if (!future.isSuccess()) {
-            throw new ChannelException("failed to connect " + address, future.cause());
+            throw new ChannelException("failed to connect", future.cause());
         }
         logger.debug("channel OUTBOUND-{} connected", nodeId);
         Channel nettyChannel = future.channel();
         nettyChannel.closeFuture().addListener((ChannelFutureListener) cf -> {
-            logger.debug("channel OUTBOUND-{} disconnected", nodeId);
+            logger.info("channel OUTBOUND-{} disconnected", nodeId);
             channelMap.remove(nodeId);
         });
         return new NioChannel(nettyChannel);
@@ -114,12 +114,12 @@ public class OutboundChannelGroup {
      * Close all channels.
      */
     void closeAll() {
-        logger.debug("close all outbound channels");
+        logger.info("close all outbound channels");
         channelMap.forEach((nodeId, nioChannelFuture) -> {
             try {
                 nioChannelFuture.get().close();
             } catch (Exception e) {
-                logger.debug("failed to close outbound channels", e);
+                logger.warn("failed to close", e);
             }
         });
     }

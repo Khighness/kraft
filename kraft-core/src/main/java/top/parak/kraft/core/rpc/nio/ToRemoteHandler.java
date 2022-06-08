@@ -32,19 +32,12 @@ public class ToRemoteHandler extends AbstractHandler {
         this.selfId = selfId;
     }
 
-    /**
-     * Send selfId to remote node when connecting successfully.
-     */
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        // send the first message: selfId
+    public void channelActive(ChannelHandlerContext ctx) {
         ctx.write(selfId);
         channel = new NioChannel(ctx.channel());
     }
 
-    /**
-     * Receive message from remote node.
-     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         logger.debug("receive {} from {}", msg, remoteId);

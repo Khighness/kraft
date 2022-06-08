@@ -13,6 +13,13 @@ import java.io.InputStream;
  */
 public interface NodeConfigLoader {
 
+    /**
+     * Load input stream and return node config.
+     *
+     * @param input input stream
+     * @return node config
+     * @throws IOException if IO exception occurs
+     */
     @Nonnull
     NodeConfig load(@Nonnull InputStream input) throws IOException;
 

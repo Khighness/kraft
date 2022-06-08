@@ -22,10 +22,19 @@ public class DefaultNodeConfigLoader implements NodeConfigLoader {
     private static final Logger logger = LoggerFactory.getLogger(DefaultNodeConfigLoader.class);
     private final String propertyNamePrefix;
 
+    /**
+     * Create DefaultNodeConfigLoader.
+     * <p>Used empty string as default property name prefix.</p>
+     */
     public DefaultNodeConfigLoader() {
         this("");
     }
 
+    /**
+     * Create DefaultNodeConfigLoader.
+     *
+     * @param propertyNamePrefix property name prefix
+     */
     public DefaultNodeConfigLoader(String propertyNamePrefix) {
         this.propertyNamePrefix = propertyNamePrefix;
     }

@@ -14,7 +14,7 @@ public class RaftRemoveNodeCommand implements Command {
 
     @Override
     public String getName() {
-        return null;
+        return "raft-remove-node";
     }
 
     @Override

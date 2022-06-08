@@ -40,7 +40,7 @@ public class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
             Protos.RequestVoteRpc protoRpc = Protos.RequestVoteRpc.newBuilder()
                     .setTerm(rpc.getTerm())
                     .setCandidateId(rpc.getCandidateId().getValue())
-                    .setLastLogIndex(rpc.getLastLogTerm())
+                    .setLastLogIndex(rpc.getLastLogIndex())
                     .setLastLogTerm(rpc.getLastLogTerm())
                     .build();
             this.writeMessage(out, MessageConstants.MSG_TYPE_REQUEST_VOTE_RPC, protoRpc);
@@ -70,7 +70,7 @@ public class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
                                             .build()
                             ).collect(Collectors.toList())
                     ).build();
-            this.writeMessage(out, MessageConstants.MSG_TYPE_REQUEST_APPEND_ENTRIES_RPC, protoRpc);
+            this.writeMessage(out, MessageConstants.MSG_TYPE_APPEND_ENTRIES_RPC, protoRpc);
         } else if (msg instanceof AppendEntriesResult) {
             AppendEntriesResult result = (AppendEntriesResult) msg;
             Protos.AppendEntriesResult protoResult = Protos.AppendEntriesResult.newBuilder()
@@ -78,7 +78,7 @@ public class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
                     .setTerm(result.getTerm())
                     .setSuccess(result.isSuccess())
                     .build();
-            this.writeMessage(out, MessageConstants.MSG_TYPE_REQUEST_APPEND_ENTRIES_RESULT, protoResult);
+            this.writeMessage(out, MessageConstants.MSG_TYPE_APPEND_ENTRIES_RESULT, protoResult);
         } else if (msg instanceof InstallSnapshotRpc) {
             InstallSnapshotRpc rpc = (InstallSnapshotRpc) msg;
             Protos.InstallSnapshotRpc protoRpc = Protos.InstallSnapshotRpc.newBuilder()
@@ -93,30 +93,28 @@ public class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
                                             .setHost(e.getHost())
                                             .setPort(e.getPort())
                                             .build()
-                            ).collect(Collectors.toList())
-                    )
+                            ).collect(Collectors.toList()))
                     .setOffset(rpc.getOffset())
                     .setData(ByteString.copyFrom(rpc.getData()))
-                    .setDone(rpc.isDone())
-                    .build();
-            this.writeMessage(out, MessageConstants.MSG_TYPE_REQUEST_INSTALL_SNAPSHOT_RPC, protoRpc);
+                    .setDone(rpc.isDone()).build();
+            this.writeMessage(out, MessageConstants.MSG_TYPE_INSTALL_SNAPSHOT_PRC, protoRpc);
         } else if (msg instanceof InstallSnapshotResult) {
             InstallSnapshotResult result = (InstallSnapshotResult) msg;
             Protos.InstallSnapshotResult protoResult = Protos.InstallSnapshotResult.newBuilder()
-                    .setTerm(result.getTerm())
-                    .build();
-            this.writeMessage(out, MessageConstants.MSG_TYPE_REQUEST_INSTALL_SNAPSHOT_RESULT, protoResult);
+                    .setTerm(result.getTerm()).build();
+            this.writeMessage(out, MessageConstants.MSG_TYPE_INSTALL_SNAPSHOT_RESULT, protoResult);
         }
     }
 
     private void writeMessage(ByteBuf out, int messageType, MessageLite message) throws IOException {
-        out.writeInt(messageType);
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
         message.writeTo(byteOutput);
+        out.writeInt(messageType);
         this.writeBytes(out, byteOutput.toByteArray());
     }
 
     private void writeMessage(ByteBuf out, int messageType, byte[] bytes) {
+        // 4 + 4 + VAR
         out.writeInt(messageType);
         this.writeBytes(out, bytes);
     }

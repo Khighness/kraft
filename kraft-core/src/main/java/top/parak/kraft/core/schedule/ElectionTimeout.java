@@ -25,7 +25,7 @@ public class ElectionTimeout {
     }
 
     public void cancel() {
-        logger.debug("cancel election timeout");
+        logger.trace("cancel election timeout");
         this.scheduledFuture.cancel(false);
     }
 

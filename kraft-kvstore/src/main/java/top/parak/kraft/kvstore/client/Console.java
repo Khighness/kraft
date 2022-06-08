@@ -41,8 +41,13 @@ public class Console {
 
         commandContext = new CommandContext(serverMap);
 
-        ArgumentCompleter completer = new ArgumentCompleter(new StringsCompleter(commandMap.keySet()), new NullCompleter());
-        lineReader = LineReaderBuilder.builder().completer(completer).build();
+        ArgumentCompleter completer = new ArgumentCompleter(
+                new StringsCompleter(commandMap.keySet()),
+                new NullCompleter()
+        );
+        lineReader = LineReaderBuilder.builder()
+                .completer(completer)
+                .build();
     }
 
     private Map<String, Command> buildCommandMap(Collection<Command> commands) {

@@ -29,18 +29,22 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
      * This decouples the RAFT algorithm component and RPC implementation component.
      */
     protected final EventBus eventBus;
+
     /**
      * The id of remote node.
      */
     NodeId remoteId;
+
     /**
      * RPC channel between remote node and self.
      */
     protected Channel channel;
+
     /**
-     * The last {@link AppendEntriesRpc}.
+     * RPC channel between remote node and self.
      */
     private AppendEntriesRpc lastAppendEntriesRpc;
+
     /**
      * The last {@link InstallSnapshotRpc}.
      */
@@ -62,14 +66,14 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
             eventBus.post(msg);
         } else if (msg instanceof AppendEntriesRpc) {
             AppendEntriesRpc rpc = (AppendEntriesRpc) msg;
+            eventBus.post(new AppendEntriesRpcMessage(rpc, remoteId, channel));
         } else if (msg instanceof AppendEntriesResult) {
             AppendEntriesResult result = (AppendEntriesResult) msg;
             if (lastAppendEntriesRpc == null) {
                 logger.warn("no last append entries rpc");
             } else {
                 if (!Objects.equals(result.getRpcMessageId(), lastAppendEntriesRpc.getMessageId())) {
-                    logger.warn("incorrect append entries rpc message id {}, excepted {}",
-                            result.getRpcMessageId(), lastAppendEntriesRpc.getMessageId());
+                    logger.warn("incorrect append entries rpc message id {}, expected {}", result.getRpcMessageId(), lastAppendEntriesRpc.getMessageId());
                 } else {
                     eventBus.post(new AppendEntriesResultMessage(result, remoteId, lastAppendEntriesRpc));
                     lastAppendEntriesRpc = null;
@@ -80,9 +84,9 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
             eventBus.post(new InstallSnapshotRpcMessage(rpc, remoteId, channel));
         } else if (msg instanceof InstallSnapshotResult) {
             InstallSnapshotResult result = (InstallSnapshotResult) msg;
-            assert lastAppendEntriesRpc != null;
+            assert lastInstallSnapshotRpc != null;
             eventBus.post(new InstallSnapshotResultMessage(result, remoteId, lastInstallSnapshotRpc));
-            lastAppendEntriesRpc = null;
+            lastInstallSnapshotRpc = null;
         }
     }
 
@@ -96,10 +100,9 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
         super.write(ctx, msg, promise);
     }
 
-
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.warn(cause.getMessage(), cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("{} {}", ctx.channel().remoteAddress().toString(), cause.getMessage());
         ctx.close();
     }
 

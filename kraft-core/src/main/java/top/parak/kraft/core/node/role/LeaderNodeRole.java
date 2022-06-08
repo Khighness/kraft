@@ -17,6 +17,12 @@ public class LeaderNodeRole extends AbstractNodeRole {
 
     private final LogReplicationTask logReplicationTask;
 
+    /**
+     * Create LeaderNodeRole.
+     *
+     * @param term               term
+     * @param logReplicationTask log replication task
+     */
     public LeaderNodeRole(int term, LogReplicationTask logReplicationTask) {
         super(RoleName.LEADER, term);
         this.logReplicationTask = logReplicationTask;

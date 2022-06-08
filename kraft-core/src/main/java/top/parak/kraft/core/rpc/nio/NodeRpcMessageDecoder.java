@@ -39,59 +39,56 @@ public class NodeRpcMessageDecoder extends ByteToMessageDecoder {
 
         in.markReaderIndex();
         int messageType = in.readInt();
-        int messageLength = in.readInt();
-        if (in.readableBytes() < messageLength) {
+        int payloadLength = in.readInt();
+        if (in.readableBytes() < payloadLength) {
             in.resetReaderIndex();
             return;
         }
 
-        byte[] message = new byte[messageLength];
-        in.readBytes(message);
+        byte[] payload = new byte[payloadLength];
+        in.readBytes(payload);
         switch (messageType) {
             case MessageConstants.MSG_TYPE_NODE_ID:
-                out.add(new NodeId(new String(message)));
+                out.add(new NodeId(new String(payload)));
                 break;
             case MessageConstants.MSG_TYPE_REQUEST_VOTE_RPC:
-                Protos.RequestVoteRpc protoRVRpc = Protos.RequestVoteRpc.parseFrom(message);
-                RequestVoteRpc rvRpc = new RequestVoteRpc();
-                rvRpc.setTerm(protoRVRpc.getTerm());
-                rvRpc.setCandidateId(new NodeId(protoRVRpc.getCandidateId()));
-                rvRpc.setLastLogIndex(protoRVRpc.getLastLogIndex());
-                rvRpc.setLastLogTerm(protoRVRpc.getLastLogTerm());
-                out.add(rvRpc);
+                Protos.RequestVoteRpc protoRVRpc = Protos.RequestVoteRpc.parseFrom(payload);
+                RequestVoteRpc rpc = new RequestVoteRpc();
+                rpc.setTerm(protoRVRpc.getTerm());
+                rpc.setCandidateId(new NodeId(protoRVRpc.getCandidateId()));
+                rpc.setLastLogIndex(protoRVRpc.getLastLogIndex());
+                rpc.setLastLogTerm(protoRVRpc.getLastLogTerm());
+                out.add(rpc);
                 break;
             case MessageConstants.MSG_TYPE_REQUEST_VOTE_RESULT:
-                Protos.RequestVoteResult protoRVResult = Protos.RequestVoteResult.parseFrom(message);
-                RequestVoteResult rvResult = new RequestVoteResult(protoRVResult.getTerm(), protoRVResult.getVoteGranted());
-                out.add(rvResult);
+                Protos.RequestVoteResult protoRVResult = Protos.RequestVoteResult.parseFrom(payload);
+                out.add(new RequestVoteResult(protoRVResult.getTerm(), protoRVResult.getVoteGranted()));
                 break;
-            case MessageConstants.MSG_TYPE_REQUEST_APPEND_ENTRIES_RPC:
-                Protos.AppendEntriesRpc protoAERpc = Protos.AppendEntriesRpc.parseFrom(message);
+            case MessageConstants.MSG_TYPE_APPEND_ENTRIES_RPC:
+                Protos.AppendEntriesRpc protoAERpc = Protos.AppendEntriesRpc.parseFrom(payload);
                 AppendEntriesRpc aeRpc = new AppendEntriesRpc();
+                aeRpc.setMessageId(protoAERpc.getMessageId());
                 aeRpc.setTerm(protoAERpc.getTerm());
                 aeRpc.setLeaderId(new NodeId(protoAERpc.getLeaderId()));
                 aeRpc.setLeaderCommit(protoAERpc.getLeaderCommit());
                 aeRpc.setPrevLogIndex(protoAERpc.getPrevLogIndex());
-                aeRpc.setPrevLogTerm(protoAERpc.getTerm());
+                aeRpc.setPrevLogTerm(protoAERpc.getPrevLogTerm());
                 aeRpc.setEntries(protoAERpc.getEntriesList().stream().map(e ->
                         entryFactory.create(e.getKind(), e.getIndex(), e.getTerm(), e.getCommand().toByteArray())
                 ).collect(Collectors.toList()));
                 out.add(aeRpc);
                 break;
-            case MessageConstants.MSG_TYPE_REQUEST_APPEND_ENTRIES_RESULT:
-                Protos.AppendEntriesResult protoAEResult = Protos.AppendEntriesResult.parseFrom(message);
-                AppendEntriesResult aeResult = new AppendEntriesResult(
-                        protoAEResult.getRpcMessageId(), protoAEResult.getTerm(), protoAEResult.getSuccess()
-                );
-                out.add(aeResult);
+            case MessageConstants.MSG_TYPE_APPEND_ENTRIES_RESULT:
+                Protos.AppendEntriesResult protoAEResult = Protos.AppendEntriesResult.parseFrom(payload);
+                out.add(new AppendEntriesResult(protoAEResult.getRpcMessageId(), protoAEResult.getTerm(), protoAEResult.getSuccess()));
                 break;
-            case MessageConstants.MSG_TYPE_REQUEST_INSTALL_SNAPSHOT_RPC:
-                Protos.InstallSnapshotRpc protoISRpc = Protos.InstallSnapshotRpc.parseFrom(message);
+            case MessageConstants.MSG_TYPE_INSTALL_SNAPSHOT_PRC:
+                Protos.InstallSnapshotRpc protoISRpc = Protos.InstallSnapshotRpc.parseFrom(payload);
                 InstallSnapshotRpc isRpc = new InstallSnapshotRpc();
                 isRpc.setTerm(protoISRpc.getTerm());
                 isRpc.setLeaderId(new NodeId(protoISRpc.getLeaderId()));
                 isRpc.setLastIndex(protoISRpc.getLastIndex());
-                isRpc.setLastTerm(protoISRpc.getLastTerm());
+                isRpc.setLastTerm(protoISRpc.getTerm());
                 isRpc.setLastConfig(protoISRpc.getLastConfigList().stream().map(e ->
                         new NodeEndpoint(e.getId(), e.getHost(), e.getPort())
                 ).collect(Collectors.toSet()));
@@ -100,10 +97,9 @@ public class NodeRpcMessageDecoder extends ByteToMessageDecoder {
                 isRpc.setDone(protoISRpc.getDone());
                 out.add(isRpc);
                 break;
-            case MessageConstants.MSG_TYPE_REQUEST_INSTALL_SNAPSHOT_RESULT:
-                Protos.InstallSnapshotResult protoISResult = Protos.InstallSnapshotResult.parseFrom(message);
-                InstallSnapshotResult isResult = new InstallSnapshotResult(protoISResult.getTerm());
-                out.add(isResult);
+            case MessageConstants.MSG_TYPE_INSTALL_SNAPSHOT_RESULT:
+                Protos.InstallSnapshotResult protoISResult = Protos.InstallSnapshotResult.parseFrom(payload);
+                out.add(new InstallSnapshotResult(protoISResult.getTerm()));
                 break;
         }
     }

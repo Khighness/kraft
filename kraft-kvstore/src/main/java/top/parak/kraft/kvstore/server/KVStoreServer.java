@@ -81,7 +81,7 @@ public class KVStoreServer {
                         p.addLast(handlerGroup, serverHandler);
                     }
                 });
-        logger.info("netty rpc server started at port {}", this.port);
+        logger.info("kv store server is serving at port {}", this.port);
         serverBootstrap.bind(this.port);
     }
 

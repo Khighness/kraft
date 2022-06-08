@@ -1,8 +1,8 @@
 package top.parak.kraft.core.rpc.nio;
 
 import top.parak.kraft.core.rpc.Channel;
-import top.parak.kraft.core.rpc.message.*;
 import top.parak.kraft.core.rpc.ChannelException;
+import top.parak.kraft.core.rpc.message.*;
 
 import javax.annotation.Nonnull;
 
@@ -17,8 +17,8 @@ public class NioChannel implements Channel {
 
     private final io.netty.channel.Channel nettyChannel;
 
-    public NioChannel(io.netty.channel.Channel nettChannel) {
-        this.nettyChannel = nettChannel;
+    NioChannel(io.netty.channel.Channel nettyChannel) {
+        this.nettyChannel = nettyChannel;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class NioChannel implements Channel {
         try {
             nettyChannel.close().sync();
         } catch (InterruptedException e) {
-            throw new ChannelException("failed to close channel", e);
+            throw new ChannelException("failed to close", e);
         }
     }
 

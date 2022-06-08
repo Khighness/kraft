@@ -35,8 +35,8 @@ import java.util.concurrent.Executors;
 public class NioConnector implements Connector {
 
     private static final Logger logger = LoggerFactory.getLogger(NioConnector.class);
-    private final NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    private final NioEventLoopGroup workerGroup;
+    private final NioEventLoopGroup bossNioEventLoopGroup = new NioEventLoopGroup(1);
+    private final NioEventLoopGroup workerNioEventLoopGroup;
     private final boolean workerGroupShared;
     private final EventBus eventBus;
     private final int port;
@@ -50,34 +50,35 @@ public class NioConnector implements Connector {
         return thread;
     });
 
-    public NioConnector(NodeId selfId, EventBus eventBus, int port, int logReplicationInterval) {
-        this(new NioEventLoopGroup(), false, selfId, eventBus, port, logReplicationInterval);
+    public NioConnector(NodeId selfNodeId, EventBus eventBus, int port, int logReplicationInterval) {
+        this(new NioEventLoopGroup(), false, selfNodeId, eventBus, port, logReplicationInterval);
     }
 
-    public NioConnector(NioEventLoopGroup workerGroup, NodeId selfId, EventBus eventBus, int port, int logReplicationInterval) {
-        this(workerGroup, true, selfId, eventBus, port, logReplicationInterval);
+    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, NodeId selfNodeId, EventBus eventBus, int port, int logReplicationInterval) {
+        this(workerNioEventLoopGroup, true, selfNodeId, eventBus, port, logReplicationInterval);
     }
 
-    public NioConnector(NioEventLoopGroup workerGroup, boolean workerGroupShared,
-                        NodeId selfId, EventBus eventBus, int port, int logReplicationInterval) {
-        this.workerGroup = workerGroup;
+    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, boolean workerGroupShared,
+                        NodeId selfNodeId, EventBus eventBus,
+                        int port, int logReplicationInterval) {
+        this.workerNioEventLoopGroup = workerNioEventLoopGroup;
         this.workerGroupShared = workerGroupShared;
         this.eventBus = eventBus;
         this.port = port;
-        this.outboundChannelGroup = new OutboundChannelGroup(workerGroup, eventBus, selfId, logReplicationInterval);
+        outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfNodeId, logReplicationInterval);
     }
 
     @Override
     public void initialize() {
         ServerBootstrap serverBootstrap = new ServerBootstrap()
-                .group(bossGroup, workerGroup)
+                .group(bossNioEventLoopGroup, workerNioEventLoopGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new NodeRpcMessageDecoder());
-                        pipeline.addLast(new NodeRpcMessageDecoder());
+                        pipeline.addLast(new NodeRpcMessageEncoder());
                         pipeline.addLast(new FromRemoteHandler(eventBus, inboundChannelGroup));
                     }
                 });
@@ -93,11 +94,18 @@ public class NioConnector implements Connector {
     public void sendRequestVote(@Nonnull RequestVoteRpc rpc, @Nonnull Collection<NodeEndpoint> destinationEndpoints) {
         Preconditions.checkNotNull(rpc);
         Preconditions.checkNotNull(destinationEndpoints);
-        for (NodeEndpoint destinationEndpoint : destinationEndpoints) {
-            logger.debug("send {} to node {}", rpc, destinationEndpoint.getId());
-            executorService.execute(() -> {
-                getChannel(destinationEndpoint).writeRequestVoteRpc(rpc);
-            });
+        for (NodeEndpoint endpoint : destinationEndpoints) {
+            logger.debug("send {} to node {}", rpc, endpoint.getId());
+            logger.info("sendRequestVote {} {}", endpoint.getId(), getChannel(endpoint));
+            executorService.execute(() -> getChannel(endpoint).writeRequestVoteRpc(rpc));
+        }
+    }
+
+    private void logException(Throwable e) {
+        if (e instanceof ChannelConnectException) {
+            logger.warn(e.getMessage());
+        } else {
+            logger.warn("failed to process channel", e);
         }
     }
 
@@ -107,6 +115,7 @@ public class NioConnector implements Connector {
         Preconditions.checkNotNull(rpcMessage);
         logger.debug("reply {} to node {}", result, rpcMessage.getSourceNodeId());
         try {
+            logger.info("replyRequestVote {} {}", rpcMessage.getSourceNodeId(), rpcMessage.getChannel());
             rpcMessage.getChannel().writeRequestVoteResult(result);
         } catch (Exception e) {
             logException(e);
@@ -162,27 +171,19 @@ public class NioConnector implements Connector {
         inboundChannelGroup.closeAll();
     }
 
-    @Override
-    public void close() {
-        logger.debug("close connector");
-        inboundChannelGroup.closeAll();
-        outboundChannelGroup.closeAll();
-        bossGroup.shutdownGracefully();
-        if (!workerGroupShared) {
-            workerGroup.shutdownGracefully();
-        }
-    }
-
-    private void logException(Throwable e) {
-        if (e instanceof ChannelConnectException) {
-            logger.warn(e.getMessage());
-        } else {
-            logger.warn("failed to process channel", e);
-        }
-    }
-
     private Channel getChannel(NodeEndpoint endpoint) {
         return outboundChannelGroup.getOrConnect(endpoint.getId(), endpoint.getAddress());
+    }
+
+    @Override
+    public void close() {
+        logger.info("close connector");
+        inboundChannelGroup.closeAll();
+        outboundChannelGroup.closeAll();
+        bossNioEventLoopGroup.shutdownGracefully();
+        if (!workerGroupShared) {
+            workerNioEventLoopGroup.shutdownGracefully();
+        }
     }
 
 }

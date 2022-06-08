@@ -1,11 +1,9 @@
 package top.parak.kraft.core.rpc.nio;
 
+import top.parak.kraft.core.node.NodeId;
 import io.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import top.parak.kraft.core.node.NodeId;
-import top.parak.kraft.core.node.role.LeaderNodeRole;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.List;
@@ -27,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @email parakovo@gmail.com
  */
 @ThreadSafe
-public class InboundChannelGroup {
+class InboundChannelGroup {
 
     private static final Logger logger = LoggerFactory.getLogger(InboundChannelGroup.class);
 
@@ -39,13 +37,15 @@ public class InboundChannelGroup {
     /**
      * Add inbound channel.
      *
-     * @param remotedId id of remote node
+     * @param remoteId id of remote node
      * @param channel   channel between remote node and self
      */
-    public void add(NodeId remotedId, NioChannel channel) {
-        logger.debug("channel INBOUND-{} connected", remotedId);
+    public void add(NodeId remoteId, NioChannel channel) {
+        channels.add(channel);
+        logger.debug("channel INBOUND-{} connected", remoteId);
         channel.getDelegate().closeFuture().addListener((ChannelFutureListener) future -> {
-           logger.debug("channel INBOUND-{} disconnected", remotedId);
+            logger.debug("channel INBOUND-{} disconnected", remoteId);
+            remove(channel);
         });
     }
 
@@ -54,7 +54,7 @@ public class InboundChannelGroup {
      *
      * @param channel channel between remote node and self
      */
-    public void remove(NioChannel channel) {
+    private void remove(NioChannel channel) {
         channels.remove(channel);
     }
 
@@ -62,7 +62,7 @@ public class InboundChannelGroup {
      * Close all inbound channels.
      */
     void closeAll() {
-        logger.debug("close all inbound connections");
+        logger.info("close all inbound channels");
         for (NioChannel channel : channels) {
             channel.close();
         }

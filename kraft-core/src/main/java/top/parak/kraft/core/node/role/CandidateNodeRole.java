@@ -18,16 +18,35 @@ public class CandidateNodeRole extends AbstractNodeRole {
     private final int votesCount;
     private final ElectionTimeout electionTimeout;
 
+    /**
+     * Create CandidateNodeRole.
+     * <p>Default votes count is 1.</p>
+     *
+     * @param term            term
+     * @param electionTimeout election timeout
+     */
     public CandidateNodeRole(int term, ElectionTimeout electionTimeout) {
         this(term, 1, electionTimeout);
     }
 
+    /**
+     * Create CandidateNodeRole.
+     *
+     * @param term            term
+     * @param votesCount      voted count
+     * @param electionTimeout election timeout
+     */
     public CandidateNodeRole(int term, int votesCount, ElectionTimeout electionTimeout) {
         super(RoleName.CANDIDATE, term);
         this.votesCount = votesCount;
         this.electionTimeout = electionTimeout;
     }
 
+    /**
+     * Get votes count.
+     *
+     * @return votes count
+     */
     public int getVotesCount() {
         return votesCount;
     }
