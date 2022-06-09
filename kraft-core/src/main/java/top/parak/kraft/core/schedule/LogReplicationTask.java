@@ -24,7 +24,7 @@ public class LogReplicationTask {
     }
 
     public void cancel() {
-        logger.debug("cancel log replication task");
+        logger.trace("cancel log replication task");
         this.scheduledFuture.cancel(false);
     }
 
