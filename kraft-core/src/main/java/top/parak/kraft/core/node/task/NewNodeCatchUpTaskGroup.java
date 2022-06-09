@@ -6,6 +6,7 @@ import top.parak.kraft.core.rpc.message.InstallSnapshotResultMessage;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Group for {@link NewNodeCatchUpTask}.
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ThreadSafe
 public class NewNodeCatchUpTaskGroup {
 
-    private final ConcurrentHashMap<NodeId, NewNodeCatchUpTask> taskMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<NodeId, NewNodeCatchUpTask> taskMap = new ConcurrentHashMap<>();
 
     /**
      * Add task.
@@ -62,7 +63,7 @@ public class NewNodeCatchUpTaskGroup {
      * @param nextLogIndex  index of next log
      * @return true if invoked, false if no task for node
      */
-    public boolean onReceiveInstallResult(InstallSnapshotResultMessage resultMessage, int nextLogIndex) {
+    public boolean onReceiveInstallSnapshotResult(InstallSnapshotResultMessage resultMessage, int nextLogIndex) {
         NewNodeCatchUpTask task = taskMap.get(resultMessage.getSourceNodeId());
         if (task == null) {
             return false;

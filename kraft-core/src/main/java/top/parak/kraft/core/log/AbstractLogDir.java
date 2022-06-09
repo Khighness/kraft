@@ -6,9 +6,11 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Abstract log dir.
+ *
  * @author KHighness
- * @email parakovo@gmail.com
  * @since 2022-04-01
+ * @email parakovo@gmail.com
  */
 abstract class AbstractLogDir implements LogDir {
 
@@ -29,7 +31,7 @@ abstract class AbstractLogDir implements LogDir {
     @Override
     public void initialize() {
         if (!dir.exists() && !dir.mkdir()) {
-            throw new LogException("failed to create directory: " + dir);
+            throw new LogException("failed to create directory " + dir);
         }
         try {
             Files.touch(getEntriesFile());

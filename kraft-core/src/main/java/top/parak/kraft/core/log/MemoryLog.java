@@ -3,6 +3,7 @@ package top.parak.kraft.core.log;
 import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import top.parak.kraft.core.log.entry.Entry;
 import top.parak.kraft.core.log.entry.EntryMeta;
 import top.parak.kraft.core.log.sequence.EntrySequence;
@@ -59,23 +60,6 @@ public class MemoryLog extends AbstractLog {
     }
 
     @Override
-    protected SnapshotBuilder newSnapshotBuilder(InstallSnapshotRpc firstRpc) {
-        return new MemorySnapshotBuilder(firstRpc);
-    }
-
-    @Override
-    protected void replaceSnapshot(Snapshot newSnapshot) {
-        int logIndexOffset = newSnapshot.getLastIncludedIndex() + 1;
-        MemoryEntrySequence newEntrySequence = new MemoryEntrySequence(logIndexOffset);
-        List<Entry> remainingEntries = entrySequence.subView(logIndexOffset);
-        newEntrySequence.append(remainingEntries);
-        snapshot = newSnapshot;
-        logger.debug("snapshot -> {}", snapshot);
-        entrySequence = newEntrySequence;
-        logger.debug("entry sequence -> {}", entrySequence);
-    }
-
-    @Override
     protected Snapshot generateSnapshot(EntryMeta lastAppliedEntryMeta, Set<NodeEndpoint> groupConfig) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         try {
@@ -84,6 +68,23 @@ public class MemoryLog extends AbstractLog {
             throw new LogException("failed to generate snapshot", e);
         }
         return new MemorySnapshot(lastAppliedEntryMeta.getIndex(), lastAppliedEntryMeta.getTerm(), output.toByteArray(), groupConfig);
+    }
+
+    @Override
+    protected SnapshotBuilder newSnapshotBuilder(InstallSnapshotRpc firstRpc) {
+        return new MemorySnapshotBuilder(firstRpc);
+    }
+
+    @Override
+    protected void replaceSnapshot(Snapshot newSnapshot) {
+        int logIndexOffset = newSnapshot.getLastIncludedIndex() + 1;
+        EntrySequence newEntrySequence = new MemoryEntrySequence(logIndexOffset);
+        List<Entry> remainingEntries = entrySequence.subView(logIndexOffset);
+        newEntrySequence.append(remainingEntries);
+        logger.debug("snapshot -> {}", newSnapshot);
+        snapshot = newSnapshot;
+        logger.debug("entry sequence -> {}", newEntrySequence);
+        entrySequence = newEntrySequence;
     }
 
 }

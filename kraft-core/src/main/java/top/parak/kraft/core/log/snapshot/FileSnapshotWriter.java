@@ -1,7 +1,7 @@
 package top.parak.kraft.core.log.snapshot;
 
+import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.node.NodeEndpoint;
-import top.parak.kraft.core.support.proto.Protos;
 
 import java.io.*;
 import java.util.Set;
@@ -24,10 +24,10 @@ public class FileSnapshotWriter implements AutoCloseable {
     /**
      * Create FileSnapshotWriter.
      *
-     * @param file               output file
+     * @param file              output file
      * @param lastIncludedIndex last index
      * @param lastIncludedTerm  last term
-     * @param lastConfig         last config
+     * @param lastConfig        last config
      * @throws IOException if IO exception occurs
      */
     public FileSnapshotWriter(File file, int lastIncludedIndex, int lastIncludedTerm, Set<NodeEndpoint> lastConfig) throws IOException {
@@ -40,7 +40,7 @@ public class FileSnapshotWriter implements AutoCloseable {
      * @param output            output stream
      * @param lastIncludedIndex last index
      * @param lastIncludedTerm  last term
-     * @param lastConfig         last config
+     * @param lastConfig        last config
      * @throws IOException if IO exception occurs
      */
     FileSnapshotWriter(OutputStream output, int lastIncludedIndex, int lastIncludedTerm, Set<NodeEndpoint> lastConfig) throws IOException {
@@ -59,6 +59,7 @@ public class FileSnapshotWriter implements AutoCloseable {
                 .build().toByteArray();
         this.output.writeInt(headerBytes.length);
         this.output.write(headerBytes);
+
     }
 
     /**

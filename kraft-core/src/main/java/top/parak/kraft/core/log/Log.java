@@ -62,16 +62,16 @@ public interface Log {
     GroupConfigEntry getLastUncommittedGroupConfigEntry();
 
     /**
-     * Get the index of the log entry to be appended next time.
+     * Get next log index.
      *
-     * @return nextIndex
+     * @return next log index
      */
     int getNextIndex();
 
     /**
-     * Get commitIndex.
+     * Get commit index.
      *
-     * @return commitIndex
+     * @return commit index
      */
     int getCommitIndex();
 
@@ -96,7 +96,7 @@ public interface Log {
      * Append a general log entry.
      *
      * @param term    current term
-     * @param command command bytes
+     * @param command command in bytes
      * @return general log entry
      */
     GeneralEntry appendEntry(int term, byte[] command);
@@ -107,7 +107,7 @@ public interface Log {
      * @param term            current term
      * @param nodeEndpoints   current node configs
      * @param newNodeEndpoint new node config
-     * @return log entry for adding node
+     * @return add node entry
      */
     AddNodeEntry appendEntryForAddNode(int term, Set<NodeEndpoint> nodeEndpoints, NodeEndpoint newNodeEndpoint);
 
@@ -155,7 +155,7 @@ public interface Log {
      * Generate snapshot.
      *
      * @param lastIncludedIndex last included index
-     * @param groupConfig        group config
+     * @param groupConfig       group config
      */
     void generateSnapshot(int lastIncludedIndex, Set<NodeEndpoint> groupConfig);
 

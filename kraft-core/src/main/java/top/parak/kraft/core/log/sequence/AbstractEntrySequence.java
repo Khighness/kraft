@@ -3,7 +3,6 @@ package top.parak.kraft.core.log.sequence;
 import top.parak.kraft.core.log.entry.Entry;
 import top.parak.kraft.core.log.entry.EntryMeta;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +22,6 @@ import java.util.List;
  * @since 2022-04-01
  * @email parakovo@gmail.com
  */
-@NotThreadSafe
 public abstract class AbstractEntrySequence implements EntrySequence {
 
     /**
@@ -31,7 +29,6 @@ public abstract class AbstractEntrySequence implements EntrySequence {
      * while also called {@code firstLogIndex}, initialize as 1.
      */
     int logIndexOffset;
-
     /**
      * The index of the next log entry to store in the log entry sequence
      * which is equal to {@code lastLogIndex - 1}, initialize as 1.
@@ -43,7 +40,7 @@ public abstract class AbstractEntrySequence implements EntrySequence {
      *
      * @param logIndexOffset the index of the first log entry in file
      */
-    public AbstractEntrySequence(int logIndexOffset) {
+    AbstractEntrySequence(int logIndexOffset) {
         this.logIndexOffset = logIndexOffset;
         this.nextLogIndex = logIndexOffset;
     }
@@ -61,6 +58,15 @@ public abstract class AbstractEntrySequence implements EntrySequence {
         return doGetFirstLogIndex();
     }
 
+    /**
+     * Do get the index of the first log entry stored in the log entry sequence.
+     *
+     * @return the first index of the log entry
+     */
+    int doGetFirstLogIndex() {
+        return logIndexOffset;
+    }
+
     @Override
     public int getLastLogIndex() {
         if (isEmpty()) {
@@ -69,39 +75,18 @@ public abstract class AbstractEntrySequence implements EntrySequence {
         return doGetLastLogIndex();
     }
 
-    @Override
-    public int getNextLogIndex() {
-        return nextLogIndex;
-    }
-
-    @Override
-    public List<Entry> subView(int fromIndex) {
-        if (isEmpty() || fromIndex > doGetLastLogIndex()) {
-            return Collections.emptyList();
-        }
-        return subList(Math.max(fromIndex, doGetFirstLogIndex()), nextLogIndex);
-    }
-
-    @Override
-    public List<Entry> subList(int fromIndex, int toIndex) {
-        if (isEmpty()) {
-            throw new EmptySequenceException();
-        }
-        if (fromIndex < doGetFirstLogIndex() || toIndex > doGetLastLogIndex() + 1 || fromIndex > toIndex) {
-            throw new IllegalArgumentException("illegal from index " + fromIndex + "or to index " + toIndex);
-        }
-        return doSubList(fromIndex, toIndex);
+    /**
+     * Do get the index of last the log entry stored in the log entry sequence.
+     *
+     * @return the last index of the log entry
+     */
+    int doGetLastLogIndex() {
+        return nextLogIndex - 1;
     }
 
     @Override
     public boolean isEntryPresent(int index) {
         return !isEmpty() && index >= doGetFirstLogIndex() && index <= doGetLastLogIndex();
-    }
-
-    @Override
-    public EntryMeta getEntryMeta(int index) {
-        Entry entry = getEntry(index);
-        return entry != null ? entry.getMeta() : null;
     }
 
     @Override
@@ -113,30 +98,9 @@ public abstract class AbstractEntrySequence implements EntrySequence {
     }
 
     @Override
-    public Entry getLastEntry() {
-        return isEmpty() ? null : doGetEntry(doGetLastLogIndex());
-    }
-
-    @Override
-    public void append(Entry entry) {
-        if (entry.getIndex() != nextLogIndex) {
-            throw new IllegalArgumentException("entry index must be " + nextLogIndex);
-        }
-        doAppend(entry);
-        nextLogIndex++;
-    }
-
-    @Override
-    public void append(List<Entry> entries) {
-        entries.forEach(this::append);
-    }
-
-    @Override
-    public void removeAfter(int index) {
-        if (isEmpty() || index >= doGetLastLogIndex()) {
-            return;
-        }
-        doRemoveAfter(index);
+    public EntryMeta getEntryMeta(int index) {
+        Entry entry = getEntry(index);
+        return entry != null ? entry.getMeta() : null;
     }
 
     /**
@@ -147,22 +111,29 @@ public abstract class AbstractEntrySequence implements EntrySequence {
      */
     protected abstract Entry doGetEntry(int index);
 
-    /**
-     * Do get the index of the first log entry stored in the log entry sequence.
-     *
-     * @return the first index of the log entry
-     */
-    int doGetFirstLogIndex() {
-        return logIndexOffset;
+    @Override
+    public Entry getLastEntry() {
+        return isEmpty() ? null : doGetEntry(doGetLastLogIndex());
     }
 
-    /**
-     * Do get the index of last the log entry stored in the log entry sequence.
-     *
-     * @return the last index of the log entry
-     */
-    int doGetLastLogIndex() {
-        return nextLogIndex - 1;
+    @Override
+    public List<Entry> subView(int fromIndex) {
+        if (isEmpty() || fromIndex > doGetLastLogIndex()) {
+            return Collections.emptyList();
+        }
+        return subList(Math.max(fromIndex, doGetFirstLogIndex()), nextLogIndex);
+    }
+
+    // [fromIndex, toIndex)
+    @Override
+    public List<Entry> subList(int fromIndex, int toIndex) {
+        if (isEmpty()) {
+            throw new EmptySequenceException();
+        }
+        if (fromIndex < doGetFirstLogIndex() || toIndex > doGetLastLogIndex() + 1 || fromIndex > toIndex) {
+            throw new IllegalArgumentException("illegal from index " + fromIndex + " or to index " + toIndex);
+        }
+        return doSubList(fromIndex, toIndex);
     }
 
     /**
@@ -175,12 +146,42 @@ public abstract class AbstractEntrySequence implements EntrySequence {
      */
     protected abstract List<Entry> doSubList(int fromIndex, int toIndex);
 
+    @Override
+    public int getNextLogIndex() {
+        return nextLogIndex;
+    }
+
+    @Override
+    public void append(List<Entry> entries) {
+        for (Entry entry : entries) {
+            append(entry);
+        }
+    }
+
+
+    @Override
+    public void append(Entry entry) {
+        if (entry.getIndex() != nextLogIndex) {
+            throw new IllegalArgumentException("entry index must be " + nextLogIndex);
+        }
+        doAppend(entry);
+        nextLogIndex++;
+    }
+
     /**
      * Do append a log entry to cache.
      *
      * @param entry the log entry
      */
     protected abstract void doAppend(Entry entry);
+
+    @Override
+    public void removeAfter(int index) {
+        if (isEmpty() || index >= doGetLastLogIndex()) {
+            return;
+        }
+        doRemoveAfter(index);
+    }
 
     /**
      * Do remove the log entry whose index is greater than the specified index.

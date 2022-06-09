@@ -14,7 +14,7 @@ import java.util.Set;
  * @since 2022-04-06
  * @email parakovo@gmail.com
  */
-abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBuilder<T>{
+public abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBuilder<T> {
 
     /**
      * The index of the last log entry in the snapshot.
@@ -70,7 +70,7 @@ abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBu
     @Override
     public void append(InstallSnapshotRpc rpc) {
         if (rpc.getOffset() != offset) {
-            throw new IllegalArgumentException("unexpected offset, excepted " + offset + ", bur was" + rpc.getOffset());
+            throw new IllegalArgumentException("unexpected offset, expected " + offset + ", but was " + rpc.getOffset());
         }
         if (rpc.getLastIndex() != lastIncludedIndex || rpc.getLastTerm() != lastIncludedTerm) {
             throw new IllegalArgumentException("unexpected last included index or term");

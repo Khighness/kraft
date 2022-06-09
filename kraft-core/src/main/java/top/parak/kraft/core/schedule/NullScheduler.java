@@ -20,13 +20,14 @@ public class NullScheduler implements Scheduler {
     private static final Logger logger = LoggerFactory.getLogger(NullScheduler.class);
 
     @Override
+    @Nonnull
     public LogReplicationTask scheduleLogReplicationTask(@Nonnull Runnable task) {
         logger.debug("schedule log replication task");
         return LogReplicationTask.NONE;
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public ElectionTimeout scheduleElectionTimeout(@Nonnull Runnable task) {
         logger.debug("schedule election timeout");
         return ElectionTimeout.NONE;
@@ -34,7 +35,6 @@ public class NullScheduler implements Scheduler {
 
     @Override
     public void stop() throws InterruptedException {
-
     }
 
 }

@@ -34,4 +34,3 @@ public abstract class GroupConfigEntry extends AbstractEntry {
     public abstract Set<NodeEndpoint> getResultNodeEndpoints();
 
 }
-

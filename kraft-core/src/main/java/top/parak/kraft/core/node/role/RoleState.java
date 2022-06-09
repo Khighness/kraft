@@ -5,6 +5,7 @@ import top.parak.kraft.core.node.NodeId;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+
 /**
  * Role state.
  *
@@ -19,7 +20,7 @@ public interface RoleState {
     /**
      * Get role name.
      *
-     * @return role name.
+     * @return role name
      */
     @Nonnull
     RoleName getRoleName();
@@ -34,7 +35,7 @@ public interface RoleState {
     /**
      * Get votes count.
      *
-     * @return votes count, {@link  RoleState#VOTES_COUNT_NOT_SET} if unknown
+     * @return votes count, {@link RoleState#VOTES_COUNT_NOT_SET} if unknown
      */
     int getVotesCount();
 

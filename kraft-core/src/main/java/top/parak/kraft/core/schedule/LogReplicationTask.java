@@ -16,8 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class LogReplicationTask {
 
     public static final LogReplicationTask NONE = new LogReplicationTask(new NullScheduledFuture());
-    public static final Logger logger = LoggerFactory.getLogger(LogReplicationTask.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(LogReplicationTask.class);
     private final ScheduledFuture<?> scheduledFuture;
 
     public LogReplicationTask(ScheduledFuture<?> scheduledFuture) {
@@ -25,15 +24,13 @@ public class LogReplicationTask {
     }
 
     public void cancel() {
-        logger.debug("cancel log replication task");
+        logger.trace("cancel log replication task");
         this.scheduledFuture.cancel(false);
     }
 
     @Override
     public String toString() {
-        return "LogReplicationTask{delay{delay=" +
-                scheduledFuture.getDelay(TimeUnit.MILLISECONDS) +
-                "ms}";
+        return "LogReplicationTask{delay=" + scheduledFuture.getDelay(TimeUnit.MILLISECONDS) + "}";
     }
 
 }

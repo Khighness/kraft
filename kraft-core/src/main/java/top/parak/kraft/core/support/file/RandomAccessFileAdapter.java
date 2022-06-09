@@ -1,7 +1,5 @@
 package top.parak.kraft.core.support.file;
 
-import top.parak.kraft.core.support.file.SeekableFile;
-
 import java.io.*;
 
 /**
@@ -22,12 +20,7 @@ public class RandomAccessFileAdapter implements SeekableFile {
 
     public RandomAccessFileAdapter(File file, String mode) throws FileNotFoundException {
         this.file = file;
-        this.randomAccessFile = new RandomAccessFile(file, mode);
-    }
-
-    @Override
-    public long position() throws IOException {
-        return randomAccessFile.getFilePointer();
+        randomAccessFile = new RandomAccessFile(file, mode);
     }
 
     @Override
@@ -79,14 +72,18 @@ public class RandomAccessFileAdapter implements SeekableFile {
     public InputStream inputStream(long start) throws IOException {
         FileInputStream input = new FileInputStream(file);
         if (start > 0) {
-           input.skip(start);
+            input.skip(start);
         }
         return input;
     }
 
     @Override
+    public long position() throws IOException {
+        return randomAccessFile.getFilePointer();
+    }
+
+    @Override
     public void flush() throws IOException {
-        // it seems nothing to do
     }
 
     @Override

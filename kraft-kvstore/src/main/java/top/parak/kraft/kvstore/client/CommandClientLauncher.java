@@ -17,37 +17,45 @@ import java.util.Map;
  */
 public class CommandClientLauncher {
 
-    public static void main(String[] args) {
-        CommandClientLauncher commandClientLauncher = new CommandClientLauncher();
-        commandClientLauncher.execute(args);
+    public static void main(String[] args) throws Exception {
+        CommandClientLauncher launcher = new CommandClientLauncher();
+        launcher.execute(args);
     }
 
+    /**
+     * Server config.
+     */
     private static class ServerConfig {
 
         private final String nodeId;
         private final String host;
-        private final int servicePort;
+        private final int port;
 
-        private ServerConfig(String nodeId, String host, int servicePort) {
+        ServerConfig(String nodeId, String host, int port) {
             this.nodeId = nodeId;
             this.host = host;
-            this.servicePort = servicePort;
+            this.port = port;
         }
 
-        public String getNodeId() {
+        String getNodeId() {
             return nodeId;
         }
 
-        public String getHost() {
+        String getHost() {
             return host;
         }
 
-        public int getServicePort() {
-            return servicePort;
+        int getPort() {
+            return port;
         }
 
     }
 
+    /**
+     * Parse args for client and start console.
+     *
+     * @param args arguments
+     */
     private void execute(String[] args) {
         Options options = new Options();
         options.addOption(Option.builder("sc")
@@ -59,17 +67,17 @@ public class CommandClientLauncher {
                         "e.g: A,127.0.0.1,3331 B,127.0.0.1,3332 C,127.0.0.1,3333")
                 .build());
         if (args.length == 0) {
-            HelpFormatter helpFormatter = new HelpFormatter();
-            helpFormatter.printHelp("kraft-kvstore-client [OPTION]...", options);
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("kraft-kvstore-client [OPTION]...", options);
             return;
         }
 
-        DefaultParser parser = new DefaultParser();
+        CommandLineParser parser = new DefaultParser();
         Map<NodeId, Address> serverMap;
         try {
             CommandLine commandLine = parser.parse(options, args);
             serverMap = parseServerConfig(commandLine.getOptionValues("sc"));
-        } catch (ParseException e) {
+        } catch (ParseException | IllegalArgumentException e) {
             System.err.println(e.getMessage());
             return;
         }
@@ -78,15 +86,27 @@ public class CommandClientLauncher {
         console.start();
     }
 
-    private Map<NodeId, Address> parseServerConfig(String[] rawServerConfigList) {
+    /**
+     * Parse server config list and return server config map.
+     *
+     * @param rawServerConfigs raw server config list
+     * @return map
+     */
+    private Map<NodeId, Address> parseServerConfig(String[] rawServerConfigs) {
         Map<NodeId, Address> serverMap = new HashMap<>();
-        for (String rawServerConfig : rawServerConfigList) {
+        for (String rawServerConfig : rawServerConfigs) {
             ServerConfig serverConfig = parseServerConfig(rawServerConfig);
-            serverMap.put(new NodeId(serverConfig.getNodeId()), new Address(serverConfig.getHost(), serverConfig.getServicePort()));
+            serverMap.put(new NodeId(serverConfig.getNodeId()), new Address(serverConfig.getHost(), serverConfig.getPort()));
         }
         return serverMap;
     }
 
+    /**
+     * Parse server config raw ad return server config.
+     *
+     * @param rawServerConfig raw server config
+     * @return server config
+     */
     private ServerConfig parseServerConfig(String rawServerConfig) {
         String[] pieces = rawServerConfig.split(",");
         if (pieces.length != 3) {

@@ -7,8 +7,6 @@ import java.util.Set;
 
 /**
  * InstallSnapshot RPC arguments.
- * <p>Invoker: Leader</p>
- * <p>Receiver: Follower</p>
  *
  * @author KHighness
  * @since 2022-04-06
@@ -102,7 +100,7 @@ public class InstallSnapshotRpc {
     }
 
     public int getDataLength() {
-        return data.length;
+        return this.data.length;
     }
 
     public void setData(byte[] data) {
@@ -120,14 +118,13 @@ public class InstallSnapshotRpc {
     @Override
     public String toString() {
         return "InstallSnapshotRpc{" +
-                "term=" + term +
-                ", leaderId=" + leaderId +
+                "data.size=" + (data != null ? data.length : 0) +
+                ", done=" + done +
                 ", lastIndex=" + lastIndex +
                 ", lastTerm=" + lastTerm +
-                ", lastConfig=" + lastConfig +
+                ", leaderId=" + leaderId +
                 ", offset=" + offset +
-                ", data=" + new String(data) +
-                ", done=" + done +
+                ", term=" + term +
                 '}';
     }
 

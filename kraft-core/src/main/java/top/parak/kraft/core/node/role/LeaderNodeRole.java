@@ -50,9 +50,7 @@ public class LeaderNodeRole extends AbstractNodeRole {
 
     @Override
     public String toString() {
-        return "LeaderNodeRole{" +
-                "term=" + term +
-                ", logReplicationTask=" + logReplicationTask +
-                '}';
+        return "LeaderNodeRole{term=" + term + ", logReplicationTask=" + logReplicationTask + '}';
     }
+
 }

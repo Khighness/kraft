@@ -48,7 +48,6 @@ public class MemorySnapshotBuilder extends AbstractSnapshotBuilder<MemorySnapsho
 
     @Override
     public void close() {
-        // it seems nothing to do
     }
 
 }

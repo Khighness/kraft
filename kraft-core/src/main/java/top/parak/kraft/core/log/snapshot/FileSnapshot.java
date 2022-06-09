@@ -2,15 +2,14 @@ package top.parak.kraft.core.log.snapshot;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.log.LogDir;
 import top.parak.kraft.core.log.LogException;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.support.file.RandomAccessFileAdapter;
 import top.parak.kraft.core.support.file.SeekableFile;
-import top.parak.kraft.core.support.proto.Protos;
 
 import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
  * @since 2022-04-06
  * @email parakovo@gmail.com
  */
-@Immutable
 public class FileSnapshot implements Snapshot {
 
     /**
@@ -102,7 +100,6 @@ public class FileSnapshot implements Snapshot {
             Protos.SnapshotHeader header = Protos.SnapshotHeader.parseFrom(headerBytes);
             lastIncludedIndex = header.getLastIndex();
             lastIncludedTerm = header.getLastTerm();
-            // read group config
             lastConfig = header.getLastConfigList().stream()
                     .map(e -> new NodeEndpoint(e.getId(), e.getHost(), e.getPort()))
                     .collect(Collectors.toSet());
@@ -137,6 +134,7 @@ public class FileSnapshot implements Snapshot {
     }
 
     @Override
+    @Nonnull
     public SnapshotChunk readData(int offset, int length) {
         if (offset > dataLength) {
             throw new IllegalArgumentException("offset > data length");
@@ -151,8 +149,8 @@ public class FileSnapshot implements Snapshot {
         }
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public InputStream getDataStream() {
         try {
             return seekableFile.inputStream(dataStart);

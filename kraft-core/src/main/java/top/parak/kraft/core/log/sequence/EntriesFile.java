@@ -91,9 +91,9 @@ public class EntriesFile {
         int index = seekableFile.readInt();
         int term = seekableFile.readInt();
         int length = seekableFile.readInt();
-        byte[] commandBytes = new byte[length];
-        seekableFile.read(commandBytes);
-        return factory.create(kind, index, term, commandBytes);
+        byte[] bytes = new byte[length];
+        seekableFile.read(bytes);
+        return factory.create(kind, index, term, bytes);
     }
 
     /**

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.parak.kraft.core.log.snapshot.Snapshot;
+import top.parak.kraft.core.node.role.AbstractNodeRole;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -18,12 +19,12 @@ import java.io.InputStream;
  */
 public abstract class AbstractDirectStateMachine implements StateMachine {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDirectStateMachine.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractNodeRole.class);
     protected int lastApplied = 0;
 
     @Override
     public int getLastApplied() {
-        return 0;
+        return lastApplied;
     }
 
     @Override

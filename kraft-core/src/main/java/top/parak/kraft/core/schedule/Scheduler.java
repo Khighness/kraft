@@ -1,7 +1,5 @@
 package top.parak.kraft.core.schedule;
 
-import com.sun.istack.internal.NotNull;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -19,7 +17,7 @@ public interface Scheduler {
      * @param task task
      * @return log replication task
      */
-    @NotNull
+    @Nonnull
     LogReplicationTask scheduleLogReplicationTask(@Nonnull Runnable task);
 
     /**

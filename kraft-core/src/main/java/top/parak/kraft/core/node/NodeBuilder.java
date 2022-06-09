@@ -1,5 +1,4 @@
 package top.parak.kraft.core.node;
-
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -21,6 +20,7 @@ import top.parak.kraft.core.support.task.TaskExecutor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Executors;
@@ -302,6 +302,7 @@ public class NodeBuilder {
         return NodeMode.GROUP_MEMBER;
     }
 
+
     /**
      * Create nio connector.
      *
@@ -309,12 +310,14 @@ public class NodeBuilder {
      */
     @Nonnull
     private NioConnector createNioConnector() {
-        int port = group.findSelf().getEndpoint().getPort();
+        NodeEndpoint endpoint = group.findSelf().getEndpoint();
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(endpoint.getHost(), endpoint.getPort());
         if (workerGroup != null) {
-            return new NioConnector(workerGroup, selfId, eventBus, port, config.getLogReplicationInterval());
+            return new NioConnector(workerGroup, selfId, eventBus, inetSocketAddress,
+                    config.getLogReplicationInterval());
         }
-        return new NioConnector(new NioEventLoopGroup(config.getNioWorkerThreads()), false,
-                selfId, eventBus, port, config.getLogReplicationInterval());
+        return new NioConnector(new NioEventLoopGroup(config.getNioWorkerThreads()), false, selfId,
+                eventBus, inetSocketAddress, config.getLogReplicationInterval());
     }
 
 }

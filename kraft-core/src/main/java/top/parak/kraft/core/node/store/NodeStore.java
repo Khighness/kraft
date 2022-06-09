@@ -16,7 +16,7 @@ public interface NodeStore {
     /**
      * Get term.
      *
-     * @return term.
+     * @return term
      */
     int getTerm();
 
@@ -36,11 +36,11 @@ public interface NodeStore {
     NodeId getVotedFor();
 
     /**
-     * Set voted for.
+     * Set voted for
      *
-     * @param nodeId voted for
+     * @param votedFor voted for
      */
-    void setVotedFor(@Nullable NodeId nodeId);
+    void setVotedFor(@Nullable NodeId votedFor);
 
     /**
      * Close store.

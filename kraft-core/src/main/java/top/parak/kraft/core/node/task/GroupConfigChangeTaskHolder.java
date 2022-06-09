@@ -33,7 +33,7 @@ public class GroupConfigChangeTaskHolder {
         this.reference = reference;
     }
 
-    public void awaitOne(long timeout) throws InterruptedException, TimeoutException {
+    public void awaitDone(long timeout) throws TimeoutException, InterruptedException {
         if (timeout == 0) {
             reference.getResult();
         } else {

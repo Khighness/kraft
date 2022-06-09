@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.parak.kraft.core.log.statemachine.AbstractSingleThreadStateMachine;
+import top.parak.kraft.core.log.statemachine.StateMachine;
+import top.parak.kraft.core.log.statemachine.StateMachineContext;
+import top.parak.kraft.core.node.task.GroupConfigChangeTaskReference;
 import top.parak.kraft.core.node.Node;
 import top.parak.kraft.core.node.role.RoleName;
-import top.parak.kraft.core.node.role.RoleNameANdLeaderId;
-import top.parak.kraft.core.node.task.GroupConfigChangeTaskReference;
-import top.parak.kraft.core.service.AddNodeCommand;
-import top.parak.kraft.core.service.RemoveNodeCommand;
+import top.parak.kraft.core.node.role.RoleNameAndLeaderId;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.support.proto.Protos;
 import top.parak.kraft.kvstore.message.*;
 
@@ -21,8 +23,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 /**
  * KV-store server service.
@@ -35,18 +37,32 @@ public class KVStoreServerService {
 
     private static final Logger logger = LoggerFactory.getLogger(KVStoreServerService.class);
 
+    /**
+     * Raft node.
+     */
     private final Node node;
-    private final ConcurrentHashMap<String, CommandRequest<?>> pendingCommands = new ConcurrentHashMap<>();
+    /**
+     * Map to store pending commands.
+     * <p>
+     * As for {@link SetCommand}, it will be stored in {@link #pendingCommands} util
+     * {@link StateMachine#applyLog(StateMachineContext, int, byte[], int)}.
+     * </p>
+     */
+    private final ConcurrentMap<String, CommandRequest<?>> pendingCommands = new ConcurrentHashMap<>();
+    /**
+     * Map to store KV.
+     */
     private Map<String, byte[]> map = new HashMap<>();
 
     /**
      * Create KVStoreServerService.
      *
-     * @param node node
+     * @param node raft node
      */
     public KVStoreServerService(Node node) {
         this.node = node;
         this.node.registerStateMachine(new StateMachineImpl());
+
     }
 
     /**
@@ -79,7 +95,7 @@ public class KVStoreServerService {
         }
 
         RemoveNodeCommand command = commandRequest.getCommand();
-        GroupConfigChangeTaskReference taskReference = this.node.removeNode(command.getNodeId());
+        GroupConfigChangeTaskReference taskReference = node.removeNode(command.getNodeId());
         awaitResult(taskReference, commandRequest);
     }
 
@@ -96,8 +112,8 @@ public class KVStoreServerService {
         }
 
         SetCommand command = commandRequest.getCommand();
-        logger.info("process command: [set {}]", command.getKey());
-        this.pendingCommands.put(command.getKey(), commandRequest);
+        logger.debug("process command: [set {} {}]", command.getKey(), new String(command.getValue()));
+        this.pendingCommands.put(command.getRequestId(), commandRequest);
         commandRequest.addCloseListener(() -> pendingCommands.remove(command.getRequestId()));
         this.node.appendLog(command.toBytes());
     }
@@ -111,6 +127,7 @@ public class KVStoreServerService {
         String key = commandRequest.getCommand().getKey();
         logger.debug("process command: [get {}]", key);
         byte[] value = this.map.get(key);
+        // TODO view from node state machine
         commandRequest.reply(new GetCommandResponse(value));
     }
 
@@ -120,7 +137,7 @@ public class KVStoreServerService {
      * @return null if current node is leader, otherwise <code>Redirect</code>
      */
     private Redirect checkLeadership() {
-        RoleNameANdLeaderId state = node.getRoleNameANdLeaderId();
+        RoleNameAndLeaderId state = node.getRoleNameAndLeaderId();
         if (state.getRoleName() != RoleName.LEADER) {
             return new Redirect(state.getLeaderId());
         }
@@ -162,12 +179,13 @@ public class KVStoreServerService {
      */
     static void toSnapshot(Map<String, byte[]> map, OutputStream output) throws IOException {
         Protos.EntryList.Builder entryList = Protos.EntryList.newBuilder();
-        map.forEach((key, value) -> entryList.addEntries(
-                Protos.EntryList.Entry.newBuilder()
-                        .setKey(key)
-                        .setValue(ByteString.copyFrom(value))
-                        .build()
-        ));
+        for (Map.Entry<String, byte[]> entry : map.entrySet()) {
+            entryList.addEntries(
+                    Protos.EntryList.Entry.newBuilder()
+                            .setKey(entry.getKey())
+                            .setValue(ByteString.copyFrom(entry.getValue())).build()
+            );
+        }
         entryList.build().writeTo(output);
         entryList.build().getSerializedSize();
     }
@@ -180,21 +198,24 @@ public class KVStoreServerService {
      * @throws IOException if IO exception occurs
      */
     static Map<String, byte[]> fromSnapshot(InputStream input) throws IOException {
+        Map<String, byte[]> map = new HashMap<>();
         Protos.EntryList entryList = Protos.EntryList.parseFrom(input);
-        return entryList.getEntriesList().stream()
-                .collect(Collectors.toMap(Protos.EntryList.Entry::getKey, e -> e.getValue().toByteArray()));
+        for (Protos.EntryList.Entry entry : entryList.getEntriesList()) {
+            map.put(entry.getKey(), entry.getValue().toByteArray());
+        }
+        return map;
     }
 
     /**
-     * Implementation of statemachine.
+     * Implementation of {@link StateMachine}.
      */
     private class StateMachineImpl extends AbstractSingleThreadStateMachine {
 
         @Override
         protected void applyCommand(@Nonnull byte[] commandBytes) {
-            SetCommand setCommand = SetCommand.fromBytes(commandBytes);
-            map.put(setCommand.getKey(), setCommand.getValue());
-            CommandRequest<?> commandRequest = pendingCommands.remove(setCommand.getRequestId());
+            SetCommand command = SetCommand.fromBytes(commandBytes);
+            map.put(command.getKey(), command.getValue());
+            CommandRequest<?> commandRequest = pendingCommands.remove(command.getRequestId());
             if (commandRequest != null) {
                 commandRequest.reply(Success.INSTANCE);
             }

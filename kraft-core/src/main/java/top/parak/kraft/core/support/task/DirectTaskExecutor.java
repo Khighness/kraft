@@ -32,17 +32,19 @@ public class DirectTaskExecutor extends AbstractTaskExecutor {
     }
 
     @Override
+    @Nonnull
     public Future<?> submit(@Nonnull Runnable task) {
         Preconditions.checkNotNull(task);
-        FutureTask<Object> futureTask = new FutureTask<>(task, null);
+        FutureTask<?> futureTask = new FutureTask<>(task, null);
         futureTask.run();
         return futureTask;
     }
 
     @Override
+    @Nonnull
     public <V> Future<V> submit(@Nonnull Callable<V> task) {
         Preconditions.checkNotNull(task);
-        FutureTask<V> futureTask = new FutureTask<>(task);
+        FutureTask<V> futureTask = new FutureTask<V>(task);
         futureTask.run();
         return futureTask;
     }
@@ -64,7 +66,6 @@ public class DirectTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     public void shutdown() throws InterruptedException {
-        // it seems nothing to do
     }
 
 }

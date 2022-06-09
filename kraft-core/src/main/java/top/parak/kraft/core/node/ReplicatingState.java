@@ -19,23 +19,20 @@ package top.parak.kraft.core.node;
  * @since 2022-03-19
  * @email parakovo@gmail.com
  */
-public class ReplicatingState {
+class ReplicatingState {
 
     /**
      * The index of the next log entry that needs to be sent to the follower.
      */
     private int nextIndex;
-
     /**
      * The index of the last log entry that has been replicated to the follower.
      */
     private int matchIndex;
-
     /**
      * The replicating status.
      */
     private boolean replicating = false;
-
     /**
      * The last replicated timestamp.
      */
@@ -46,7 +43,7 @@ public class ReplicatingState {
      *
      * @param nextIndex next index
      */
-    public ReplicatingState(int nextIndex) {
+    ReplicatingState(int nextIndex) {
         this(nextIndex, 0);
     }
 
@@ -56,9 +53,9 @@ public class ReplicatingState {
      * @param nextIndex  next index
      * @param matchIndex match index
      */
-    public ReplicatingState(int nextIndex, int matchIndex) {
+    ReplicatingState(int nextIndex, int matchIndex) {
         this.nextIndex = nextIndex;
-        this.matchIndex= matchIndex;
+        this.matchIndex = matchIndex;
     }
 
     /**
@@ -66,17 +63,8 @@ public class ReplicatingState {
      *
      * @return next index
      */
-    public int getNextIndex() {
+    int getNextIndex() {
         return nextIndex;
-    }
-
-    /**
-     * Set the index of the next log entry that needs to be sent to the follower.
-     *
-     * @param nextIndex the index of the next log that needs to be sent to the follower
-     */
-    public void setNextIndex(int nextIndex) {
-        this.nextIndex = nextIndex;
     }
 
     /**
@@ -84,61 +72,16 @@ public class ReplicatingState {
      *
      * @return match index
      */
-    public int getMatchIndex() {
+    int getMatchIndex() {
         return matchIndex;
-    }
-
-    /**
-     * Set the index of the last log entry that has been replicated to the follower.
-     *
-     * @param matchIndex match index
-     */
-    public void setMatchIndex(int matchIndex) {
-        this.matchIndex = matchIndex;
-    }
-
-    /**
-     * Test if replicating.
-     *
-     * @return true if replicating, otherwise false
-     */
-    public boolean isReplicating() {
-        return replicating;
-    }
-
-    /**
-     * Set replicating.
-     *
-     * @param replicating replicating
-     */
-    public void setReplicating(boolean replicating) {
-        this.replicating = replicating;
-    }
-
-    /**
-     * Get the last replicated timestamp.
-     *
-     * @return last replicated timestamp
-     */
-    public long getLastReplicatedAt() {
-        return lastReplicatedAt;
-    }
-
-    /**
-     * Set the last replicated timestamp.
-     *
-     * @param lastReplicatedAt last replicated timestamp
-     */
-    public void setLastReplicatedAt(long lastReplicatedAt) {
-        this.lastReplicatedAt = lastReplicatedAt;
     }
 
     /**
      * Back off next index, in other word, decrease.
      *
-     * @return true if decrease successfully
+     * @return true if decrease successfully, false if next index is less than or equal to {@code 1}
      */
-    public boolean backOffNextIndex() {
+    boolean backOffNextIndex() {
         if (nextIndex > 1) {
             nextIndex--;
             return true;
@@ -152,7 +95,7 @@ public class ReplicatingState {
      * @param lastEntryIndex last entry index
      * @return true if advanced, false if no change
      */
-    public boolean advance(int lastEntryIndex) {
+    boolean advance(int lastEntryIndex) {
         // changed
         boolean result = (matchIndex != lastEntryIndex || nextIndex != (lastEntryIndex + 1));
 
@@ -160,6 +103,42 @@ public class ReplicatingState {
         nextIndex = lastEntryIndex + 1;
 
         return result;
+    }
+
+    /**
+     * Test if replicating.
+     *
+     * @return true if replicating, otherwise false
+     */
+    boolean isReplicating() {
+        return replicating;
+    }
+
+    /**
+     * Set replicating.
+     *
+     * @param replicating replicating
+     */
+    void setReplicating(boolean replicating) {
+        this.replicating = replicating;
+    }
+
+    /**
+     * Get last replicated timestamp.
+     *
+     * @return last replicated timestamp
+     */
+    long getLastReplicatedAt() {
+        return lastReplicatedAt;
+    }
+
+    /**
+     * Set last replicated timestamp.
+     *
+     * @param lastReplicatedAt last replicated timestamp
+     */
+    void setLastReplicatedAt(long lastReplicatedAt) {
+        this.lastReplicatedAt = lastReplicatedAt;
     }
 
     @Override

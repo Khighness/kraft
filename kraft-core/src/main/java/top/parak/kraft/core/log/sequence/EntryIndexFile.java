@@ -6,7 +6,10 @@ import top.parak.kraft.core.support.file.SeekableFile;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Log entry index file.
@@ -42,7 +45,7 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
     /**
      * The offset of {@link #minEntryIndex} or {@link #maxEntryIndex}.
      */
-    private static final long OFFSET_ENTRY_INDEX = Integer.BYTES;
+    private static final long OFFSET_MAX_ENTRY_INDEX = Integer.BYTES;
     /**
      * The length of a row of a log entry index.
      */
@@ -143,10 +146,10 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
             minEntryIndex = index;
         } else {
             if (index != maxEntryIndex + 1) {
-                throw new IllegalArgumentException("index should be " + (maxEntryIndex + 1) + ", bus was " + index);
+                throw new IllegalArgumentException("index must be " + (maxEntryIndex + 1) + ", but was " + index);
             }
             // skip min entry index
-            seekableFile.seek(OFFSET_ENTRY_INDEX);
+            seekableFile.seek(OFFSET_MAX_ENTRY_INDEX);
         }
 
         // write max entry index
@@ -155,12 +158,16 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
         updateEntryIndexCount();
 
         // move to position after last entry offset
-        seekableFile.seek(getOffsetEntryIndexItem(index));
+        seekableFile.seek(getOffsetOfEntryIndexItem(index));
         seekableFile.writeLong(offset);
         seekableFile.writeInt(kind);
         seekableFile.writeInt(term);
 
         entryIndexMap.put(index, new EntryIndexItem(index, offset, kind, term));
+    }
+
+    private long getOffsetOfEntryIndexItem(int index) {
+        return (index - minEntryIndex) * LENGTH_ENTRY_INDEX_ITEM + Integer.BYTES * 2;
     }
 
     /**
@@ -178,11 +185,11 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
             return;
         }
         // move to position after min log entry index
-        seekableFile.seek(OFFSET_ENTRY_INDEX);
+        seekableFile.seek(OFFSET_MAX_ENTRY_INDEX);
         // rewrite max log entry index
         seekableFile.writeInt(newMaxEntryIndex);
         // reset size of the index file
-        seekableFile.truncate(getOffsetEntryIndexItem(newMaxEntryIndex + 1));
+        seekableFile.truncate(getOffsetOfEntryIndexItem(newMaxEntryIndex + 1));
         // remove the log entry index in map
         for (int i = newMaxEntryIndex + 1; i <= maxEntryIndex; i++) {
             entryIndexMap.remove(i);
@@ -258,10 +265,6 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
         }
     }
 
-    private long getOffsetEntryIndexItem(int index) {
-        return (OFFSET_ENTRY_INDEX << 1) + (long) (index - minEntryIndex) * LENGTH_ENTRY_INDEX_ITEM;
-    }
-
     @Override
     @Nonnull
     public Iterator<EntryIndexItem> iterator() {
@@ -271,6 +274,10 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
         return new EntryIndexIterator(entryIndexCount, minEntryIndex);
     }
 
+    public void close() throws IOException {
+        seekableFile.close();
+    }
+
     private class EntryIndexIterator implements Iterator<EntryIndexItem> {
 
         private final int entryIndexCount;
@@ -278,7 +285,13 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
 
         EntryIndexIterator(int entryIndexCount, int minEntryIndex) {
             this.entryIndexCount = entryIndexCount;
-            currentEntryIndex = minEntryIndex;
+            this.currentEntryIndex = minEntryIndex;
+        }
+
+        @Override
+        public boolean hasNext() {
+            checkModification();
+            return currentEntryIndex <= maxEntryIndex;
         }
 
         private void checkModification() {
@@ -288,17 +301,10 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
         }
 
         @Override
-        public boolean hasNext() {
-            checkModification();
-            return currentEntryIndex <= maxEntryIndex;
-        }
-
-        @Override
         public EntryIndexItem next() {
             checkModification();
             return entryIndexMap.get(currentEntryIndex++);
         }
-
     }
 
 }

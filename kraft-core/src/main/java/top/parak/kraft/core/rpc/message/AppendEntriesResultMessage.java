@@ -19,11 +19,12 @@ public class AppendEntriesResultMessage {
      */
     private final AppendEntriesResult result;
     /**
-     * Leader id, invoker id.
+     * Leader id.
      */
     private final NodeId sourceNodeId;
     /**
      * AppendEntries RPC arguments.
+     * TODO remove rpc, just lastEntryIndex required, or move to replicating state
      */
     private final AppendEntriesRpc rpc;
 

@@ -11,19 +11,12 @@ import java.io.Serializable;
  */
 public class RequestVoteResult implements Serializable {
 
-    /**
-     * Current term.
-     */
     private int term;
+    private boolean voteGranted;
 
-    /**
-     * If vote for candidate.
-     */
-    private boolean votedGranted;
-
-    public RequestVoteResult(int term, boolean votedGranted) {
+    public RequestVoteResult(int term, boolean voteGranted) {
         this.term = term;
-        this.votedGranted = votedGranted;
+        this.voteGranted = voteGranted;
     }
 
     public int getTerm() {
@@ -35,19 +28,17 @@ public class RequestVoteResult implements Serializable {
     }
 
     public boolean isVoteGranted() {
-        return votedGranted;
+        return voteGranted;
     }
 
-    public void setVotedGranted(boolean votedGranted) {
-        this.votedGranted = votedGranted;
+    public void setVoteGranted(boolean voteGranted) {
+        this.voteGranted = voteGranted;
     }
 
     @Override
     public String toString() {
-        return "RequestVoteResult{" +
-                "term=" + term +
-                ", votedGranted=" + votedGranted +
+        return "RequestVoteResult{" + "term=" + term +
+                ", voteGranted=" + voteGranted +
                 '}';
     }
-
 }

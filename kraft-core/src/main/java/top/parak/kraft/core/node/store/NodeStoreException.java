@@ -9,21 +9,10 @@ package top.parak.kraft.core.node.store;
  */
 public class NodeStoreException extends RuntimeException {
 
-    /**
-     * Create NodeStoreException.
-     *
-     * @param cause cause
-     */
     public NodeStoreException(Throwable cause) {
         super(cause);
     }
 
-    /**
-     * Create NodeStoreException.
-     *
-     * @param message message
-     * @param cause cause
-     */
     public NodeStoreException(String message, Throwable cause) {
         super(message, cause);
     }

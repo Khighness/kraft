@@ -25,13 +25,11 @@ public class CommandRequest<T> {
     }
 
     public void reply(Object response) {
-        this.channel.write(response);
+        this.channel.writeAndFlush(response);
     }
 
     public void addCloseListener(Runnable runnable) {
-        this.channel.closeFuture().addListener(
-                (ChannelFutureListener) future -> runnable.run()
-        );
+        this.channel.closeFuture().addListener((ChannelFutureListener) future -> runnable.run());
     }
 
     public T getCommand() {

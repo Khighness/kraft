@@ -5,7 +5,10 @@ import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.*;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Mock connector.

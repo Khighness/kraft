@@ -74,18 +74,16 @@ public class FollowerNodeRole extends AbstractNodeRole {
     @Override
     protected boolean doStateEquals(AbstractNodeRole role) {
         FollowerNodeRole that = (FollowerNodeRole) role;
-        return Objects.equals(this.votedFor, that.votedFor)
-                && Objects.equals(this.leaderId, that.leaderId);
+        return Objects.equals(this.votedFor, that.votedFor) && Objects.equals(this.leaderId, that.leaderId);
     }
 
     @Override
     public String toString() {
         return "FollowerNodeRole{" +
                 "term=" + term +
-                ", votedFor=" + votedFor +
                 ", leaderId=" + leaderId +
+                ", votedFor=" + votedFor +
                 ", electionTimeout=" + electionTimeout +
                 '}';
     }
-
 }

@@ -47,43 +47,6 @@ public class ByteArraySeekableFile implements SeekableFile {
         this.position = 0;
     }
 
-    /**
-     * Check position.
-     *
-     * @param position position
-     * @throws IllegalArgumentException if position is less than 0 or position is greater than size
-     */
-    private void checkPosition(long position) {
-        if (position < 0 || position > size) {
-            throw new IllegalArgumentException("offset < 0 or offset > size");
-        }
-    }
-
-    /**
-     * Ensure capacity.
-     *
-     * @param capacity capacity
-     */
-    private void ensureCapacity(int capacity) {
-        int oldLength = content.length;
-        if (position + capacity <= oldLength) {
-            return;
-        }
-        if (oldLength == 0) {
-            content = new byte[capacity];
-            return;
-        }
-        int newLength = (oldLength >= capacity ? oldLength << 1 : oldLength + capacity);
-        byte[] newContent = new byte[newLength];
-        System.arraycopy(content, 0, newContent, 0, oldLength);
-        content = newContent;
-    }
-
-    @Override
-    public long position() throws IOException {
-        return position;
-    }
-
     @Override
     public void seek(long position) throws IOException {
         checkPosition(position);
@@ -151,18 +114,42 @@ public class ByteArraySeekableFile implements SeekableFile {
 
     @Override
     public InputStream inputStream(long start) throws IOException {
-        checkPosition(position);
+        checkPosition(start);
         return new ByteArrayInputStream(content, (int) start, (int) (size - start));
     }
 
     @Override
+    public long position() {
+        return position;
+    }
+
+    @Override
     public void flush() throws IOException {
-        // it seems nothing to do
     }
 
     @Override
     public void close() throws IOException {
-        // it seems nothing to do
+    }
+
+    private void checkPosition(long position) {
+        if (position < 0 || position > size) {
+            throw new IllegalArgumentException("offset < 0 or offset > size");
+        }
+    }
+
+    private void ensureCapacity(int capacity) {
+        int oldLength = content.length;
+        if (position + capacity <= oldLength) {
+            return;
+        }
+        if (oldLength == 0) {
+            content = new byte[capacity];
+            return;
+        }
+        int newLength = (oldLength >= capacity ? oldLength * 2 : oldLength + capacity);
+        byte[] newContent = new byte[newLength];
+        System.arraycopy(content, 0, newContent, 0, oldLength);
+        content = newContent;
     }
 
 }

@@ -8,7 +8,7 @@ package top.parak.kraft.core.node;
  * @email parakovo@gmail.com
  * @see ReplicatingState
  */
-public class GroupMember {
+class GroupMember {
 
     /**
      * The node endpoint of the group member.
@@ -19,8 +19,8 @@ public class GroupMember {
      */
     private ReplicatingState replicatingState;
     /**
-     * True if the member is catching upb when entering the group,
-     * otherwise false which means it has finished catching up.
+     * True means the member is a healthy and normal node in group,
+     * false if the member is catching up when entering the group.
      */
     private boolean major;
     /**
@@ -28,46 +28,46 @@ public class GroupMember {
      */
     private boolean removing = false;
 
-    public GroupMember(NodeEndpoint endpoint) {
+    /**
+     * Create GroupMember.
+     *
+     * @param endpoint endpoint
+     */
+    GroupMember(NodeEndpoint endpoint) {
         this(endpoint, null, true);
     }
 
-    public GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState, boolean major) {
+    /**
+     * Create GroupMember.
+     *
+     * @param endpoint         endpoint
+     * @param replicatingState replicating state
+     * @param major            major
+     */
+    GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState, boolean major) {
         this.endpoint = endpoint;
         this.replicatingState = replicatingState;
         this.major = major;
     }
 
-    public NodeEndpoint getEndpoint() {
+    NodeEndpoint getEndpoint() {
         return endpoint;
     }
 
-    public ReplicatingState getReplicatingState() {
-        return replicatingState;
+    NodeId getId() {
+        return endpoint.getId();
     }
 
-    public void setReplicatingState(ReplicatingState replicatingState) {
+    boolean idEquals(NodeId id) {
+        return endpoint.getId().equals(id);
+    }
+
+    void setReplicatingState(ReplicatingState replicatingState) {
         this.replicatingState = replicatingState;
     }
 
-    public boolean isReplicationStateSet() {
+    boolean isReplicationStateSet() {
         return replicatingState != null;
-    }
-
-    public boolean isMajor() {
-        return major;
-    }
-
-    public void setMajor(boolean major) {
-        this.major = major;
-    }
-
-    public boolean isRemoving() {
-        return removing;
-    }
-
-    public void setRemoving() {
-        this.removing = true;
     }
 
     private ReplicatingState ensureReplicatingState() {
@@ -77,50 +77,58 @@ public class GroupMember {
         return replicatingState;
     }
 
-    public NodeId getId() {
-        return endpoint.getId();
+    boolean isMajor() {
+        return major;
     }
 
-    public boolean idEquals(NodeId id) {
-        return endpoint.getId().equals(id);
+    void setMajor(boolean major) {
+        this.major = major;
     }
 
-    public int getNextIndex() {
+    boolean isRemoving() {
+        return removing;
+    }
+
+    void setRemoving() {
+        removing = true;
+    }
+
+    int getNextIndex() {
         return ensureReplicatingState().getNextIndex();
     }
 
-    public int getMatchIndex() {
+    int getMatchIndex() {
         return ensureReplicatingState().getMatchIndex();
     }
 
-    public boolean advanceReplicatingState(int lastEntryIndex) {
+    boolean advanceReplicatingState(int lastEntryIndex) {
         return ensureReplicatingState().advance(lastEntryIndex);
     }
 
-    public boolean backOffNextIndex() {
+    boolean backOffNextIndex() {
         return ensureReplicatingState().backOffNextIndex();
     }
 
-    public void replicateNow() {
+    void replicateNow() {
         replicateAt(System.currentTimeMillis());
     }
 
-    public void replicateAt(long replicatedAt) {
+    void replicateAt(long replicatedAt) {
         ReplicatingState replicatingState = ensureReplicatingState();
         replicatingState.setReplicating(true);
         replicatingState.setLastReplicatedAt(replicatedAt);
     }
 
-    public boolean isReplicating() {
+    boolean isReplicating() {
         return ensureReplicatingState().isReplicating();
     }
 
-    public void stopReplicating() {
+    void stopReplicating() {
         ensureReplicatingState().setReplicating(false);
     }
 
     /**
-     * Check if follower should replicate.
+     * Test if should replicate.
      * <p>
      * Return true if
      * <ol>
@@ -129,9 +137,10 @@ public class GroupMember {
      * </ol>
      * </p>
      *
+     * @param readTimeout read timeout
      * @return true if should, otherwise false
      */
-    public boolean shouldReplicate(long readTimeout) {
+    boolean shouldReplicate(long readTimeout) {
         ReplicatingState replicatingState = ensureReplicatingState();
         return !replicatingState.isReplicating() ||
                 System.currentTimeMillis() - replicatingState.getLastReplicatedAt() >= readTimeout;
@@ -141,9 +150,9 @@ public class GroupMember {
     public String toString() {
         return "GroupMember{" +
                 "endpoint=" + endpoint +
-                ", replicatingState=" + replicatingState +
                 ", major=" + major +
                 ", removing=" + removing +
+                ", replicatingState=" + replicatingState +
                 '}';
     }
 

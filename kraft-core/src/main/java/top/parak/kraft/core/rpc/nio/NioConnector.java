@@ -2,6 +2,12 @@ package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import top.parak.kraft.core.node.NodeEndpoint;
+import top.parak.kraft.core.node.NodeId;
+import top.parak.kraft.core.rpc.Channel;
+import top.parak.kraft.core.rpc.ChannelConnectException;
+import top.parak.kraft.core.rpc.Connector;
+import top.parak.kraft.core.rpc.message.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -11,26 +17,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.node.NodeEndpoint;
-import top.parak.kraft.core.node.NodeId;
-import top.parak.kraft.core.rpc.Channel;
-import top.parak.kraft.core.rpc.ChannelConnectException;
-import top.parak.kraft.core.rpc.Connector;
-import top.parak.kraft.core.rpc.message.*;
-
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * NIO connector.
- *
- * @author KHighness
- * @since 2022-05-25
- * @email parakovo@gmail.com
- */
+// TODO add test
 @ThreadSafe
 public class NioConnector implements Connector {
 
@@ -39,7 +33,7 @@ public class NioConnector implements Connector {
     private final NioEventLoopGroup workerNioEventLoopGroup;
     private final boolean workerGroupShared;
     private final EventBus eventBus;
-    private final int port;
+    private final InetSocketAddress serviceAddress;
     private final InboundChannelGroup inboundChannelGroup = new InboundChannelGroup();
     private final OutboundChannelGroup outboundChannelGroup;
     private final ExecutorService executorService = Executors.newCachedThreadPool((r) -> {
@@ -50,24 +44,23 @@ public class NioConnector implements Connector {
         return thread;
     });
 
-    public NioConnector(NodeId selfNodeId, EventBus eventBus, int port, int logReplicationInterval) {
-        this(new NioEventLoopGroup(), false, selfNodeId, eventBus, port, logReplicationInterval);
-    }
-
-    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, NodeId selfNodeId, EventBus eventBus, int port, int logReplicationInterval) {
-        this(workerNioEventLoopGroup, true, selfNodeId, eventBus, port, logReplicationInterval);
+    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup,
+                        NodeId selfId, EventBus eventBus,
+                        InetSocketAddress serviceAddress, int logReplicationInterval) {
+        this(workerNioEventLoopGroup, false, selfId, eventBus, serviceAddress, logReplicationInterval);
     }
 
     public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, boolean workerGroupShared,
-                        NodeId selfNodeId, EventBus eventBus,
-                        int port, int logReplicationInterval) {
+                        NodeId selfId, EventBus eventBus,
+                        InetSocketAddress serviceAddress, int logReplicationInterval) {
         this.workerNioEventLoopGroup = workerNioEventLoopGroup;
         this.workerGroupShared = workerGroupShared;
         this.eventBus = eventBus;
-        this.port = port;
-        outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfNodeId, logReplicationInterval);
+        this.serviceAddress = serviceAddress;
+        outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfId, logReplicationInterval);
     }
 
+    // should not call more than once
     @Override
     public void initialize() {
         ServerBootstrap serverBootstrap = new ServerBootstrap()
@@ -82,11 +75,11 @@ public class NioConnector implements Connector {
                         pipeline.addLast(new FromRemoteHandler(eventBus, inboundChannelGroup));
                     }
                 });
-        logger.info("raft rpc service is listening on port {}", port);
+        logger.debug("raft-rpc server is serving at [{}]", this.serviceAddress.toString());
         try {
-            serverBootstrap.bind(port).sync();
+            serverBootstrap.bind(serviceAddress).sync();
         } catch (InterruptedException e) {
-            throw new ConnectorException("failed to bind port", e);
+            throw new ConnectorException("failed to bind " + this.serviceAddress.toString(), e);
         }
     }
 
@@ -177,7 +170,7 @@ public class NioConnector implements Connector {
 
     @Override
     public void close() {
-        logger.info("close connector");
+        logger.debug("close connector");
         inboundChannelGroup.closeAll();
         outboundChannelGroup.closeAll();
         bossNioEventLoopGroup.shutdownGracefully();

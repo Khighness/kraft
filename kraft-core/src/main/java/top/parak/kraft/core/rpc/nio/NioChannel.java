@@ -12,8 +12,9 @@ import javax.annotation.Nonnull;
  * @author KHighness
  * @since 2022-04-14
  * @email parakovo@gmail.com
+ * @see java.nio.channels.NetworkChannel
  */
-public class NioChannel implements Channel {
+class NioChannel implements Channel {
 
     private final io.netty.channel.Channel nettyChannel;
 

@@ -2,7 +2,7 @@ package top.parak.kraft.core.log.entry;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import top.parak.kraft.core.support.proto.Protos;
+import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 
@@ -48,19 +48,19 @@ public class EntryFactory {
                     Protos.RemoveNodeCommand removeNodeCommand = Protos.RemoveNodeCommand.parseFrom(commandBytes);
                     return new RemoveNodeEntry(index, term, asNodeEndpoints(removeNodeCommand.getNodeEndpointsList()), new NodeId(removeNodeCommand.getNodeToRemove()));
                 default:
-                    throw new IllegalArgumentException("unexpected entry kind: " + kind);
+                    throw new IllegalArgumentException("unexpected entry kind " + kind);
             }
         } catch (InvalidProtocolBufferException e) {
             throw new IllegalStateException("failed to parse command", e);
         }
     }
 
-    private Set<NodeEndpoint> asNodeEndpoints(Collection<Protos.NodeEndpoint> protoEndpoints) {
-        return protoEndpoints.stream().map(this::asNodeEndpoint).collect(Collectors.toSet());
+    private Set<NodeEndpoint> asNodeEndpoints(Collection<Protos.NodeEndpoint> protoNodeEndpoints) {
+        return protoNodeEndpoints.stream().map(this::asNodeEndpoint).collect(Collectors.toSet());
     }
 
-    private NodeEndpoint asNodeEndpoint(Protos.NodeEndpoint protoEndpoint) {
-        return new NodeEndpoint(protoEndpoint.getId(), protoEndpoint.getHost(), protoEndpoint.getPort());
+    private NodeEndpoint asNodeEndpoint(Protos.NodeEndpoint protoNodeEndpoint) {
+        return new NodeEndpoint(protoNodeEndpoint.getId(), protoNodeEndpoint.getHost(), protoNodeEndpoint.getPort());
     }
 
 }

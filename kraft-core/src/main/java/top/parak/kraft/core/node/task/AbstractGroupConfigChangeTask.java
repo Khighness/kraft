@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  * @since 2022-05-31
  * @email parakovo@gmail.com
  */
-public abstract class AbstractGroupConfigChangeTask implements GroupConfigChangeTask {
+abstract class AbstractGroupConfigChangeTask implements GroupConfigChangeTask {
 
     protected enum State {
         START,
@@ -23,22 +23,21 @@ public abstract class AbstractGroupConfigChangeTask implements GroupConfigChange
     protected final GroupConfigChangeTaskContext context;
     protected State state = State.START;
 
-    public AbstractGroupConfigChangeTask(GroupConfigChangeTaskContext context) {
+    AbstractGroupConfigChangeTask(GroupConfigChangeTaskContext context) {
         this.context = context;
     }
 
     @Override
     public synchronized GroupConfigChangeTaskResult call() throws Exception {
-        logger.debug("start group config change task");
+        logger.debug("task start");
         setState(State.START);
-        // append group config log entry
         appendGroupConfig();
-        // wait for log append to complete
         setState(State.GROUP_CONFIG_APPENDED);
         wait();
-        logger.debug("done group config change task");
+        logger.debug("task done");
         context.done();
         return mapResult(state);
+
     }
 
     private GroupConfigChangeTaskResult mapResult(State state) {
@@ -51,7 +50,7 @@ public abstract class AbstractGroupConfigChangeTask implements GroupConfigChange
     }
 
     protected void setState(State state) {
-        logger.debug("group config change task state -> {}", state);
+        logger.debug("state -> {}", state);
         this.state = state;
     }
 

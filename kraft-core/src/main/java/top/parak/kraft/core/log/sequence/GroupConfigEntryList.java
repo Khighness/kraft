@@ -2,6 +2,8 @@ package top.parak.kraft.core.log.sequence;
 
 import top.parak.kraft.core.log.entry.GroupConfigEntry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
  * @since 2022-04-01
  * @email parakovo@gmail.com
  */
+@NotThreadSafe
 public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
 
     private final LinkedList<GroupConfigEntry> entries = new LinkedList<>();
@@ -48,7 +51,7 @@ public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
         while (iterator.hasNext()) {
             GroupConfigEntry entry = iterator.next();
             if (entry.getIndex() > entryIndex) {
-                if (entry.getIndex() > entryIndex) {
+                if (firstRemovedEntry == null) {
                     firstRemovedEntry = entry;
                 }
                 iterator.remove();
@@ -74,15 +77,14 @@ public class GroupConfigEntryList implements Iterable<GroupConfigEntry> {
     }
 
     @Override
+    @Nonnull
     public Iterator<GroupConfigEntry> iterator() {
         return entries.iterator();
     }
 
     @Override
     public String toString() {
-        return "GroupConfigEntryList{" +
-                "entries=" + entries +
-                '}';
+        return "GroupConfigEntryList{" + entries + '}';
     }
 
 }

@@ -20,10 +20,6 @@ import java.util.Set;
 public class MemorySnapshot implements Snapshot {
 
     /**
-     * The byte array to store snapshot.
-     */
-    private final byte[] data;
-    /**
      * The index of the last log entry in the snapshot.
      */
     private final int lastIncludedIndex;
@@ -32,9 +28,14 @@ public class MemorySnapshot implements Snapshot {
      */
     private final int lastIncludedTerm;
     /**
+     * The byte array to store snapshot.
+     */
+    private final byte[] data;
+    /**
      * The last group config in the snapshot.
      */
     private final Set<NodeEndpoint> lastConfig;
+
 
     /**
      * Create MemorySnapShot.
@@ -87,6 +88,7 @@ public class MemorySnapshot implements Snapshot {
     }
 
     @Override
+    @Nonnull
     public SnapshotChunk readData(int offset, int length) {
         if (offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset " + offset + " out of bound");
@@ -98,15 +100,23 @@ public class MemorySnapshot implements Snapshot {
         return new SnapshotChunk(buffer, offset + length >= this.data.length);
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public InputStream getDataStream() {
         return new ByteArrayInputStream(data);
     }
 
     @Override
     public void close() {
-        // it seems nothing to do
+    }
+
+    @Override
+    public String toString() {
+        return "MemorySnapshot{" +
+                "lastIncludedIndex=" + lastIncludedIndex +
+                ", lastIncludedTerm=" + lastIncludedTerm +
+                ", data.size=" + data.length +
+                '}';
     }
 
 }

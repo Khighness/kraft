@@ -1,7 +1,7 @@
 package top.parak.kraft.core.rpc.nio;
 
 /**
- * Thrown when connector occur exception.
+ * Thrown when connector occurs exception.
  *
  * @author KHighness
  * @since 2022-04-14

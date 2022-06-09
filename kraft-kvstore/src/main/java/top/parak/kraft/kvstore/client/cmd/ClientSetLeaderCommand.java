@@ -3,11 +3,10 @@ package top.parak.kraft.kvstore.client.cmd;
 import com.google.common.annotations.Beta;
 
 import top.parak.kraft.core.node.NodeId;
-
 import top.parak.kraft.kvstore.client.CommandContext;
 
 /**
- * ClientSetLeader command.
+ * <code>client-set-leader</code> command.
  *
  * @author KHighness
  * @since 2022-05-30
@@ -29,7 +28,7 @@ public class ClientSetLeaderCommand implements Command {
 
         NodeId nodeId = new NodeId(arguments);
         try {
-            context.setClientLeader(nodeId);
+            context.setClientLeaderId(nodeId);
             System.out.println(nodeId);
         } catch (IllegalStateException e) {
             System.err.println(e.getMessage());

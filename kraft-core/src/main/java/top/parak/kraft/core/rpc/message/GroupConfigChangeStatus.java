@@ -11,6 +11,6 @@ public enum GroupConfigChangeStatus {
 
     OK,
     TIMEOUT,
-    NOT_LEADER
+    NOT_LEADER;
 
 }

@@ -4,11 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
+import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.log.entry.EntryFactory;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.*;
-import top.parak.kraft.core.support.proto.Protos;
 
 import java.util.List;
 import java.util.stream.Collectors;

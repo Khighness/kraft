@@ -1,6 +1,6 @@
 package top.parak.kraft.core.log.entry;
 
-import top.parak.kraft.core.support.proto.Protos;
+import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.node.NodeEndpoint;
 
 import java.util.HashSet;
@@ -47,12 +47,12 @@ public class AddNodeEntry extends GroupConfigEntry {
     @Override
     public byte[] getCommandBytes() {
         return Protos.AddNodeCommand.newBuilder()
-                .addAllNodeEndpoints(getNodeEndpoints().stream().map(e ->
-                    Protos.NodeEndpoint.newBuilder()
-                            .setId(e.getId().getValue())
-                            .setHost(e.getHost())
-                            .setPort(e.getPort())
-                            .build()
+                .addAllNodeEndpoints(getNodeEndpoints().stream().map(c ->
+                        Protos.NodeEndpoint.newBuilder()
+                                .setId(c.getId().getValue())
+                                .setHost(c.getHost())
+                                .setPort(c.getPort())
+                                .build()
                 ).collect(Collectors.toList()))
                 .setNewNodeEndpoint(Protos.NodeEndpoint.newBuilder()
                         .setId(newNodeEndpoint.getId().getValue())

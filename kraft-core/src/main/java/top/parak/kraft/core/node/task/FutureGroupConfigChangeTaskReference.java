@@ -25,8 +25,8 @@ public class FutureGroupConfigChangeTaskReference implements GroupConfigChangeTa
         this.future = future;
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public GroupConfigChangeTaskResult getResult() throws InterruptedException {
         try {
             return future.get();
@@ -36,8 +36,8 @@ public class FutureGroupConfigChangeTaskReference implements GroupConfigChangeTa
         }
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public GroupConfigChangeTaskResult getResult(long timeout) throws InterruptedException, TimeoutException {
         try {
             return future.get(timeout, TimeUnit.MILLISECONDS);

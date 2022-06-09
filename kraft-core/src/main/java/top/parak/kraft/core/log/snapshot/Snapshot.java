@@ -68,12 +68,11 @@ public interface Snapshot {
     long getDataSize();
 
     /**
-     * Get a snapshot chunk.
+     * Get the input stream of the snapshot.
      *
-     * @param offset the start place
-     * @param length the specified length
-     * @return a snapshot chunk
+     * @return a input stream
      */
+    @Nonnull
     SnapshotChunk readData(int offset, int length);
 
     /**
@@ -85,7 +84,7 @@ public interface Snapshot {
     InputStream getDataStream();
 
     /**
-     * CLose the snapshot file.
+     * Close the snapshot.
      */
     void close();
 

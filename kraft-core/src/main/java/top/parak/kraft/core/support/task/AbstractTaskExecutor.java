@@ -2,7 +2,6 @@ package top.parak.kraft.core.support.task;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
-import top.parak.kraft.core.support.task.TaskExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -20,7 +19,7 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
     public void submit(@Nonnull Runnable task, @Nonnull FutureCallback<Object> callback) {
         Preconditions.checkNotNull(task);
         Preconditions.checkNotNull(callback);
-        submit(task, Collections.singleton(callback));
+        submit(task, Collections.singletonList(callback));
     }
 
 }

@@ -14,7 +14,13 @@ public abstract class AbstractNodeRole {
     private final RoleName name;
     protected final int term;
 
-    protected AbstractNodeRole(RoleName name, int term) {
+    /**
+     * Create AbstractNodeRole.
+     *
+     * @param name role name
+     * @param term term
+     */
+    AbstractNodeRole(RoleName name, int term) {
         this.name = name;
         this.term = term;
     }
@@ -43,8 +49,8 @@ public abstract class AbstractNodeRole {
      * @param selfId the node's own id
      * @return role name and leader id
      */
-    public RoleNameANdLeaderId getRoleNameANdLeaderId(NodeId selfId) {
-        return new RoleNameANdLeaderId(name, getLeaderId(selfId));
+    public RoleNameAndLeaderId getNameAndLeaderId(NodeId selfId) {
+        return new RoleNameAndLeaderId(name, getLeaderId(selfId));
     }
 
     /**
@@ -68,7 +74,7 @@ public abstract class AbstractNodeRole {
     public abstract RoleState getState();
 
     /**
-     * Compare role's state.
+     * Compare role state.
      *
      * @param that role to be compared
      * @return true if equal, otherwise false
@@ -81,7 +87,7 @@ public abstract class AbstractNodeRole {
     }
 
     /**
-     * Do compare rols's state.
+     * Do compare role state.
      *
      * @param role role to be compared
      * @return true if equal, otherwise false

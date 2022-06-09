@@ -1,6 +1,7 @@
 package top.parak.kraft.core.rpc;
 
 import top.parak.kraft.core.node.NodeEndpoint;
+import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.*;
 
 import javax.annotation.Nonnull;

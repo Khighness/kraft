@@ -201,5 +201,5 @@ public class EntryIndexFileTest {
         entryIndexFile.removeAfter(3);
         iterator.next();
     }
-    
+
 }

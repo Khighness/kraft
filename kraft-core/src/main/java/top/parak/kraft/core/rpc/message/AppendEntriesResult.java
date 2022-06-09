@@ -48,8 +48,8 @@ public class AppendEntriesResult implements Serializable {
     public String toString() {
         return "AppendEntriesResult{" +
                 "rpcMessageId='" + rpcMessageId + '\'' +
-                ", term=" + term +
                 ", success=" + success +
+                ", term=" + term +
                 '}';
     }
 

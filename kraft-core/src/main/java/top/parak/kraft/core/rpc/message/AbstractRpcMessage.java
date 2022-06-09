@@ -16,14 +16,14 @@ public abstract class AbstractRpcMessage<T> {
     private final NodeId sourceNodeId;
     private final Channel channel;
 
-    public AbstractRpcMessage(T rpc, NodeId sourceNodeId, Channel channel) {
+    AbstractRpcMessage(T rpc, NodeId sourceNodeId, Channel channel) {
         this.rpc = rpc;
         this.sourceNodeId = sourceNodeId;
         this.channel = channel;
     }
 
     public T get() {
-        return rpc;
+        return this.rpc;
     }
 
     public NodeId getSourceNodeId() {

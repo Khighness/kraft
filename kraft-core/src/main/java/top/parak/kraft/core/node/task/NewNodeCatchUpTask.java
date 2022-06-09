@@ -26,7 +26,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
         REPLICATING,
         REPLICATION_FAILED,
         REPLICATION_CATCH_UP,
-        TIMEOUT,
+        TIMEOUT
     }
 
     private static final Logger logger = LoggerFactory.getLogger(NewNodeCatchUpTask.class);
@@ -36,10 +36,10 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
     private final NodeConfig config;
     private State state = State.START;
     private boolean done = false;
-    private long lastReplicatedAt;
-    private long lastAdvanceAt;
+    private long lastReplicateAt; // set when start
+    private long lastAdvanceAt; // set when start
     private int round = 1;
-    private int nextIndex = 0;
+    private int nextIndex = 0; // reset when receive append entries result
     private int matchIndex = 0;
 
     public NewNodeCatchUpTask(NewNodeCatchUpTaskContext context, NodeEndpoint endpoint, NodeConfig config) {
@@ -55,23 +55,23 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
 
     @Override
     public synchronized NewNodeCatchUpTaskResult call() throws Exception {
-        logger.debug("node {} start catch up task", nodeId);
+        logger.debug("task start");
         setState(State.START);
         context.replicateLog(endpoint);
-        lastReplicatedAt = System.currentTimeMillis();
-        lastAdvanceAt = lastReplicatedAt;
+        lastReplicateAt = System.currentTimeMillis();
+        lastAdvanceAt = lastReplicateAt;
         setState(State.REPLICATING);
         while (!done) {
             wait(config.getNewNodeReadTimeout());
             // 1. done
             // 2. replicate -> no response within timeout
-            if (System.currentTimeMillis() - lastReplicatedAt >= config.getNewNodeReadTimeout()) {
-                logger.debug("node {} does not response within read timeout", endpoint.getId());
+            if (System.currentTimeMillis() - lastReplicateAt >= config.getNewNodeReadTimeout()) {
+                logger.debug("node {} not response within read timeout", endpoint.getId());
                 state = State.TIMEOUT;
                 break;
             }
         }
-        logger.debug("node {} done catch up task", nodeId);
+        logger.debug("task done");
         context.done(this);
         return mapResult(state);
     }
@@ -88,10 +88,11 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
     }
 
     private void setState(State state) {
-        logger.debug("node {} catch up state -> {}", nodeId, state);
+        logger.debug("state -> {}", state);
         this.state = state;
     }
 
+    // in node thread
     synchronized void onReceiveAppendEntriesResult(AppendEntriesResultMessage resultMessage, int nextLogIndex) {
         assert nodeId.equals(resultMessage.getSourceNodeId());
         if (state != State.REPLICATING) {
@@ -108,37 +109,34 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
             matchIndex = lastEntryIndex;
             nextIndex = lastEntryIndex + 1;
             lastAdvanceAt = System.currentTimeMillis();
-            // finish catching up
-            if (nextIndex >= nextLogIndex) {
+            if (nextIndex >= nextLogIndex) { // catch up
                 setStateAndNotify(State.REPLICATION_CATCH_UP);
                 return;
             }
-            // exceed max round
             if ((++round) > config.getNewNodeMaxRound()) {
-                logger.info("node {} can't catch up within max round", nodeId);
+                logger.info("node {} cannot catch up within max round", nodeId);
                 setStateAndNotify(State.TIMEOUT);
                 return;
             }
         } else {
-            // cannot continue to catch up
             if (nextIndex <= 1) {
-                logger.warn("node {} can't back off next index more, stop replication", nodeId);
+                logger.warn("node {} cannot back off next index more, stop replication", nodeId);
                 setStateAndNotify(State.REPLICATION_FAILED);
                 return;
             }
             nextIndex--;
-            // slow network
             if (System.currentTimeMillis() - lastAdvanceAt >= config.getNewNodeAdvanceTimeout()) {
-                logger.debug("node {} can't make progress within timeout", nodeId);
+                logger.debug("node {} cannot make progress within timeout", nodeId);
                 setStateAndNotify(State.TIMEOUT);
                 return;
             }
         }
         context.doReplicateLog(endpoint, nextIndex);
-        lastReplicatedAt = System.currentTimeMillis();
+        lastReplicateAt = System.currentTimeMillis();
         notify();
     }
 
+    // in node thread
     synchronized void onReceiveInstallSnapshotResult(InstallSnapshotResultMessage resultMessage, int nextLogIndex) {
         assert nodeId.equals(resultMessage.getSourceNodeId());
         if (state != State.REPLICATING) {
@@ -158,7 +156,7 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
         } else {
             context.sendInstallSnapshot(endpoint, rpc.getOffset() + rpc.getDataLength());
         }
-        lastReplicatedAt = System.currentTimeMillis();
+        lastReplicateAt = System.currentTimeMillis();
         notify();
     }
 
@@ -174,11 +172,11 @@ public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
                 "state=" + state +
                 ", endpoint=" + endpoint +
                 ", done=" + done +
-                ", lastReplicatedAt=" + lastReplicatedAt +
+                ", lastReplicateAt=" + lastReplicateAt +
                 ", lastAdvanceAt=" + lastAdvanceAt +
-                ", round=" + round +
                 ", nextIndex=" + nextIndex +
                 ", matchIndex=" + matchIndex +
+                ", round=" + round +
                 '}';
     }
 

@@ -1,5 +1,6 @@
 package top.parak.kraft.core.log;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +44,7 @@ class LogGeneration extends AbstractLogDir implements Comparable<LogGeneration> 
     }
 
     @Override
-    public int compareTo(LogGeneration o) {
+    public int compareTo(@Nonnull LogGeneration o) {
         return Integer.compare(lastIncludedIndex, o.lastIncludedIndex);
     }
 

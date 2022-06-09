@@ -1,14 +1,14 @@
 package top.parak.kraft.core.rpc.nio;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.MessageLite;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.MessageLite;
+import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.*;
-import top.parak.kraft.core.support.proto.Protos;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @since 2022-04-14
  * @email parakovo@gmail.com
  */
-public class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
+class NodeRpcMessageEncoder extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {

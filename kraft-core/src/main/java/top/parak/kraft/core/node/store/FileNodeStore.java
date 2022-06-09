@@ -5,7 +5,7 @@ import top.parak.kraft.core.support.file.Files;
 import top.parak.kraft.core.support.file.RandomAccessFileAdapter;
 import top.parak.kraft.core.support.file.SeekableFile;
 
-import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.File;
 import java.io.IOException;
 
@@ -29,6 +29,7 @@ import java.io.IOException;
  * @since 2022-04-06
  * @email parakovo@gmail.com
  */
+@NotThreadSafe
 public class FileNodeStore implements NodeStore {
 
     /**
@@ -53,23 +54,34 @@ public class FileNodeStore implements NodeStore {
     /**
      * The currentTerm of node stored in {@link #seekableFile}.
      */
-    private int currentTerm = 0;
+    private int term = 0;
     /**
      * The votedFor of node stored in {@link #seekableFile}.
      */
     private NodeId votedFor = null;
 
+    /**
+     * Create FileNodeStore.
+     *
+     * @param file file
+     */
     public FileNodeStore(File file) {
         try {
             if (!file.exists()) {
                 Files.touch(file);
             }
             seekableFile = new RandomAccessFileAdapter(file);
+            initializeOrLoad();
         } catch (IOException e) {
             throw new NodeStoreException(e);
         }
     }
 
+    /**
+     * Create FileNodeStore.
+     *
+     * @param seekableFile seekableFile
+     */
     public FileNodeStore(SeekableFile seekableFile) {
         this.seekableFile = seekableFile;
         try {
@@ -81,22 +93,18 @@ public class FileNodeStore implements NodeStore {
 
     private void initializeOrLoad() throws IOException {
         if (seekableFile.size() == 0) {
-            // initialize
-            // term (4) + votedFor length(4) = 8
+            // (term, 4) + (votedFor length, 4) = 8
             seekableFile.truncate(8L);
             seekableFile.seek(0);
-            // write term
-            seekableFile.writeInt(0);
-            // length of votedFor
-            seekableFile.writeInt(0);
+            seekableFile.writeInt(0); // term
+            seekableFile.writeInt(0); // votedFor length
         } else {
-            // loading
             // read term
-            currentTerm = seekableFile.readInt();
-            // read votedFor
-            int lengthOfVotedFOr = seekableFile.readInt();
-            if (lengthOfVotedFOr > 0) {
-                byte[] bytes = new byte[lengthOfVotedFOr];
+            term = seekableFile.readInt();
+            // read voted for
+            int length = seekableFile.readInt();
+            if (length > 0) {
+                byte[] bytes = new byte[length];
                 seekableFile.read(bytes);
                 votedFor = new NodeId(new String(bytes));
             }
@@ -105,7 +113,7 @@ public class FileNodeStore implements NodeStore {
 
     @Override
     public int getTerm() {
-        return currentTerm;
+        return term;
     }
 
     @Override
@@ -116,22 +124,20 @@ public class FileNodeStore implements NodeStore {
         } catch (IOException e) {
             throw new NodeStoreException(e);
         }
-        this.currentTerm = term;
+        this.term = term;
     }
 
-    @Nullable
     @Override
     public NodeId getVotedFor() {
         return votedFor;
     }
 
     @Override
-    public void setVotedFor(@Nullable NodeId votedFor) {
+    public void setVotedFor(NodeId votedFor) {
         try {
             seekableFile.seek(OFFSET_VOTED_FOR);
             if (votedFor == null) {
                 seekableFile.writeInt(0);
-                seekableFile.truncate(8L);
             } else {
                 byte[] bytes = votedFor.getValue().getBytes();
                 seekableFile.writeInt(bytes.length);

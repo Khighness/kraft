@@ -1,9 +1,10 @@
 package top.parak.kraft.core.rpc.nio;
 
-import top.parak.kraft.core.node.NodeId;
 import io.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import top.parak.kraft.core.node.NodeId;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.List;
@@ -41,7 +42,6 @@ class InboundChannelGroup {
      * @param channel   channel between remote node and self
      */
     public void add(NodeId remoteId, NioChannel channel) {
-        channels.add(channel);
         logger.debug("channel INBOUND-{} connected", remoteId);
         channel.getDelegate().closeFuture().addListener((ChannelFutureListener) future -> {
             logger.debug("channel INBOUND-{} disconnected", remoteId);
@@ -62,7 +62,7 @@ class InboundChannelGroup {
      * Close all inbound channels.
      */
     void closeAll() {
-        logger.info("close all inbound channels");
+        logger.debug("close all inbound channels");
         for (NioChannel channel : channels) {
             channel.close();
         }

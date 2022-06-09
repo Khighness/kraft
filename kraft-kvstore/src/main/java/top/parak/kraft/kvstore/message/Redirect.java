@@ -27,9 +27,7 @@ public class Redirect {
 
     @Override
     public String toString() {
-        return "Redirect{" +
-                "leaderId='" + leaderId + '\'' +
-                '}';
+        return "Redirect{" + "leaderId=" + leaderId + '}';
     }
 
 }

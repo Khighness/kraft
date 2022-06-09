@@ -5,8 +5,10 @@ import com.google.protobuf.MessageLite;
 
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.service.*;
-import top.parak.kraft.kvstore.message.GetCommand;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.message.MessageConstants;
+import top.parak.kraft.kvstore.message.GetCommand;
 import top.parak.kraft.kvstore.message.SetCommand;
 import top.parak.kraft.kvstore.server.KVStoreServer;
 import top.parak.kraft.kvstore.support.proto.Protos;
@@ -16,10 +18,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
- * KV-store client socket channel.
+ * KV-store client socket channel which is implemented by blocking io (BIO).
  * <p>
- * {@link KVStoreClient} will create a socket channel for every {@link KVStoreServer}.
- * All socket channels will be managed by {@link CommandContext}.
+ * {@link KVStoreClient} will create a new socket channel whose is short-connection
+ * to {@link KVStoreServer} when client needs to communicate with server.
  * </p>
  *
  * @author KHighness
@@ -28,25 +30,25 @@ import java.net.Socket;
  */
 public class KVStoreClientSocketChannel implements Channel {
 
-    private final String host;
-    private final int port;
+    /**
+     * Server address.
+     */
+    private final InetSocketAddress serverAddress;
 
     /**
-     * Create SocketChannel.
+     * Create KVStoreClientSocketChannel.
      *
-     * @param host host
-     * @param port port
+     * @param serverAddress server address
      */
-    public KVStoreClientSocketChannel(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public KVStoreClientSocketChannel(InetSocketAddress serverAddress) {
+        this.serverAddress = serverAddress;
     }
 
     @Override
     public Object send(Object message) {
         try (Socket socket = new Socket()) {
             socket.setTcpNoDelay(true);
-            socket.connect(new InetSocketAddress(this.host, this.port));
+            socket.connect(serverAddress);
             this.write(socket.getOutputStream(), message);
             return this.read(socket.getInputStream());
         } catch (IOException e) {
@@ -72,7 +74,7 @@ public class KVStoreClientSocketChannel implements Channel {
                 return null;
             case MessageConstants.MSG_TYPE_FAILURE:
                 Protos.Failure protoFailure = Protos.Failure.parseFrom(message);
-                throw new ChannelException("error_code " + protoFailure.getErrorCode() + ", message " + protoFailure.getMessage());
+                throw new ChannelException("error code " + protoFailure.getErrorCode() + ", message " + protoFailure.getMessage());
             case MessageConstants.MSG_TYPE_REDIRECT:
                 Protos.Redirect protoRedirect = Protos.Redirect.parseFrom(message);
                 throw new RedirectException(new NodeId(protoRedirect.getLeaderId()));
@@ -96,9 +98,8 @@ public class KVStoreClientSocketChannel implements Channel {
      */
     private void write(OutputStream output, Object message) throws IOException {
         if (message instanceof GetCommand) {
-            GetCommand getCommand = (GetCommand) message;
             Protos.GetCommand protoGetCommand = Protos.GetCommand.newBuilder()
-                    .setKey(getCommand.getKey())
+                    .setKey(((GetCommand) message).getKey())
                     .build();
             this.write(output, MessageConstants.MSG_TYPE_GET_COMMAND, protoGetCommand);
         } else if (message instanceof SetCommand) {
@@ -109,18 +110,19 @@ public class KVStoreClientSocketChannel implements Channel {
                     .build();
             this.write(output, MessageConstants.MSG_TYPE_SET_COMMAND, protoSetCommand);
         } else if (message instanceof AddNodeCommand) {
-            AddNodeCommand addNodeCommand = (AddNodeCommand) message;
-            Protos.AddNodeCommand protoAddNodeCommand = Protos.AddNodeCommand.newBuilder()
-                    .setNodeId(addNodeCommand.getNodeId())
-                    .setHost(addNodeCommand.getHost())
-                    .setPort(addNodeCommand.getPort())
+            AddNodeCommand command = (AddNodeCommand) message;
+            Protos.AddNodeCommand protoAddServerCommand = Protos.AddNodeCommand.newBuilder()
+                    .setNodeId(command.getNodeId())
+                    .setHost(command.getHost())
+                    .setPort(command.getPort())
                     .build();
-            this.write(output, MessageConstants.MSG_TYPE_ADD_SERVER_COMMAND, protoAddNodeCommand);
+            this.write(output, MessageConstants.MSG_TYPE_ADD_SERVER_COMMAND, protoAddServerCommand);
         } else if (message instanceof RemoveNodeCommand) {
-            Protos.RemoveNodeCommand protoRemoveNodeCommand = Protos.RemoveNodeCommand.newBuilder()
-                    .setNodeId(((RemoveNodeCommand) message).getNodeId().getValue())
+            RemoveNodeCommand command = (RemoveNodeCommand) message;
+            Protos.RemoveNodeCommand protoRemoveServerCommand = Protos.RemoveNodeCommand.newBuilder()
+                    .setNodeId(command.getNodeId().getValue())
                     .build();
-            this.write(output, MessageConstants.MSG_TYPE_REMOVE_SERVER_COMMAND, protoRemoveNodeCommand);
+            this.write(output, MessageConstants.MSG_TYPE_REMOVE_SERVER_COMMAND, protoRemoveServerCommand);
         }
     }
 

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- * Root dir.
+ * Root directory.
  *
  * @author KHighness
  * @since 2022-04-01
@@ -60,7 +60,7 @@ class RootDir {
     LogDir rename(LogDir dir, int lastIncludedIndex) {
         LogGeneration destDir = new LogGeneration(baseDir, lastIncludedIndex);
         if (destDir.exists()) {
-            throw new IllegalStateException("failed to rename, destination dir " + destDir + " exists");
+            throw new IllegalStateException("failed to rename, dest dir " + destDir + " exists");
         }
 
         logger.info("rename dir {} to {}", dir, destDir);
@@ -71,9 +71,9 @@ class RootDir {
     }
 
     LogGeneration createFirstGeneration() {
-        LogGeneration logGeneration = new LogGeneration(baseDir, 0);
-        logGeneration.initialize();
-        return logGeneration;
+        LogGeneration generation = new LogGeneration(baseDir, 0);
+        generation.initialize();
+        return generation;
     }
 
     LogGeneration getLatestGeneration() {
@@ -82,19 +82,20 @@ class RootDir {
             return null;
         }
         LogGeneration latest = null;
-        String filename;
-        LogGeneration logGeneration;
+        String fileName;
+        LogGeneration generation;
         for (File file : files) {
             if (!file.isDirectory()) {
                 continue;
             }
-            filename = file.getName();
-            if (DIR_NAME_GENERATING.equals(filename) || DIR_NAME_INSTALLING.equals(filename) || !LogGeneration.isValidDirName(filename)) {
+            fileName = file.getName();
+            if (DIR_NAME_GENERATING.equals(fileName) || DIR_NAME_INSTALLING.equals(fileName) ||
+                    !LogGeneration.isValidDirName(fileName)) {
                 continue;
             }
-            logGeneration = new LogGeneration(file);
-            if (latest == null || logGeneration.compareTo(latest) > 0) {
-                latest = logGeneration;
+            generation = new LogGeneration(file);
+            if (latest == null || generation.compareTo(latest) > 0) {
+                latest = generation;
             }
         }
         return latest;

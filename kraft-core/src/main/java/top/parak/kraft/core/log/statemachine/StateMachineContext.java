@@ -12,7 +12,7 @@ public interface StateMachineContext {
     /**
      * Generate snapshot.
      *
-     * @param lastIncludedIndex last index of included log
+     * @param lastIncludedIndex the index of the last included log
      */
     void generateSnapshot(int lastIncludedIndex);
 

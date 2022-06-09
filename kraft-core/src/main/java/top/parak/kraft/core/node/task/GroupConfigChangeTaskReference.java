@@ -27,7 +27,7 @@ public interface GroupConfigChangeTaskReference {
      * @param timeout timeout
      * @return result
      * @throws InterruptedException if interrupted
-     * @throws TimeoutException     if timeout
+     * @throws TimeoutException if timeout
      */
     @Nonnull
     GroupConfigChangeTaskResult getResult(long timeout) throws InterruptedException, TimeoutException;

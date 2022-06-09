@@ -3,7 +3,7 @@ package top.parak.kraft.core.log;
 import java.io.File;
 
 /**
- * Normal log dir.
+ * Normal log directory.
  *
  * @author KHighness
  * @since 2022-04-01
@@ -11,6 +11,11 @@ import java.io.File;
  */
 public class NormalLogDir extends AbstractLogDir {
 
+    /**
+     * Create NormalLogDir.
+     *
+     * @param dir directory
+     */
     NormalLogDir(File dir) {
         super(dir);
     }

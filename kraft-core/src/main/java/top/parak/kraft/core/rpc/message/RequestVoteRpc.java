@@ -6,8 +6,6 @@ import java.io.Serializable;
 
 /**
  * RequestVote RPC arguments.
- * <p>Invoker: Candidate</p>
- * <p>Receiver: Follower</p>
  *
  * @author KHighness
  * @since 2022-03-18
@@ -15,21 +13,9 @@ import java.io.Serializable;
  */
 public class RequestVoteRpc implements Serializable {
 
-    /**
-     * The term of candidate.
-     */
     private int term;
-    /**
-     * The node id of candidate.
-     */
     private NodeId candidateId;
-    /**
-     * The index of candidate' s last log entry.
-     */
     private int lastLogIndex = 0;
-    /**
-     * The term of candidate' s last log entry.
-     */
     private int lastLogTerm = 0;
 
     public int getTerm() {
@@ -67,10 +53,10 @@ public class RequestVoteRpc implements Serializable {
     @Override
     public String toString() {
         return "RequestVoteRpc{" +
-                "term=" + term +
-                ", nodeId=" + candidateId +
+                "candidateId=" + candidateId +
                 ", lastLogIndex=" + lastLogIndex +
                 ", lastLogTerm=" + lastLogTerm +
+                ", term=" + term +
                 '}';
     }
 

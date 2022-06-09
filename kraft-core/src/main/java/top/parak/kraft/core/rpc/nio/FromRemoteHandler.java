@@ -1,10 +1,12 @@
 package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.eventbus.EventBus;
-import top.parak.kraft.core.node.NodeId;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import top.parak.kraft.core.node.NodeId;
+
 
 /**
  * Netty Handler to deal with remote node's connection.
@@ -13,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @since 2022-05-24
  * @email parakovo@gmail.com
  */
-public class FromRemoteHandler extends AbstractHandler {
+class FromRemoteHandler extends AbstractHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(FromRemoteHandler.class);
     private final InboundChannelGroup channelGroup;
@@ -29,9 +31,6 @@ public class FromRemoteHandler extends AbstractHandler {
         this.channelGroup = channelGroup;
     }
 
-    /**
-     * Receive message from remote node.
-     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof NodeId) {

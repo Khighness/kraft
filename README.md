@@ -14,7 +14,7 @@
 - [x] append log entry
 - [x] generate log snapshot
 - [x] group member change
-- [x] kv server and client
+- [x] kv KVStoreServer and client
 - [ ] prevote rpc
 - [ ] log batch transfer and pipelining
 - [ ] leadership transfer

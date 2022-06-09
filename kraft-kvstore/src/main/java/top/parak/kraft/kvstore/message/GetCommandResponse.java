@@ -1,7 +1,5 @@
 package top.parak.kraft.kvstore.message;
 
-import java.util.Arrays;
-
 /**
  * GetCommandResponse message.
  *
@@ -33,10 +31,7 @@ public class GetCommandResponse {
 
     @Override
     public String toString() {
-        return "GetCommandResponse{" +
-                "found=" + found +
-                ", value=" + Arrays.toString(value) +
-                '}';
+        return "GetCommandResponse{found=" + found + '}';
     }
 
 }

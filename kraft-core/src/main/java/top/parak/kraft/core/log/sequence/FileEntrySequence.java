@@ -25,7 +25,7 @@ import java.util.List;
 public class FileEntrySequence extends AbstractEntrySequence {
 
     /**
-     * The factory to create a log entry.
+     * The factory to create log entry.
      */
     private final EntryFactory entryFactory = new EntryFactory();
     /**
@@ -44,7 +44,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
      * The initial commitIndex defined in RAFT is {@code 0}, regardless
      * of whether the log is persistent or not.
      */
-    private int commitIndex = 0;
+    private int commitIndex;
 
     /**
      * Create FileEntrySequence.
@@ -59,7 +59,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
             this.entryIndexFile = new EntryIndexFile(logDir.getEntryOffsetIndexFile());
             initialize();
         } catch (IOException e) {
-            throw new LogException("failed to open entries file of entry index file", e);
+            throw new LogException("failed to open entries file or entry index file", e);
         }
     }
 
@@ -115,6 +115,8 @@ public class FileEntrySequence extends AbstractEntrySequence {
             }
         }
         // search in file
+        // pending entries not empty but index < firstPendingEntryIndex => entry in file
+        // pending entries empty => entry in file
         assert !entryIndexFile.isEmpty();
         return getEntryInFile(index);
     }
@@ -158,9 +160,9 @@ public class FileEntrySequence extends AbstractEntrySequence {
                 }
             }
         }
-
         return result;
     }
+
 
     @Override
     public Entry getLastEntry() {
@@ -183,7 +185,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
     protected void doRemoveAfter(int index) {
         // remove entries in cache
         if (!pendingEntries.isEmpty() && index >= pendingEntries.getFirst().getIndex() - 1) {
-            for (int i = index + 1; i < doGetLastLogIndex(); i++) {
+            for (int i = index + 1; i <= doGetLastLogIndex(); i++) {
                 pendingEntries.removeLast();
             }
             nextLogIndex = index + 1;
@@ -225,7 +227,6 @@ public class FileEntrySequence extends AbstractEntrySequence {
         if (pendingEntries.isEmpty() || pendingEntries.getLast().getIndex() < index) {
             throw new IllegalArgumentException("no entry to commit or commit index exceed");
         }
-        // move entries from cache to file
         long offset;
         Entry entry = null;
         try {
@@ -249,7 +250,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
     public void close() {
         try {
             entriesFile.close();
-            entryIndexFile.clear();
+            entryIndexFile.close();
         } catch (IOException e) {
             throw new LogException("failed to close", e);
         }
@@ -262,21 +263,22 @@ public class FileEntrySequence extends AbstractEntrySequence {
         // check file
         try {
             int entryKind;
-            for (EntryIndexItem entryIndexItem : entryIndexFile) {
-                entryKind = entryIndexItem.getKind();
+            for (EntryIndexItem indexItem : entryIndexFile) {
+                entryKind = indexItem.getKind();
                 if (entryKind == Entry.KIND_ADD_NODE || entryKind == Entry.KIND_REMOVE_NODE) {
-                    list.add((GroupConfigEntry) entriesFile.loadEntry(entryIndexItem.getOffset(), entryFactory));
+                    list.add((GroupConfigEntry) entriesFile.loadEntry(indexItem.getOffset(), entryFactory));
                 }
             }
         } catch (IOException e) {
             throw new LogException("failed to load entry", e);
         }
 
-        // check cache
-        pendingEntries.stream()
-                .filter(GroupConfigEntry.class::isInstance)
-                .forEach(entry -> list.add((GroupConfigEntry) entry));
-
+        // check pending entries
+        for (Entry entry : pendingEntries) {
+            if (entry instanceof GroupConfigEntry) {
+                list.add((GroupConfigEntry) entry);
+            }
+        }
         return list;
     }
 

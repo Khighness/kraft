@@ -1,6 +1,7 @@
 package top.parak.kraft.core.node.config;
 
 import top.parak.kraft.core.log.Log;
+import top.parak.kraft.core.node.NodeBuilder;
 
 /**
  * Node configuration.

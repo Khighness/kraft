@@ -28,22 +28,22 @@ public class AddNodeTask extends AbstractGroupConfigChangeTask {
     }
 
     @Override
-    protected void appendGroupConfig() {
-        context.addNode(endpoint, nextIndex, matchIndex);
-    }
-
-    @Override
     public boolean isTargetNode(NodeId nodeId) {
         return endpoint.getId().equals(nodeId);
     }
 
     @Override
+    protected void appendGroupConfig() {
+        context.addNode(endpoint, nextIndex, matchIndex);
+    }
+
+    @Override
     public String toString() {
         return "AddNodeTask{" +
-                "endpoint=" + endpoint +
+                "state=" + state +
+                ", endpoint=" + endpoint +
                 ", nextIndex=" + nextIndex +
                 ", matchIndex=" + matchIndex +
-                ", state=" + state +
                 '}';
     }
 

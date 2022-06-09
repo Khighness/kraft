@@ -2,6 +2,7 @@ package top.parak.kraft.core.support.task;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.*;
+import top.parak.kraft.core.support.task.AbstractTaskExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -11,8 +12,8 @@ import java.util.concurrent.*;
  * Listening task executor.
  *
  * @author KHighness
- * @email parakovo@gmail.com
  * @since 2022-04-02
+ * @email parakovo@gmail.com
  */
 public class ListeningTaskExecutor extends AbstractTaskExecutor {
 
@@ -32,19 +33,21 @@ public class ListeningTaskExecutor extends AbstractTaskExecutor {
         this(MoreExecutors.listeningDecorator(executorService), monitorExecutorService, true);
     }
 
-    private ListeningTaskExecutor(ListeningExecutorService listeningExecutorService, ExecutorService executorService, boolean monitorShared) {
+    private ListeningTaskExecutor(ListeningExecutorService listeningExecutorService, ExecutorService monitorExecutorService, boolean monitorShared) {
         this.listeningExecutorService = listeningExecutorService;
-        this.monitorExecutorService = executorService;
+        this.monitorExecutorService = monitorExecutorService;
         this.monitorShared = monitorShared;
     }
 
     @Override
+    @Nonnull
     public Future<?> submit(@Nonnull Runnable task) {
         Preconditions.checkNotNull(task);
         return listeningExecutorService.submit(task);
     }
 
     @Override
+    @Nonnull
     public <V> Future<V> submit(@Nonnull Callable<V> task) {
         Preconditions.checkNotNull(task);
         return listeningExecutorService.submit(task);

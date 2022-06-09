@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * AppendEntries RPC arguments.
- * <p>Invoker: Leader</p>
- * <p>Receiver: Follower & Candidate</p>
  *
  * @author KHighness
  * @since 2022-03-31
@@ -18,35 +16,12 @@ import java.util.List;
  */
 public class AppendEntriesRpc implements Serializable {
 
-    /**
-     * The id of message.
-     */
     private String messageId;
-    /**
-     * The term of leader.
-     */
     private int term;
-    /**
-     * The id of leader.
-     */
     private NodeId leaderId;
-    /**
-     * The index of the log entry immediately preceding new ones.
-     */
     private int prevLogIndex = 0;
-    /**
-     * The term of the previous log entry.
-     */
     private int prevLogTerm;
-    /**
-     * The log entries to store.
-     * <p>Empty for heartbeat.</p>
-     * <p>May send more than one for efficiency.</p>
-     */
     private List<Entry> entries = Collections.emptyList();
-    /**
-     * The commitIndex of leader.
-     */
     private int leaderCommit;
 
     public String getMessageId() {
@@ -112,15 +87,13 @@ public class AppendEntriesRpc implements Serializable {
     @Override
     public String toString() {
         return "AppendEntriesRpc{" +
-                "messageId='" + messageId + '\'' +
-                ", term=" + term +
+                "messageId='" + messageId +
+                "', entries.size=" + entries.size() +
+                ", leaderCommit=" + leaderCommit +
                 ", leaderId=" + leaderId +
                 ", prevLogIndex=" + prevLogIndex +
                 ", prevLogTerm=" + prevLogTerm +
-                ", entries.size=" + entries.size() +
-                 ", entries=" + entries +
-                ", leaderCommit=" + leaderCommit +
+                ", term=" + term +
                 '}';
     }
-
 }

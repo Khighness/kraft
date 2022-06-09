@@ -13,16 +13,14 @@ import java.util.Collection;
  * @since 2022-06-05
  * @email parakovo@gmail.com
  */
-public abstract class ConnectorAdapter implements Connector{
+public abstract class ConnectorAdapter implements Connector {
 
     @Override
     public void initialize() {
-
     }
 
     @Override
     public void sendRequestVote(@Nonnull RequestVoteRpc rpc, @Nonnull Collection<NodeEndpoint> destinationEndpoints) {
-
     }
 
     @Override
@@ -52,12 +50,10 @@ public abstract class ConnectorAdapter implements Connector{
 
     @Override
     public void resetChannels() {
-
     }
 
     @Override
     public void close() {
-
     }
 
 }

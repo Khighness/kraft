@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class InstallSnapshotState {
 
-    public enum  StateName {
+    public enum StateName {
         ILLEGAL_INSTALL_SNAPSHOT_RPC,
         INSTALLING,
         INSTALLED

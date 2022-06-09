@@ -111,8 +111,8 @@ public class NodeImpl implements Node {
 
     @Nonnull
     @Override
-    public RoleNameANdLeaderId getRoleNameANdLeaderId() {
-        return role.getRoleNameANdLeaderId(context.selfId());
+    public RoleNameAndLeaderId getRoleNameAndLeaderId() {
+        return role.getNameAndLeaderId(context.selfId());
     }
 
     /**
@@ -126,7 +126,7 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public void addNoeRoleListener(@Nonnull NodeRoleListener listener) {
+    public void addNodeRoleListener(@Nonnull NodeRoleListener listener) {
         Preconditions.checkNotNull(listener);
         roleListeners.add(listener);
     }
@@ -263,7 +263,7 @@ public class NodeImpl implements Node {
      * @throws NotLeaderException if current node isn't a leader
      */
     private void ensureLeader() {
-        RoleNameANdLeaderId result = role.getRoleNameANdLeaderId(context.selfId());
+        RoleNameAndLeaderId result = role.getNameAndLeaderId(context.selfId());
         if (result.getRoleName() == RoleName.LEADER) {
             return;
         }
@@ -458,7 +458,7 @@ public class NodeImpl implements Node {
     @Nullable
     private GroupConfigChangeTaskResult awaitPreviousGroupConfigChangeTask() {
         try {
-            groupConfigChangeTaskHolder.awaitOne(context.config().getPreviousGroupConfigChangeTimeout());
+            groupConfigChangeTaskHolder.awaitDone(context.config().getPreviousGroupConfigChangeTimeout());
             return null;
         } catch (InterruptedException ignored) {
             return GroupConfigChangeTaskResult.ERROR;
@@ -849,7 +849,7 @@ public class NodeImpl implements Node {
         }
 
         // dispatch to new node catch up task by node id
-        if (newNodeCatchUpTaskGroup.onReceiveInstallResult(resultMessage, context.log().getNextIndex())) {
+        if (newNodeCatchUpTaskGroup.onReceiveInstallSnapshotResult(resultMessage, context.log().getNextIndex())) {
             return;
         }
 
@@ -932,7 +932,7 @@ public class NodeImpl implements Node {
      * @param event group config entry batch removed event
      */
     @Subscribe
-    public void onGroupConfigEntryBatchedRemoved(GroupConfigEntryBatchRemovedEvent event) {
+    public void onGroupConfigEntryBatchRemoved(GroupConfigEntryBatchRemovedEvent event) {
         context.taskExecutor().submit(() -> {
             GroupConfigEntry entry = event.getFirstRemovedEntry();
             context.group().updateNodes(entry.getNodeEndpoints());

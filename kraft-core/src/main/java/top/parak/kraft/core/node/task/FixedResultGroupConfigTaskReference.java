@@ -1,7 +1,6 @@
 package top.parak.kraft.core.node.task;
 
 import javax.annotation.Nonnull;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Fixed result for {@link GroupConfigChangeTaskReference}.
@@ -18,15 +17,15 @@ public class FixedResultGroupConfigTaskReference implements GroupConfigChangeTas
         this.result = result;
     }
 
-    @Nonnull
     @Override
+    @Nonnull
     public GroupConfigChangeTaskResult getResult() throws InterruptedException {
         return result;
     }
 
-    @Nonnull
     @Override
-    public GroupConfigChangeTaskResult getResult(long timeout) throws InterruptedException, TimeoutException {
+    @Nonnull
+    public GroupConfigChangeTaskResult getResult(long timeout) {
         return result;
     }
 

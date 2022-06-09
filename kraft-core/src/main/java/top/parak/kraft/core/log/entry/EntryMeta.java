@@ -13,12 +13,10 @@ public class EntryMeta {
      * The kind of the log entry.
      */
     private final int kind;
-
     /**
      * The index of the log entry.
      */
     private final int index;
-
     /**
      * The term of the log entry.
      */
@@ -62,15 +60,6 @@ public class EntryMeta {
      */
     public int getTerm() {
         return term;
-    }
-
-    @Override
-    public String toString() {
-        return "EntryMeta{" +
-                "kind=" + kind +
-                ", index=" + index +
-                ", term=" + term +
-                '}';
     }
 
 }

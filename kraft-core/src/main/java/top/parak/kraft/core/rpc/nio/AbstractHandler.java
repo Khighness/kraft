@@ -1,15 +1,14 @@
 package top.parak.kraft.core.rpc.nio;
 
 import com.google.common.eventbus.EventBus;
+import top.parak.kraft.core.node.NodeId;
+import top.parak.kraft.core.rpc.Channel;
+import top.parak.kraft.core.rpc.message.*;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import top.parak.kraft.core.node.NodeId;
-import top.parak.kraft.core.rpc.Channel;
-import top.parak.kraft.core.rpc.message.*;
 
 import java.util.Objects;
 
@@ -20,7 +19,7 @@ import java.util.Objects;
  * @since 2022-04-13
  * @email parakovo@gmail.com
  */
-public abstract class AbstractHandler extends ChannelDuplexHandler {
+abstract class AbstractHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
 
@@ -50,7 +49,12 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
      */
     private InstallSnapshotRpc lastInstallSnapshotRpc;
 
-    public AbstractHandler(EventBus eventBus) {
+    /**
+     * Create AbstractHandler.
+     *
+     * @param eventBus event-bus
+     */
+    AbstractHandler(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
@@ -102,7 +106,7 @@ public abstract class AbstractHandler extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("{} {}", ctx.channel().remoteAddress().toString(), cause.getMessage());
+        logger.warn(cause.getMessage(), cause);
         ctx.close();
     }
 

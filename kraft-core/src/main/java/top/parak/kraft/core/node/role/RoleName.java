@@ -9,8 +9,6 @@ package top.parak.kraft.core.node.role;
  */
 public enum RoleName {
 
-    FOLLOWER,
-    CANDIDATE,
-    LEADER
+    FOLLOWER, CANDIDATE, LEADER;
 
 }

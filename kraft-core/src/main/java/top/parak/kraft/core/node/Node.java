@@ -1,7 +1,7 @@
 package top.parak.kraft.core.node;
 
 import top.parak.kraft.core.log.statemachine.StateMachine;
-import top.parak.kraft.core.node.role.RoleNameANdLeaderId;
+import top.parak.kraft.core.node.role.RoleNameAndLeaderId;
 import top.parak.kraft.core.node.task.GroupConfigChangeTaskReference;
 
 import javax.annotation.Nonnull;
@@ -35,14 +35,14 @@ public interface Node {
      * @return role name and leader id
      */
     @Nonnull
-    RoleNameANdLeaderId getRoleNameANdLeaderId();
+    RoleNameAndLeaderId getRoleNameAndLeaderId();
 
     /**
      * Add node role listener.
      *
      * @param listener listener
      */
-    void addNoeRoleListener(@Nonnull NodeRoleListener listener);
+    void addNodeRoleListener(@Nonnull NodeRoleListener listener);
 
     /**
      * Start node.
@@ -65,6 +65,7 @@ public interface Node {
      * @throws NotLeaderException    if current node is not a leader
      * @throws IllegalStateException if group config change concurrently
      */
+    @Nonnull
     GroupConfigChangeTaskReference addNode(@Nonnull NodeEndpoint endpoint);
 
     /**
@@ -75,6 +76,7 @@ public interface Node {
      * @throws NotLeaderException    if current node is not a leader
      * @throws IllegalStateException if group config change concurrently
      */
+    @Nonnull
     GroupConfigChangeTaskReference removeNode(@Nonnull NodeId id);
 
     /**

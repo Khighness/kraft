@@ -30,14 +30,22 @@ class OutboundChannelGroup {
     private static final Logger logger = LoggerFactory.getLogger(OutboundChannelGroup.class);
     private final EventLoopGroup workerGroup;
     private final EventBus eventBus;
-    private final NodeId selfNodeId;
+    private final NodeId slefId;
     private final int connectTimeoutMillis;
     private final ConcurrentMap<NodeId, Future<NioChannel>> channelMap = new ConcurrentHashMap<>();
 
-    OutboundChannelGroup(EventLoopGroup workerGroup, EventBus eventBus, NodeId selfNodeId, int logReplicationInterval) {
+    /**
+     * Create OutboundChannelGroup.
+     *
+     * @param workerGroup            worker group
+     * @param eventBus               event-bus
+     * @param selfId                 self id
+     * @param logReplicationInterval log replication interval
+     */
+    OutboundChannelGroup(EventLoopGroup workerGroup, EventBus eventBus, NodeId selfId, int logReplicationInterval) {
         this.workerGroup = workerGroup;
         this.eventBus = eventBus;
-        this.selfNodeId = selfNodeId;
+        this.slefId = selfId;
         this.connectTimeoutMillis = logReplicationInterval / 2;
     }
 
@@ -66,7 +74,7 @@ class OutboundChannelGroup {
             if (e instanceof ExecutionException) {
                 Throwable cause = e.getCause();
                 if (cause instanceof ConnectException) {
-                    throw new ChannelConnectException("failed to connect to node " + nodeId +
+                    throw new ChannelConnectException("failed to get channel to node " + nodeId +
                             ", cause " + cause.getMessage(), cause);
                 }
             }
@@ -94,7 +102,7 @@ class OutboundChannelGroup {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new NodeRpcMessageDecoder());
                         pipeline.addLast(new NodeRpcMessageEncoder());
-                        pipeline.addLast(new ToRemoteHandler(eventBus, nodeId, selfNodeId));
+                        pipeline.addLast(new ToRemoteHandler(eventBus, nodeId, slefId));
                     }
                 });
         ChannelFuture future = bootstrap.connect(address.getHost(), address.getPort()).sync();
@@ -104,7 +112,7 @@ class OutboundChannelGroup {
         logger.debug("channel OUTBOUND-{} connected", nodeId);
         Channel nettyChannel = future.channel();
         nettyChannel.closeFuture().addListener((ChannelFutureListener) cf -> {
-            logger.info("channel OUTBOUND-{} disconnected", nodeId);
+            logger.debug("channel OUTBOUND-{} disconnected", nodeId);
             channelMap.remove(nodeId);
         });
         return new NioChannel(nettyChannel);
@@ -114,7 +122,7 @@ class OutboundChannelGroup {
      * Close all channels.
      */
     void closeAll() {
-        logger.info("close all outbound channels");
+        logger.debug("close all outbound channels");
         channelMap.forEach((nodeId, nioChannelFuture) -> {
             try {
                 nioChannelFuture.get().close();

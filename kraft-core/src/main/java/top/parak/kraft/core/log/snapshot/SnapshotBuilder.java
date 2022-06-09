@@ -2,6 +2,7 @@ package top.parak.kraft.core.log.snapshot;
 
 import top.parak.kraft.core.rpc.message.InstallSnapshotRpc;
 
+
 /**
  * Snapshot builder.
  * <p>Handle different types of log snapshots via {@code T}.</p>

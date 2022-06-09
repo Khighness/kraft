@@ -10,7 +10,11 @@ package top.parak.kraft.core.log.entry;
 public abstract class AbstractEntry implements Entry {
 
     /**
-     * The kind of the log entry.
+     * Abstract log entry.
+     *
+     * @author KHighness
+     * @since 2022-03-31
+     * @email parakovo@gmail.com
      */
     private final int kind;
     /**
@@ -29,7 +33,7 @@ public abstract class AbstractEntry implements Entry {
      * @param index the index of the log entry
      * @param term  the term of the log entry
      */
-    public AbstractEntry(int kind, int index, int term) {
+    AbstractEntry(int kind, int index, int term) {
         this.kind = kind;
         this.index = index;
         this.term = term;
@@ -42,12 +46,12 @@ public abstract class AbstractEntry implements Entry {
 
     @Override
     public int getIndex() {
-        return this.index;
+        return index;
     }
 
     @Override
     public int getTerm() {
-        return this.term;
+        return term;
     }
 
     @Override

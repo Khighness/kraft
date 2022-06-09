@@ -28,21 +28,21 @@ public interface LogDir {
      *
      * @return log entry file
      */
-    File getEntriesFile();
+    File getSnapshotFile();
 
     /**
      * Get the log entry index file corresponding to the log entry file.
      *
      * @return log entry index file
      */
-    File getEntryOffsetIndexFile();
+    File getEntriesFile();
 
     /**
      * Get snapshot file.
      *
      * @return snapshot file
      */
-    File getSnapshotFile();
+    File getEntryOffsetIndexFile();
 
     /**
      * Get directory.

@@ -31,9 +31,13 @@ public class ElectionTimeout {
 
     @Override
     public String toString() {
-        return "ElectionTimeout{delay=" +
-                scheduledFuture.getDelay(TimeUnit.MILLISECONDS) +
-                "ms}";
+        if (this.scheduledFuture.isCancelled()) {
+            return "ElectionTimeout(state=cancelled)";
+        }
+        if (this.scheduledFuture.isDone()) {
+            return "ElectionTimeout(state=done)";
+        }
+        return "ElectionTimeout{delay=" + scheduledFuture.getDelay(TimeUnit.MILLISECONDS) + "ms}";
     }
 
 }

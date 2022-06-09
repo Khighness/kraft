@@ -1,5 +1,6 @@
 package top.parak.kraft.core.schedule;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.*;
 
 /**
@@ -12,12 +13,12 @@ import java.util.concurrent.*;
 public class NullScheduledFuture implements ScheduledFuture<Object> {
 
     @Override
-    public long getDelay(TimeUnit unit) {
+    public long getDelay(@Nonnull TimeUnit unit) {
         return 0;
     }
 
     @Override
-    public int compareTo(Delayed o) {
+    public int compareTo(@Nonnull Delayed o) {
         return 0;
     }
 
@@ -42,7 +43,7 @@ public class NullScheduledFuture implements ScheduledFuture<Object> {
     }
 
     @Override
-    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public Object get(long timeout, @Nonnull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         return null;
     }
 
