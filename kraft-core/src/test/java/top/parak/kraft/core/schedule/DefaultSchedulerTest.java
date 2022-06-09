@@ -13,6 +13,7 @@ import top.parak.kraft.core.support.task.TaskExecutor;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,38 +37,6 @@ public class DefaultSchedulerTest {
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
-    }
-
-    @Test
-    public void ipdateJavaDoc() throws IOException {
-        File file = new File("");
-        FileInputStream inputStream = new FileInputStream(file);
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-        File newFile = new File("");
-        if  (newFile.createNewFile()) {
-            FileOutputStream outputStream = new FileOutputStream(newFile);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-            String line;
-            int n = 0;
-            while ((line = bufferedReader.readLine()) != null) {
-                n++;
-                // 16 <= n <= 407
-                if (16 <= n && n <= 407 && n % 2 == 1) {
-                    continue;
-                }
-                bufferedWriter.write(line + "\n");
-            }
-
-            bufferedWriter.close();
-            outputStreamWriter.close();
-            outputStream.close();
-        }
-        bufferedReader.close();
-        inputStreamReader.close();
-        inputStream.close();
     }
 
     private static TaskExecutor taskExecutor;
