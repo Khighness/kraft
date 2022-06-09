@@ -11,6 +11,13 @@ import java.util.stream.Collectors;
 
 /**
  * Node group.
+ * <p>
+ * Used to record the members in cluster and find members.
+ * </p>
+ *
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
  */
 @NotThreadSafe
 class NodeGroup {
@@ -20,7 +27,7 @@ class NodeGroup {
     private Map<NodeId, GroupMember> memberMap;
 
     /**
-     * Create group with single member(standalone).
+     * Create group with single node(standalone).
      *
      * @param endpoint endpoint
      */
@@ -29,7 +36,7 @@ class NodeGroup {
     }
 
     /**
-     * Create group.
+     * Create group with node list(group).
      *
      * @param endpoints endpoints
      * @param selfId    self id
@@ -44,7 +51,6 @@ class NodeGroup {
      *
      * @param endpoints endpoints
      * @return member map
-     * @throws IllegalArgumentException if endpoints is empty
      */
     private Map<NodeId, GroupMember> buildMemberMap(Collection<NodeEndpoint> endpoints) {
         Map<NodeId, GroupMember> map = new HashMap<>();
@@ -55,6 +61,15 @@ class NodeGroup {
             throw new IllegalArgumentException("endpoints is empty");
         }
         return map;
+    }
+
+    /**
+     * Check if member is unique one in group, in other word, check if standalone mode.
+     *
+     * @return true if only one member and the id of member equals to specified id, otherwise false
+     */
+    boolean isStandalone() {
+        return memberMap.size() == 1 && memberMap.containsKey(selfId);
     }
 
     /**
@@ -143,6 +158,23 @@ class NodeGroup {
     }
 
     /**
+     * Add member to group.
+     *
+     * @param endpoint   endpoint
+     * @param nextIndex  next index
+     * @param matchIndex match index
+     * @param major      major
+     * @return added member
+     */
+    GroupMember addNode(NodeEndpoint endpoint, int nextIndex, int matchIndex, boolean major) {
+        logger.info("add node {} to group", endpoint.getId());
+        ReplicatingState replicatingState = new ReplicatingState(nextIndex, matchIndex);
+        GroupMember member = new GroupMember(endpoint, replicatingState, major);
+        memberMap.put(endpoint.getId(), member);
+        return member;
+    }
+
+    /**
      * Remove member.
      *
      * @param id id
@@ -150,6 +182,17 @@ class NodeGroup {
     void removeNode(NodeId id) {
         logger.info("node {} removed", id);
         memberMap.remove(id);
+    }
+
+    /**
+     * Update member list.
+     * <p>All replicating state will be dropped.</p>
+     *
+     * @param endpoints endpoints
+     */
+    void updateNodes(Set<NodeEndpoint> endpoints) {
+        memberMap = buildMemberMap(endpoints);
+        logger.info("group change changed -> {}", memberMap.keySet());
     }
 
     /**
@@ -170,7 +213,6 @@ class NodeGroup {
      * <p>
      * To get major match index in group, sort match indices and get the middle one.
      * </p>
-     * TODO add doc
      *
      * @return match index
      */
@@ -200,33 +242,7 @@ class NodeGroup {
         return memberMap.values().stream().filter(m -> !m.idEquals(selfId)).collect(Collectors.toList());
     }
 
-    /**
-     * Add member to group.
-     *
-     * @param endpoint   endpoint
-     * @param nextIndex  next index
-     * @param matchIndex match index
-     * @param major      major
-     * @return added member
-     */
-    GroupMember addNode(NodeEndpoint endpoint, int nextIndex, int matchIndex, boolean major) {
-        logger.info("add node {} to group", endpoint.getId());
-        ReplicatingState replicatingState = new ReplicatingState(nextIndex, matchIndex);
-        GroupMember member = new GroupMember(endpoint, replicatingState, major);
-        memberMap.put(endpoint.getId(), member);
-        return member;
-    }
 
-    /**
-     * Update member list.
-     * <p>All replicating state will be dropped.</p>
-     *
-     * @param endpoints endpoints
-     */
-    void updateNodes(Set<NodeEndpoint> endpoints) {
-        memberMap = buildMemberMap(endpoints);
-        logger.info("group change changed -> {}", memberMap.keySet());
-    }
 
     /**
      * List endpoint of major members.
@@ -258,14 +274,7 @@ class NodeGroup {
         return endpoints;
     }
 
-    /**
-     * Check if member is unique one in group, in other word, check if standalone mode.
-     *
-     * @return true if only one member and the id of member equals to specified id, otherwise false
-     */
-    boolean isStandalone() {
-        return memberMap.size() == 1 && memberMap.containsKey(selfId);
-    }
+
 
     /**
      * Node match index.

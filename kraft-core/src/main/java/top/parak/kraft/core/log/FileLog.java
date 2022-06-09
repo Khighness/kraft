@@ -1,6 +1,7 @@
 package top.parak.kraft.core.log;
 
 import com.google.common.eventbus.EventBus;
+
 import top.parak.kraft.core.log.entry.Entry;
 import top.parak.kraft.core.log.entry.EntryMeta;
 import top.parak.kraft.core.log.sequence.EntrySequence;
@@ -15,18 +16,30 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * File log.
+ *
+ * @author KHighness
+ * @since 2022-04-06
+ * @email parakovo@gmail.com
+ */
 @NotThreadSafe
 public class FileLog extends AbstractLog {
 
     private final RootDir rootDir;
 
+    /**
+     * Create FileLog.
+     *
+     * @param baseDir  base directory
+     * @param eventBus event bus
+     */
     public FileLog(File baseDir, EventBus eventBus) {
         super(eventBus);
         rootDir = new RootDir(baseDir);
 
         LogGeneration latestGeneration = rootDir.getLatestGeneration();
         snapshot = new EmptySnapshot();
-        // TODO add log
         if (latestGeneration != null) {
             if (latestGeneration.getSnapshotFile().exists()) {
                 snapshot = new FileSnapshot(latestGeneration);

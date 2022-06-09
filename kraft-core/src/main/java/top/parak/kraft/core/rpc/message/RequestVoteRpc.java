@@ -4,6 +4,13 @@ import top.parak.kraft.core.node.NodeId;
 
 import java.io.Serializable;
 
+/**
+ * RequestVote RPC arguments.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
+ */
 public class RequestVoteRpc implements Serializable {
 
     private int term;

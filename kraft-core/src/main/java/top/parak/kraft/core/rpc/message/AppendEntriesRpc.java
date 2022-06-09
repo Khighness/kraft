@@ -7,6 +7,13 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * AppendEntries RPC arguments.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public class AppendEntriesRpc implements Serializable {
 
     private String messageId;

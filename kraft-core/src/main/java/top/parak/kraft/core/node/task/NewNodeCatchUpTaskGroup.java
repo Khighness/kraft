@@ -10,6 +10,10 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Group for {@link NewNodeCatchUpTask}.
+ *
+ * @author KHighness
+ * @since 2022-06-03
+ * @email parakovo@gmail.com
  */
 @ThreadSafe
 public class NewNodeCatchUpTaskGroup {
@@ -27,10 +31,20 @@ public class NewNodeCatchUpTaskGroup {
     }
 
     /**
+     * Remove task.
+     *
+     * @param task task
+     * @return true if removed, false if not found
+     */
+    public boolean remove(NewNodeCatchUpTask task) {
+        return taskMap.remove(task.getNodeId()) != null;
+    }
+
+    /**
      * Invoke <code>onReceiveAppendEntriesResult</code> on task.
      *
      * @param resultMessage result message
-     * @param nextLogIndex  next index of log
+     * @param nextLogIndex  index of next log
      * @return true if invoked, false if no task for node
      */
     public boolean onReceiveAppendEntriesResult(AppendEntriesResultMessage resultMessage, int nextLogIndex) {
@@ -42,6 +56,13 @@ public class NewNodeCatchUpTaskGroup {
         return true;
     }
 
+    /**
+     * Invoke <code>onReceiveInstallSnapshotResult</code> on task.
+     *
+     * @param resultMessage result message
+     * @param nextLogIndex  index of next log
+     * @return true if invoked, false if no task for node
+     */
     public boolean onReceiveInstallSnapshotResult(InstallSnapshotResultMessage resultMessage, int nextLogIndex) {
         NewNodeCatchUpTask task = taskMap.get(resultMessage.getSourceNodeId());
         if (task == null) {
@@ -49,16 +70,6 @@ public class NewNodeCatchUpTaskGroup {
         }
         task.onReceiveInstallSnapshotResult(resultMessage, nextLogIndex);
         return true;
-    }
-
-    /**
-     * Remove task.
-     *
-     * @param task task
-     * @return {@code true} if removed, {@code false} if not found
-     */
-    public boolean remove(NewNodeCatchUpTask task) {
-        return taskMap.remove(task.getNodeId()) != null;
     }
 
 }

@@ -4,6 +4,10 @@ import top.parak.kraft.core.node.NodeEndpoint;
 
 /**
  * Task context for {@link NewNodeCatchUpTask}.
+ *
+ * @author KHighness
+ * @since 2022-06-02
+ * @email parakovo@gmail.com
  */
 public interface NewNodeCatchUpTaskContext {
 
@@ -25,6 +29,12 @@ public interface NewNodeCatchUpTaskContext {
      */
     void doReplicateLog(NodeEndpoint endpoint, int nextIndex);
 
+    /**
+     * Send install snapshot.
+     *
+     * @param endpoint endpoint
+     * @param offset   offset
+     */
     void sendInstallSnapshot(NodeEndpoint endpoint, int offset);
 
     /**

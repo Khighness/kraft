@@ -8,6 +8,13 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.concurrent.*;
 
+/**
+ * Single-threaded task executor.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public class SingleThreadTaskExecutor extends AbstractTaskExecutor {
 
     private final ExecutorService executorService;

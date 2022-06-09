@@ -9,6 +9,10 @@ import java.util.Objects;
 
 /**
  * Node id.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
 @Immutable
 public class NodeId implements Serializable {
@@ -16,7 +20,7 @@ public class NodeId implements Serializable {
     private final String value;
 
     /**
-     * Create.
+     * Create NodeId.
      *
      * @param value value
      */
@@ -26,10 +30,9 @@ public class NodeId implements Serializable {
     }
 
     /**
-     * Create.
+     * Create NodeId.
      *
      * @param value value
-     * @return node id
      */
     public static NodeId of(@Nonnull String value) {
         return new NodeId(value);

@@ -21,10 +21,10 @@ public class ClientAddServerCommand implements Command {
 
     @Override
     public void execute(String arguments, CommandContext context) {
-        // <node-id> <host> <port-service>
+        // <node-id> <host> <service-port>
         String[] pieces = arguments.split("\\s");
         if (pieces.length != 3) {
-            throw new IllegalArgumentException("usage: " + getName() + " <node-id> <host> <port-service>");
+            throw new IllegalArgumentException("usage: " + getName() + " <node-id> <host> <service-port>");
         }
 
         String nodeId = pieces[0];

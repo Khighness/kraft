@@ -4,8 +4,11 @@ import javax.annotation.Nonnull;
 
 /**
  * Scheduler.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
-// TODO optimize
 public interface Scheduler {
 
     /**

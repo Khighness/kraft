@@ -5,15 +5,33 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+/**
+ * Root directory.
+ *
+ * @author KHighness
+ * @since 2022-04-01
+ * @email parakovo@gmail.com
+ */
 class RootDir {
 
+    private static final Logger logger = LoggerFactory.getLogger(RootDir.class);
+
+    /**
+     * The name of the log snapshot file.
+     */
     static final String FILE_NAME_SNAPSHOT = "service.ss";
+    /**
+     * The name of the log entry file.
+     */
     static final String FILE_NAME_ENTRIES = "entries.bin";
+    /**
+     * The name of the log entry meta file.
+     */
     static final String FILE_NAME_ENTRY_OFFSET_INDEX = "entries.idx";
+
     private static final String DIR_NAME_GENERATING = "generating";
     private static final String DIR_NAME_INSTALLING = "installing";
 
-    private static final Logger logger = LoggerFactory.getLogger(RootDir.class);
     private final File baseDir;
 
     RootDir(File baseDir) {

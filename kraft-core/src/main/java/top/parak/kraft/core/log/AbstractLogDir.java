@@ -5,10 +5,25 @@ import top.parak.kraft.core.support.file.Files;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Abstract log dir.
+ *
+ * @author KHighness
+ * @since 2022-04-01
+ * @email parakovo@gmail.com
+ */
 abstract class AbstractLogDir implements LogDir {
 
+    /**
+     * The log directory.
+     */
     final File dir;
 
+    /**
+     * Create AbstractLogDir.
+     *
+     * @param dir directory
+     */
     AbstractLogDir(File dir) {
         this.dir = dir;
     }

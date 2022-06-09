@@ -5,21 +5,23 @@ import com.google.protobuf.MessageLite;
 
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.service.*;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.message.MessageConstants;
-import top.parak.kraft.kvstore.server.KVStoreServer;
-import top.parak.kraft.kvstore.support.proto.Protos;
 import top.parak.kraft.kvstore.message.GetCommand;
 import top.parak.kraft.kvstore.message.SetCommand;
+import top.parak.kraft.kvstore.server.KVStoreServer;
+import top.parak.kraft.kvstore.support.proto.Protos;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
- * KV-store client socket channel which is implemented by blocking io (bio).
+ * KV-store client socket channel which is implemented by blocking io (BIO).
  * <p>
- * {@link KVStoreClient} will create a socket channel for every {@link KVStoreServer}.
- * All socket channels will be managed by {@link CommandContext}.
+ * {@link KVStoreClient} will create a new socket channel whose is short-connection
+ * to {@link KVStoreServer} when client needs to communicate with server.
  * </p>
  *
  * @author KHighness
@@ -28,19 +30,25 @@ import java.net.Socket;
  */
 public class KVStoreClientSocketChannel implements Channel {
 
-    private final String host;
-    private final int port;
+    /**
+     * Server address.
+     */
+    private final InetSocketAddress serverAddress;
 
-    public KVStoreClientSocketChannel(String host, int port) {
-        this.host = host;
-        this.port = port;
+    /**
+     * Create KVStoreClientSocketChannel.
+     *
+     * @param serverAddress server address
+     */
+    public KVStoreClientSocketChannel(InetSocketAddress serverAddress) {
+        this.serverAddress = serverAddress;
     }
 
     @Override
     public Object send(Object message) {
         try (Socket socket = new Socket()) {
             socket.setTcpNoDelay(true);
-            socket.connect(new InetSocketAddress(this.host, this.port));
+            socket.connect(serverAddress);
             this.write(socket.getOutputStream(), message);
             return this.read(socket.getInputStream());
         } catch (IOException e) {

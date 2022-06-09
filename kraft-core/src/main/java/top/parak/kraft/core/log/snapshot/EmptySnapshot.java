@@ -9,6 +9,13 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Empty snapshot.
+ *
+ * @author KHighness
+ * @since 2022-04-06
+ * @email parakovo@gmail.com
+ */
 @Immutable
 public class EmptySnapshot implements Snapshot {
 

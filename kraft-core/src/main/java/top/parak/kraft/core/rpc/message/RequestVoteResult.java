@@ -2,6 +2,13 @@ package top.parak.kraft.core.rpc.message;
 
 import java.io.Serializable;
 
+/**
+ * RequestVote RPC results.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public class RequestVoteResult implements Serializable {
 
     private int term;

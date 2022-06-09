@@ -2,6 +2,13 @@ package top.parak.kraft.core.support.file;
 
 import java.io.*;
 
+/**
+ * {@link SeekableFile} implementation based on {@link java.io.RandomAccessFile}.
+ *
+ * @author KHighness
+ * @since 2022-04-02
+ * @email parakovo@gmail.com
+ */
 public class RandomAccessFileAdapter implements SeekableFile {
 
     private final File file;

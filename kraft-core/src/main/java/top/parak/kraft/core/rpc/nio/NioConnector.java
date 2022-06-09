@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,7 +33,7 @@ public class NioConnector implements Connector {
     private final NioEventLoopGroup workerNioEventLoopGroup;
     private final boolean workerGroupShared;
     private final EventBus eventBus;
-    private final int port;
+    private final InetSocketAddress serviceAddress;
     private final InboundChannelGroup inboundChannelGroup = new InboundChannelGroup();
     private final OutboundChannelGroup outboundChannelGroup;
     private final ExecutorService executorService = Executors.newCachedThreadPool((r) -> {
@@ -43,22 +44,20 @@ public class NioConnector implements Connector {
         return thread;
     });
 
-    public NioConnector(NodeId selfNodeId, EventBus eventBus, int port, int logReplicationInterval) {
-        this(new NioEventLoopGroup(), false, selfNodeId, eventBus, port, logReplicationInterval);
-    }
-
-    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, NodeId selfNodeId, EventBus eventBus, int port, int logReplicationInterval) {
-        this(workerNioEventLoopGroup, true, selfNodeId, eventBus, port, logReplicationInterval);
+    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup,
+                        NodeId selfId, EventBus eventBus,
+                        InetSocketAddress serviceAddress, int logReplicationInterval) {
+        this(workerNioEventLoopGroup, false, selfId, eventBus, serviceAddress, logReplicationInterval);
     }
 
     public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, boolean workerGroupShared,
-                        NodeId selfNodeId, EventBus eventBus,
-                        int port, int logReplicationInterval) {
+                        NodeId selfId, EventBus eventBus,
+                        InetSocketAddress serviceAddress, int logReplicationInterval) {
         this.workerNioEventLoopGroup = workerNioEventLoopGroup;
         this.workerGroupShared = workerGroupShared;
         this.eventBus = eventBus;
-        this.port = port;
-        outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfNodeId, logReplicationInterval);
+        this.serviceAddress = serviceAddress;
+        outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfId, logReplicationInterval);
     }
 
     // should not call more than once
@@ -76,11 +75,11 @@ public class NioConnector implements Connector {
                         pipeline.addLast(new FromRemoteHandler(eventBus, inboundChannelGroup));
                     }
                 });
-        logger.debug("node listen on port {}", port);
+        logger.debug("raft-rpc server is serving at [{}]", this.serviceAddress.toString());
         try {
-            serverBootstrap.bind(port).sync();
+            serverBootstrap.bind(serviceAddress).sync();
         } catch (InterruptedException e) {
-            throw new ConnectorException("failed to bind port", e);
+            throw new ConnectorException("failed to bind " + this.serviceAddress.toString(), e);
         }
     }
 

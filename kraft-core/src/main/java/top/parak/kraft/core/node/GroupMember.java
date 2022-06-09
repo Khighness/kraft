@@ -3,19 +3,47 @@ package top.parak.kraft.core.node;
 /**
  * State of group member.
  *
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
  * @see ReplicatingState
  */
 class GroupMember {
 
+    /**
+     * The node endpoint of the group member.
+     */
     private final NodeEndpoint endpoint;
+    /**
+     * The replicating state of the group member.
+     */
     private ReplicatingState replicatingState;
+    /**
+     * True means the member is a healthy and normal node in group,
+     * false if the member is catching up when entering the group.
+     */
     private boolean major;
+    /**
+     * True if the group member is removed, otherwise false.
+     */
     private boolean removing = false;
 
+    /**
+     * Create GroupMember.
+     *
+     * @param endpoint endpoint
+     */
     GroupMember(NodeEndpoint endpoint) {
         this(endpoint, null, true);
     }
 
+    /**
+     * Create GroupMember.
+     *
+     * @param endpoint         endpoint
+     * @param replicatingState replicating state
+     * @param major            major
+     */
     GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState, boolean major) {
         this.endpoint = endpoint;
         this.replicatingState = replicatingState;

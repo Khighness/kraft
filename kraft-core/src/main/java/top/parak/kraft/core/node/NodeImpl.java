@@ -38,7 +38,9 @@ import java.util.concurrent.TimeoutException;
 /**
  * Node implementation.
  *
- * @see NodeContext
+ * @author KHighness
+ * @since 2022-05-28
+ * @email parakovo@gmail.com
  */
 @ThreadSafe
 public class NodeImpl implements Node {

@@ -4,6 +4,7 @@ import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.Address;
 import top.parak.kraft.core.service.ServerRouter;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 
 /**
@@ -43,11 +44,19 @@ public class CommandContext {
         this.client = new KVStoreClient(buildServerRouter(serverMap));
     }
 
+    /**
+     * Build server router from server map.
+     *
+     * @param serverMap server map
+     * @return server router
+     */
     private ServerRouter buildServerRouter(Map<NodeId, Address> serverMap) {
         ServerRouter router = new ServerRouter();
         for (NodeId nodeId : serverMap.keySet()) {
             Address address = serverMap.get(nodeId);
-            router.add(nodeId, new KVStoreClientSocketChannel(address.getHost(), address.getPort()));
+            router.add(nodeId, new KVStoreClientSocketChannel(
+                    new InetSocketAddress(address.getHost(), address.getPort()))
+            );
         }
         return router;
     }

@@ -3,6 +3,13 @@ package top.parak.kraft.core.schedule;
 import javax.annotation.Nonnull;
 import java.util.concurrent.*;
 
+/**
+ * Null scheduled future.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
+ */
 public class NullScheduledFuture implements ScheduledFuture<Object> {
 
     @Override

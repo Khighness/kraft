@@ -9,6 +9,7 @@ import top.parak.kraft.core.node.NodeBuilder;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 
+import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,8 +29,8 @@ public class CommandServerLauncher {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(CommandServerLauncher.class);
-    private static final String MODE_STANDALONE = "standalone";
-    private static final String MODE_STANDBY = "standby";
+    private static final String MODE_STANDALONE   = "standalone";
+    private static final String MODE_STANDBY      = "standby";
     private static final String MODE_GROUP_MEMBER = "group-member";
 
     /**
@@ -139,9 +140,8 @@ public class CommandServerLauncher {
                 .setStandby(standby)
                 .setDataDir(cmdLine.getOptionValue('d'))
                 .build();
-        KVStoreServer KVStoreServer = new KVStoreServer(node, servicePort);
-        logger.info("start with mode {}, id {}, host {}, port raft node {}, port service {}",
-                (standby ? "standby" : "standalone"), id, host, raftRpcPort, servicePort);
+        KVStoreServer KVStoreServer = new KVStoreServer(node, new InetSocketAddress(host, servicePort));
+        logger.info("id {}, start with mode {}", id, (standby ? "standby" : "standalone"));
         startServer(KVStoreServer);
     }
 
@@ -158,7 +158,8 @@ public class CommandServerLauncher {
 
         String[] rawGroupConfigs = cmdLine.getOptionValues("gc");
         String rawNodeId = cmdLine.getOptionValue('i');
-        int portService = ((Long) cmdLine.getParsedOptionValue("p2")).intValue();
+        String host = cmdLine.getOptionValue("h", "127.0.0.1");
+        int servicePort = ((Long) cmdLine.getParsedOptionValue("p2")).intValue();
 
         Set<NodeEndpoint> nodeEndpoints = Stream.of(rawGroupConfigs)
                 .map(this::parseNodeEndpoint)
@@ -167,13 +168,13 @@ public class CommandServerLauncher {
         Node node = new NodeBuilder(nodeEndpoints, new NodeId(rawNodeId))
                 .setDataDir(cmdLine.getOptionValue('d'))
                 .build();
-        KVStoreServer KVStoreServer = new KVStoreServer(node, portService);
-        logger.info("start as group member, group config {}, id {}, port service {}", nodeEndpoints, rawNodeId, portService);
+        KVStoreServer KVStoreServer = new KVStoreServer(node, new InetSocketAddress(host, servicePort));
+        logger.info("id {}, start as group member, group config {}", rawNodeId, nodeEndpoints);
         startServer(KVStoreServer);
     }
 
     /**
-     * Parse raw group config and return node endpint.
+     * Parse raw group config and return node endpoint.
      *
      * @param rawGroupConfig raw group config
      * @return node endpoint
@@ -194,6 +195,12 @@ public class CommandServerLauncher {
         return new NodeEndpoint(nodeId, host, port);
     }
 
+    /**
+     * Start server.
+     *
+     * @param server     server
+     * @throws Exception if server failed to start
+     */
     private void startServer(KVStoreServer server) throws Exception {
         this.server = server;
         this.server.start();

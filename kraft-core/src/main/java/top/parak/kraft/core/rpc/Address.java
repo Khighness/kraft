@@ -6,7 +6,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Address.
+ * Node address.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
 @Immutable
 public class Address {
@@ -15,7 +19,7 @@ public class Address {
     private final int port;
 
     /**
-     * Create.
+     * Create Address.
      *
      * @param host host
      * @param port port

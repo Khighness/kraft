@@ -6,6 +6,14 @@ import top.parak.kraft.core.rpc.message.*;
 
 import javax.annotation.Nonnull;
 
+/**
+ * NIO channel.
+ *
+ * @author KHighness
+ * @since 2022-04-14
+ * @email parakovo@gmail.com
+ * @see java.nio.channels.NetworkChannel
+ */
 class NioChannel implements Channel {
 
     private final io.netty.channel.Channel nettyChannel;

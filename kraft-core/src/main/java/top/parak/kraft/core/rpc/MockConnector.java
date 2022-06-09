@@ -10,6 +10,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Mock connector.
+ * <p>
+ * Used to test.
+ * </p>
+ *
+ * @author KHighness
+ * @since 2022-06-05
+ * @email parakovo@gmail.com
+ */
 public class MockConnector extends ConnectorAdapter {
 
     private LinkedList<Message> messages = new LinkedList<>();

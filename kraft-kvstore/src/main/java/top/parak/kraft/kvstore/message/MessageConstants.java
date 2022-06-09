@@ -9,6 +9,9 @@ package top.parak.kraft.kvstore.message;
  */
 public class MessageConstants {
 
+    /**
+     * Message type of {@link }
+     */
     public static final int MSG_TYPE_SUCCESS = 0;
     public static final int MSG_TYPE_FAILURE = 1;
     public static final int MSG_TYPE_REDIRECT = 2;

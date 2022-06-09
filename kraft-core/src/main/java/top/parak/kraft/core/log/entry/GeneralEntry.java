@@ -1,5 +1,12 @@
 package top.parak.kraft.core.log.entry;
 
+/**
+ * Metadata of log entry.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public class GeneralEntry extends AbstractEntry {
 
     private final byte[] commandBytes;

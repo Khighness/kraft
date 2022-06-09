@@ -9,6 +9,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Future for {@link GroupConfigChangeTaskReference}.
+ *
+ * @author KHighness
+ * @since 2022-06-01
+ * @email parakovo@gmail.com
+ */
 public class FutureGroupConfigChangeTaskReference implements GroupConfigChangeTaskReference {
 
     private static final Logger logger = LoggerFactory.getLogger(FutureGroupConfigChangeTaskReference.class);

@@ -1,16 +1,24 @@
 package top.parak.kraft.core.node.task;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.node.config.NodeConfig;
 import top.parak.kraft.core.rpc.message.AppendEntriesResultMessage;
 import top.parak.kraft.core.rpc.message.InstallSnapshotResultMessage;
 import top.parak.kraft.core.rpc.message.InstallSnapshotRpc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
+/**
+ * New node catch up task.
+ *
+ * @author KHighness
+ * @since 2022-06-02
+ * @email parakovo@gmail.com
+ */
 public class NewNodeCatchUpTask implements Callable<NewNodeCatchUpTaskResult> {
 
     private enum State {

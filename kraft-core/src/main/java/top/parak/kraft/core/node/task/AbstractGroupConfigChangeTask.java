@@ -3,6 +3,13 @@ package top.parak.kraft.core.node.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Abstract group config change task.
+ *
+ * @author KHighness
+ * @since 2022-05-31
+ * @email parakovo@gmail.com
+ */
 abstract class AbstractGroupConfigChangeTask implements GroupConfigChangeTask {
 
     protected enum State {

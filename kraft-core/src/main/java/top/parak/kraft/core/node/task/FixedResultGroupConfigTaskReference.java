@@ -1,10 +1,14 @@
 package top.parak.kraft.core.node.task;
 
-import top.parak.kraft.core.node.task.GroupConfigChangeTaskReference;
-import top.parak.kraft.core.node.task.GroupConfigChangeTaskResult;
-
 import javax.annotation.Nonnull;
 
+/**
+ * Fixed result for {@link GroupConfigChangeTaskReference}.
+ *
+ * @author KHighness
+ * @since 2022-06-01
+ * @email parakovo@gmail.com
+ */
 public class FixedResultGroupConfigTaskReference implements GroupConfigChangeTaskReference {
 
     private final GroupConfigChangeTaskResult result;

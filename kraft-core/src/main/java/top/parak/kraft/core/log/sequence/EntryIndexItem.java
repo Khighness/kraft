@@ -4,6 +4,13 @@ import top.parak.kraft.core.log.entry.EntryMeta;
 
 import javax.annotation.concurrent.Immutable;
 
+/**
+ * Entry index item.
+ *
+ * @author KHighness
+ * @since 2022-04-02
+ * @email parakovo@gmail.com
+ */
 @Immutable
 class EntryIndexItem {
 

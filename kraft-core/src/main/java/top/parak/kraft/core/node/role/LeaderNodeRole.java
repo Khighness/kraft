@@ -5,11 +5,24 @@ import top.parak.kraft.core.schedule.LogReplicationTask;
 
 import javax.annotation.concurrent.Immutable;
 
+/**
+ * Leader node role.
+ *
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
+ */
 @Immutable
 public class LeaderNodeRole extends AbstractNodeRole {
 
     private final LogReplicationTask logReplicationTask;
 
+    /**
+     * Create LeaderNodeRole.
+     *
+     * @param term               term
+     * @param logReplicationTask log replication task
+     */
     public LeaderNodeRole(int term, LogReplicationTask logReplicationTask) {
         super(RoleName.LEADER, term);
         this.logReplicationTask = logReplicationTask;
@@ -39,4 +52,5 @@ public class LeaderNodeRole extends AbstractNodeRole {
     public String toString() {
         return "LeaderNodeRole{term=" + term + ", logReplicationTask=" + logReplicationTask + '}';
     }
+
 }

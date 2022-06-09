@@ -1,12 +1,18 @@
 package top.parak.kraft.core.rpc;
 
 import top.parak.kraft.core.node.NodeEndpoint;
-import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.*;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
 
+/**
+ * Connector adapter used to test.
+ *
+ * @author KHighness
+ * @since 2022-06-05
+ * @email parakovo@gmail.com
+ */
 public abstract class ConnectorAdapter implements Connector {
 
     @Override

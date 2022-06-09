@@ -2,6 +2,13 @@ package top.parak.kraft.core.rpc.message;
 
 import top.parak.kraft.core.node.NodeEndpoint;
 
+/**
+ * AddServer RPC result.
+ *
+ * @author KHighness
+ * @since 2022-05-24
+ * @email parakovo@gmail.com
+ */
 public class AddServerResult {
 
     private final GroupConfigChangeStatus status;

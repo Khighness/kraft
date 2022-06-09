@@ -9,18 +9,52 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Memory-based snapshot.
+ *
+ * @author KHighness
+ * @since 2022-04-06
+ * @email parakovo@gmail.com
+ */
 @Immutable
 public class MemorySnapshot implements Snapshot {
 
+    /**
+     * The index of the last log entry in the snapshot.
+     */
     private final int lastIncludedIndex;
+    /**
+     * The term of the last log entry in the snapshot.
+     */
     private final int lastIncludedTerm;
+    /**
+     * The byte array to store snapshot.
+     */
     private final byte[] data;
+    /**
+     * The last group config in the snapshot.
+     */
     private final Set<NodeEndpoint> lastConfig;
 
+
+    /**
+     * Create MemorySnapShot.
+     *
+     * @param lastIncludedIndex last index
+     * @param lastIncludedTerm  last term
+     */
     public MemorySnapshot(int lastIncludedIndex, int lastIncludedTerm) {
         this(lastIncludedIndex, lastIncludedTerm, new byte[0], Collections.emptySet());
     }
 
+    /**
+     * Create MemorySnapshot.
+     *
+     * @param lastIncludedIndex last index
+     * @param lastIncludedTerm  last term
+     * @param data              byte array
+     * @param lastConfig         last config
+     */
     public MemorySnapshot(int lastIncludedIndex, int lastIncludedTerm, byte[] data, Set<NodeEndpoint> lastConfig) {
         this.lastIncludedIndex = lastIncludedIndex;
         this.lastIncludedTerm = lastIncludedTerm;

@@ -7,15 +7,33 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Memory-based log entry sequence.
+ *
+ * @author KHighness
+ * @since 2022-04-02
+ * @email parakovo@gmail.com
+ */
 @NotThreadSafe
 public class MemoryEntrySequence extends AbstractEntrySequence {
 
+    /**
+     * The list to store the log entries.
+     */
     private final List<Entry> entries = new ArrayList<>();
-
+    /**
+     * The initial commitIndex defined in RAFT is {@code 0}, regardless
+     * of whether the log is persistent or not.
+     */
     public MemoryEntrySequence() {
         this(1);
     }
 
+    /**
+     * Create MemoryEntrySequence.
+     *
+     * @param logIndexOffset the index of the first log entry
+     */
     public MemoryEntrySequence(int logIndexOffset) {
         super(logIndexOffset);
     }
@@ -37,11 +55,12 @@ public class MemoryEntrySequence extends AbstractEntrySequence {
 
     @Override
     public void commit(int index) {
+        // TODO
     }
 
     @Override
     public int getCommitIndex() {
-        // TODO implement me
+        // TODO
         throw new UnsupportedOperationException();
     }
 

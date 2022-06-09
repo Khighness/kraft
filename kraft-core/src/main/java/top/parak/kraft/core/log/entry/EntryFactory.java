@@ -1,6 +1,7 @@
 package top.parak.kraft.core.log.entry;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+
 import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
@@ -9,8 +10,30 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Log entry factory.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public class EntryFactory {
 
+    /**
+     * Create log entry.
+     * <ul>
+     * <li>{@link NoOpEntry}</li>
+     * <li>{@link GeneralEntry}</li>
+     * <li>{@link AddNodeEntry}</li>
+     * <li>{@link RemoveNodeEntry}</li>
+     * </ul>
+     *
+     * @param kind          the kind of the log entry
+     * @param index         the index of the log entry
+     * @param term          the term of the log entry
+     * @param commandBytes  the command bytes of the log entry
+     * @return log entry
+     */
     public Entry create(int kind, int index, int term, byte[] commandBytes) {
         try {
             switch (kind) {

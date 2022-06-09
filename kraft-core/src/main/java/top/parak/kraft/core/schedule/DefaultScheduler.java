@@ -1,9 +1,10 @@
 package top.parak.kraft.core.schedule;
 
 import com.google.common.base.Preconditions;
-import top.parak.kraft.core.node.config.NodeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import top.parak.kraft.core.node.config.NodeConfig;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -13,6 +14,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Default scheduler.
+ *
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
+ */
 @ThreadSafe
 public class DefaultScheduler implements Scheduler {
 
@@ -48,7 +56,7 @@ public class DefaultScheduler implements Scheduler {
     @Nonnull
     public LogReplicationTask scheduleLogReplicationTask(@Nonnull Runnable task) {
         Preconditions.checkNotNull(task);
-        logger.debug("schedule log replication task");
+        logger.trace("schedule log replication task");
         ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleWithFixedDelay(
                 task, logReplicationDelay, logReplicationInterval, TimeUnit.MILLISECONDS);
         return new LogReplicationTask(scheduledFuture);
@@ -58,7 +66,7 @@ public class DefaultScheduler implements Scheduler {
     @Nonnull
     public ElectionTimeout scheduleElectionTimeout(@Nonnull Runnable task) {
         Preconditions.checkNotNull(task);
-        logger.debug("schedule election timeout");
+        logger.trace("schedule election timeout");
         int timeout = electionTimeoutRandom.nextInt(maxElectionTimeout - minElectionTimeout) + minElectionTimeout;
         ScheduledFuture<?> scheduledFuture = scheduledExecutorService.schedule(task, timeout, TimeUnit.MILLISECONDS);
         return new ElectionTimeout(scheduledFuture);
@@ -66,7 +74,7 @@ public class DefaultScheduler implements Scheduler {
 
     @Override
     public void stop() throws InterruptedException {
-        logger.debug("stop scheduler");
+        logger.info("stop scheduler");
         scheduledExecutorService.shutdown();
         scheduledExecutorService.awaitTermination(1, TimeUnit.SECONDS);
     }

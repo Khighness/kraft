@@ -1,26 +1,65 @@
 package top.parak.kraft.core.node;
 
 /**
- * Replicating state.
+ * Replicating State.
+ * <p>
+ * In order to track the replication progress of each follower, the leader
+ * needs to record the index of the next log entry to be replicated which
+ * is defined as {@link ReplicatingState#nextIndex} and the index of the
+ * matched logs which is defined as {@link ReplicatingState#matchIndex}.
+ * </p>
+ * <p>
+ * In the entire log replication process, the leader's {@code commitIndex}
+ * is determined by the follower's {@code #matchIndex}. Among the {@code matchIndex}
+ * of all followers, more than half of the {@code matchIndex} will become
+ * leader's new {@code commitIndex}.
+ * </p>
+ *
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
  */
 class ReplicatingState {
 
+    /**
+     * The index of the next log entry that needs to be sent to the follower.
+     */
     private int nextIndex;
+    /**
+     * The index of the last log entry that has been replicated to the follower.
+     */
     private int matchIndex;
+    /**
+     * The replicating status.
+     */
     private boolean replicating = false;
+    /**
+     * The last replicated timestamp.
+     */
     private long lastReplicatedAt = 0;
 
+    /**
+     * Create ReplicatingState.
+     *
+     * @param nextIndex next index
+     */
     ReplicatingState(int nextIndex) {
         this(nextIndex, 0);
     }
 
+    /**
+     * Create ReplicatingState.
+     *
+     * @param nextIndex  next index
+     * @param matchIndex match index
+     */
     ReplicatingState(int nextIndex, int matchIndex) {
         this.nextIndex = nextIndex;
         this.matchIndex = matchIndex;
     }
 
     /**
-     * Get next index.
+     * Get the index of the next log entry that needs to be sent to the follower.
      *
      * @return next index
      */
@@ -29,7 +68,7 @@ class ReplicatingState {
     }
 
     /**
-     * Get match index.
+     * Get the index of the last log entry that has been replicated to the follower.
      *
      * @return match index
      */

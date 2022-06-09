@@ -7,7 +7,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Thrown when current node is not leader.
+ * Thrown when the current node role is not a leader.
+ *
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
  */
 public class NotLeaderException extends RuntimeException {
 
@@ -15,7 +19,7 @@ public class NotLeaderException extends RuntimeException {
     private final NodeEndpoint leaderEndpoint;
 
     /**
-     * Create.
+     * Create NotLeaderException.
      *
      * @param roleName       role name
      * @param leaderEndpoint leader endpoint

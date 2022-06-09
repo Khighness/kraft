@@ -6,6 +6,13 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Election timeout.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
+ */
 public class ElectionTimeout {
 
     private static final Logger logger = LoggerFactory.getLogger(ElectionTimeout.class);

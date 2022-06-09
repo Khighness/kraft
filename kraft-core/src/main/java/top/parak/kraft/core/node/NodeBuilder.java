@@ -1,11 +1,12 @@
 package top.parak.kraft.core.node;
-
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
-import top.parak.kraft.core.log.FileLog;
+import io.netty.channel.nio.NioEventLoopGroup;
+
 import top.parak.kraft.core.log.Log;
-import top.parak.kraft.core.log.MemoryLog;
 import top.parak.kraft.core.node.config.NodeConfig;
+import top.parak.kraft.core.log.FileLog;
+import top.parak.kraft.core.log.MemoryLog;
 import top.parak.kraft.core.node.store.FileNodeStore;
 import top.parak.kraft.core.node.store.MemoryNodeStore;
 import top.parak.kraft.core.node.store.NodeStore;
@@ -15,22 +16,26 @@ import top.parak.kraft.core.schedule.DefaultScheduler;
 import top.parak.kraft.core.schedule.Scheduler;
 import top.parak.kraft.core.support.task.ListeningTaskExecutor;
 import top.parak.kraft.core.support.task.TaskExecutor;
-import io.netty.channel.nio.NioEventLoopGroup;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Executors;
 
 /**
  * Node builder.
+ *
+ * @author KHighness
+ * @since 2022-04-01
+ * @email parakovo@gmail.com
  */
 public class NodeBuilder {
 
     /**
-     * Group.
+     * Node group.
      */
     private final NodeGroup group;
 
@@ -40,7 +45,7 @@ public class NodeBuilder {
     private final NodeId selfId;
 
     /**
-     * Event bus, INTERNAL.
+     * Event bus.
      */
     private final EventBus eventBus;
 
@@ -50,14 +55,14 @@ public class NodeBuilder {
     private NodeConfig config = new NodeConfig();
 
     /**
-     * Starts as standby or not.
+     * Start as standby or not.
      */
     private boolean standby = false;
 
     /**
      * Log.
      * If data directory specified, {@link FileLog} will be created.
-     * Default to {@link MemoryLog}.
+     * Default to {@link MemoryLog}
      */
     private Log log = null;
 
@@ -90,16 +95,25 @@ public class NodeBuilder {
 
     /**
      * Event loop group for worker.
-     * If specified, reuse. otherwise create one.
+     * If specified, reuse, otherwise create one.
      */
-    private NioEventLoopGroup workerNioEventLoopGroup = null;
+    private NioEventLoopGroup workerGroup = null;
 
-    // TODO add doc
+    /**
+     * Create NodeBuilder whose type is standby.
+     *
+     * @param endpoint endpoint.
+     */
     public NodeBuilder(@Nonnull NodeEndpoint endpoint) {
-        this(Collections.singletonList(endpoint), endpoint.getId());
+        this(Collections.singleton(endpoint), endpoint.getId());
     }
 
-    // TODO add doc
+    /**
+     * Create NodeBuilder whose type is group member.
+     *
+     * @param endpoints endpoints
+     * @param selfId    self id
+     */
     public NodeBuilder(@Nonnull Collection<NodeEndpoint> endpoints, @Nonnull NodeId selfId) {
         Preconditions.checkNotNull(endpoints);
         Preconditions.checkNotNull(selfId);
@@ -109,18 +123,29 @@ public class NodeBuilder {
     }
 
     /**
-     * Create.
+     * Create NodeBuilder.
      *
      * @param selfId self id
      * @param group  group
      */
-    @Deprecated
     public NodeBuilder(@Nonnull NodeId selfId, @Nonnull NodeGroup group) {
         Preconditions.checkNotNull(selfId);
         Preconditions.checkNotNull(group);
         this.selfId = selfId;
         this.group = group;
         this.eventBus = new EventBus(selfId.getValue());
+    }
+
+    /**
+     * Set configuration.
+     *
+     * @param config config
+     * @return this
+     */
+    public NodeBuilder setConfig(NodeConfig config) {
+        Preconditions.checkNotNull(config);
+        this.config = config;
+        return this;
     }
 
     /**
@@ -135,39 +160,14 @@ public class NodeBuilder {
     }
 
     /**
-     * Set configuration.
+     * Set store.
      *
-     * @param config config
+     * @param store store
      * @return this
      */
-    public NodeBuilder setConfig(@Nonnull NodeConfig config) {
-        Preconditions.checkNotNull(config);
-        this.config = config;
-        return this;
-    }
-
-    /**
-     * Set connector.
-     *
-     * @param connector connector
-     * @return this
-     */
-    NodeBuilder setConnector(@Nonnull Connector connector) {
-        Preconditions.checkNotNull(connector);
-        this.connector = connector;
-        return this;
-    }
-
-    /**
-     * Set event loop for worker.
-     * If specified, it's caller's responsibility to close worker event loop.
-     *
-     * @param workerNioEventLoopGroup worker event loop
-     * @return this
-     */
-    public NodeBuilder setWorkerNioEventLoopGroup(@Nonnull NioEventLoopGroup workerNioEventLoopGroup) {
-        Preconditions.checkNotNull(workerNioEventLoopGroup);
-        this.workerNioEventLoopGroup = workerNioEventLoopGroup;
+    public NodeBuilder setStore(NodeStore store) {
+        Preconditions.checkNotNull(store);
+        this.store = store;
         return this;
     }
 
@@ -177,9 +177,21 @@ public class NodeBuilder {
      * @param scheduler scheduler
      * @return this
      */
-    NodeBuilder setScheduler(@Nonnull Scheduler scheduler) {
+    public NodeBuilder setScheduler(Scheduler scheduler) {
         Preconditions.checkNotNull(scheduler);
         this.scheduler = scheduler;
+        return this;
+    }
+
+    /**
+     * Set connector.
+     *
+     * @param connector connector
+     * @return this
+     */
+    public NodeBuilder setConnector(Connector connector) {
+        Preconditions.checkNotNull(connector);
+        this.connector = connector;
         return this;
     }
 
@@ -189,7 +201,7 @@ public class NodeBuilder {
      * @param taskExecutor task executor
      * @return this
      */
-    NodeBuilder setTaskExecutor(@Nonnull TaskExecutor taskExecutor) {
+    public NodeBuilder setTaskExecutor(TaskExecutor taskExecutor) {
         Preconditions.checkNotNull(taskExecutor);
         this.taskExecutor = taskExecutor;
         return this;
@@ -201,28 +213,28 @@ public class NodeBuilder {
      * @param groupConfigChangeTaskExecutor group config change task executor
      * @return this
      */
-    NodeBuilder setGroupConfigChangeTaskExecutor(@Nonnull TaskExecutor groupConfigChangeTaskExecutor) {
+    public NodeBuilder setGroupConfigChangeTaskExecutor(TaskExecutor groupConfigChangeTaskExecutor) {
         Preconditions.checkNotNull(groupConfigChangeTaskExecutor);
         this.groupConfigChangeTaskExecutor = groupConfigChangeTaskExecutor;
         return this;
     }
 
     /**
-     * Set store.
+     * Set event loop group for worker.
      *
-     * @param store store
+     * @param workerGroup event loop group for worker
      * @return this
      */
-    NodeBuilder setStore(@Nonnull NodeStore store) {
-        Preconditions.checkNotNull(store);
-        this.store = store;
+    public NodeBuilder setWorkerGroup(NioEventLoopGroup workerGroup) {
+        Preconditions.checkNotNull(workerGroup);
+        this.workerGroup = workerGroup;
         return this;
     }
 
     /**
      * Set data directory.
      *
-     * @param dataDirPath data directory
+     * @param dataDirPath data directory.
      * @return this
      */
     public NodeBuilder setDataDir(@Nullable String dataDirPath) {
@@ -231,7 +243,7 @@ public class NodeBuilder {
         }
         File dataDir = new File(dataDirPath);
         if (!dataDir.isDirectory() || !dataDir.exists()) {
-            throw new IllegalArgumentException("[" + dataDirPath + "] not a directory, or not exists");
+            throw new IllegalArgumentException("[" + dataDirPath + "] isn't a directory, or it doesn't exist");
         }
         log = new FileLog(dataDir, eventBus);
         store = new FileNodeStore(new File(dataDir, FileNodeStore.FILE_NAME));
@@ -255,38 +267,22 @@ public class NodeBuilder {
      */
     @Nonnull
     private NodeContext buildContext() {
-        NodeContext context = new NodeContext();
-        context.setGroup(group);
-        context.setMode(evaluateMode());
-        context.setLog(log != null ? log : new MemoryLog(eventBus));
-        context.setStore(store != null ? store : new MemoryNodeStore());
-        context.setSelfId(selfId);
-        context.setConfig(config);
-        context.setEventBus(eventBus);
-        context.setScheduler(scheduler != null ? scheduler : new DefaultScheduler(config));
-        context.setConnector(connector != null ? connector : createNioConnector());
-        context.setTaskExecutor(taskExecutor != null ? taskExecutor : new ListeningTaskExecutor(
+        NodeContext nodeContext = new NodeContext();
+        nodeContext.setGroup(group);
+        nodeContext.setMode(evaluateMode());
+        nodeContext.setStore(store != null ? store : new MemoryNodeStore());
+        nodeContext.setLog(log != null ? log : new MemoryLog(eventBus));
+        nodeContext.setSelfId(selfId);
+        nodeContext.setConfig(config);
+        nodeContext.setEventBus(eventBus);
+        nodeContext.setScheduler(scheduler != null ? scheduler : new DefaultScheduler(config));
+        nodeContext.setConnector(connector != null ? connector : createNioConnector());
+        nodeContext.setTaskExecutor(taskExecutor != null ? taskExecutor : new ListeningTaskExecutor(
                 Executors.newSingleThreadExecutor(r -> new Thread(r, "node"))
         ));
-        // TODO share monitor
-        context.setGroupConfigChangeTaskExecutor(groupConfigChangeTaskExecutor != null ? groupConfigChangeTaskExecutor :
+        nodeContext.setGroupConfigChangeTaskExecutor(groupConfigChangeTaskExecutor != null ? groupConfigChangeTaskExecutor :
                 new ListeningTaskExecutor(Executors.newSingleThreadExecutor(r -> new Thread(r, "group-config-change"))));
-        return context;
-    }
-
-    /**
-     * Create nio connector.
-     *
-     * @return nio connector
-     */
-    @Nonnull
-    private NioConnector createNioConnector() {
-        int port = group.findSelf().getEndpoint().getPort();
-        if (workerNioEventLoopGroup != null) {
-            return new NioConnector(workerNioEventLoopGroup, selfId, eventBus, port, config.getLogReplicationInterval());
-        }
-        return new NioConnector(new NioEventLoopGroup(config.getNioWorkerThreads()), false,
-                selfId, eventBus, port, config.getLogReplicationInterval());
+        return nodeContext;
     }
 
     /**
@@ -296,7 +292,7 @@ public class NodeBuilder {
      * @see NodeGroup#isStandalone()
      */
     @Nonnull
-    private NodeMode evaluateMode() {
+    public NodeMode evaluateMode() {
         if (standby) {
             return NodeMode.STANDBY;
         }
@@ -304,6 +300,24 @@ public class NodeBuilder {
             return NodeMode.STANDALONE;
         }
         return NodeMode.GROUP_MEMBER;
+    }
+
+
+    /**
+     * Create nio connector.
+     *
+     * @return nio connector
+     */
+    @Nonnull
+    private NioConnector createNioConnector() {
+        NodeEndpoint endpoint = group.findSelf().getEndpoint();
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(endpoint.getHost(), endpoint.getPort());
+        if (workerGroup != null) {
+            return new NioConnector(workerGroup, selfId, eventBus, inetSocketAddress,
+                    config.getLogReplicationInterval());
+        }
+        return new NioConnector(new NioEventLoopGroup(config.getNioWorkerThreads()), false, selfId,
+                eventBus, inetSocketAddress, config.getLogReplicationInterval());
     }
 
 }

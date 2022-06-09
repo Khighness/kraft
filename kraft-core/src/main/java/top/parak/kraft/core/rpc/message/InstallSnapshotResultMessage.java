@@ -1,10 +1,18 @@
 package top.parak.kraft.core.rpc.message;
 
 import com.google.common.base.Preconditions;
+
 import top.parak.kraft.core.node.NodeId;
 
 import javax.annotation.Nonnull;
 
+/**
+ * InstallSnapshotResult message.
+ *
+ * @author KHighness
+ * @since 2022-04-13
+ * @email parakovo@gmail.com
+ */
 public class InstallSnapshotResultMessage {
 
     private final InstallSnapshotResult result;

@@ -1,17 +1,33 @@
 package top.parak.kraft.core.rpc.nio;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+
 import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.log.entry.EntryFactory;
 import top.parak.kraft.core.node.NodeEndpoint;
 import top.parak.kraft.core.node.NodeId;
 import top.parak.kraft.core.rpc.message.*;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Node-RPC message decoder.
+ *
+ * <p><b>Transport protocol between nodes in group</b></p>
+ * <pre>
+ *   |<-------(4)------>|<-------(4)------>|<--ContentLength->|
+ *   +------------------+------------------+------------------+
+ *   |   Message Type   |  Message Length  | Message Content  |
+ *   +------------------+------------------+------------------+
+ * </pre>
+ *
+ * @author KHighness
+ * @since 2022-04-14
+ * @email parakovo@gmail.com
+ */
 public class NodeRpcMessageDecoder extends ByteToMessageDecoder {
 
     private final EntryFactory entryFactory = new EntryFactory();

@@ -12,15 +12,48 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+/**
+ * Abstract handler.
+ *
+ * @author KHighness
+ * @since 2022-04-13
+ * @email parakovo@gmail.com
+ */
 abstract class AbstractHandler extends ChannelDuplexHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
+
+    /**
+     * EventBus is a pub-sub component used to publish event to subscribers.
+     * This decouples the RAFT algorithm component and RPC implementation component.
+     */
     protected final EventBus eventBus;
+
+    /**
+     * The id of remote node.
+     */
     NodeId remoteId;
+
+    /**
+     * RPC channel between remote node and self.
+     */
     protected Channel channel;
+
+    /**
+     * RPC channel between remote node and self.
+     */
     private AppendEntriesRpc lastAppendEntriesRpc;
+
+    /**
+     * The last {@link InstallSnapshotRpc}.
+     */
     private InstallSnapshotRpc lastInstallSnapshotRpc;
 
+    /**
+     * Create AbstractHandler.
+     *
+     * @param eventBus event-bus
+     */
     AbstractHandler(EventBus eventBus) {
         this.eventBus = eventBus;
     }

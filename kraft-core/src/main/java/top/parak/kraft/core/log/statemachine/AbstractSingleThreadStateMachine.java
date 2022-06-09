@@ -1,15 +1,23 @@
 package top.parak.kraft.core.log.statemachine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import top.parak.kraft.core.log.snapshot.Snapshot;
 import top.parak.kraft.core.support.task.SingleThreadTaskExecutor;
 import top.parak.kraft.core.support.task.TaskExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Abstract single thread state machine.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public abstract class AbstractSingleThreadStateMachine implements StateMachine {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractSingleThreadStateMachine.class);

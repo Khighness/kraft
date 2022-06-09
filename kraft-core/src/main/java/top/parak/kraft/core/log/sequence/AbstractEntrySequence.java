@@ -6,11 +6,40 @@ import top.parak.kraft.core.log.entry.EntryMeta;
 import java.util.Collections;
 import java.util.List;
 
-abstract class AbstractEntrySequence implements EntrySequence {
+/**
+ * Abstract entry sequence.
+ *
+ * <p><b>Structure of entry sequence</b></p>
+ * <pre>
+ * +-----------+-----------+-----------+-----------+- - - - - -+
+ * |   entry   |   entry   |   entry   |   entry   |   entry   |
+ * +-----------+-----------+-----------+-----------+- - - - - -+
+ *       ↑                                   ↑           ↑
+ * logIndexOffset(firstLogIndex)        lastLogIndex nextLogIndex
+ * </pre>
+ *
+ * @author KHighness
+ * @since 2022-04-01
+ * @email parakovo@gmail.com
+ */
+public abstract class AbstractEntrySequence implements EntrySequence {
 
+    /**
+     * The index of the first log entry stored in the log entry sequence
+     * while also called {@code firstLogIndex}, initialize as 1.
+     */
     int logIndexOffset;
+    /**
+     * The index of the next log entry to store in the log entry sequence
+     * which is equal to {@code lastLogIndex - 1}, initialize as 1.
+     */
     int nextLogIndex;
 
+    /**
+     * Create AbstractEntrySequence.
+     *
+     * @param logIndexOffset the index of the first log entry in file
+     */
     AbstractEntrySequence(int logIndexOffset) {
         this.logIndexOffset = logIndexOffset;
         this.nextLogIndex = logIndexOffset;
@@ -29,6 +58,11 @@ abstract class AbstractEntrySequence implements EntrySequence {
         return doGetFirstLogIndex();
     }
 
+    /**
+     * Do get the index of the first log entry stored in the log entry sequence.
+     *
+     * @return the first index of the log entry
+     */
     int doGetFirstLogIndex() {
         return logIndexOffset;
     }
@@ -41,6 +75,11 @@ abstract class AbstractEntrySequence implements EntrySequence {
         return doGetLastLogIndex();
     }
 
+    /**
+     * Do get the index of last the log entry stored in the log entry sequence.
+     *
+     * @return the last index of the log entry
+     */
     int doGetLastLogIndex() {
         return nextLogIndex - 1;
     }
@@ -64,6 +103,12 @@ abstract class AbstractEntrySequence implements EntrySequence {
         return entry != null ? entry.getMeta() : null;
     }
 
+    /**
+     * Do get the log entry whose index equals to the specified index.
+     *
+     * @param index the specified index
+     * @return the log entry
+     */
     protected abstract Entry doGetEntry(int index);
 
     @Override
@@ -91,6 +136,14 @@ abstract class AbstractEntrySequence implements EntrySequence {
         return doSubList(fromIndex, toIndex);
     }
 
+    /**
+     * Do get the log entries whose index is greater than (can equal) {@code fromIndex} and
+     * less than (can not equal) {@code toIndex}.
+     *
+     * @param fromIndex from index
+     * @param toIndex   to index
+     * @return sub list [fromIndex, toIndex)
+     */
     protected abstract List<Entry> doSubList(int fromIndex, int toIndex);
 
     @Override
@@ -105,6 +158,7 @@ abstract class AbstractEntrySequence implements EntrySequence {
         }
     }
 
+
     @Override
     public void append(Entry entry) {
         if (entry.getIndex() != nextLogIndex) {
@@ -114,6 +168,11 @@ abstract class AbstractEntrySequence implements EntrySequence {
         nextLogIndex++;
     }
 
+    /**
+     * Do append a log entry to cache.
+     *
+     * @param entry the log entry
+     */
     protected abstract void doAppend(Entry entry);
 
     @Override
@@ -124,6 +183,11 @@ abstract class AbstractEntrySequence implements EntrySequence {
         doRemoveAfter(index);
     }
 
+    /**
+     * Do remove the log entry whose index is greater than the specified index.
+     *
+     * @param index the specified index
+     */
     protected abstract void doRemoveAfter(int index);
 
 }

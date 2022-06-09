@@ -15,6 +15,12 @@ public class DefaultRoleState implements RoleState {
     private NodeId votedFor;
     private NodeId leaderId;
 
+    /**
+     * Create DefaultRoleState.
+     *
+     * @param roleName role name
+     * @param term     term
+     */
     public DefaultRoleState(RoleName roleName, int term) {
         this.roleName = roleName;
         this.term = term;

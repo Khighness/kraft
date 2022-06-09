@@ -14,6 +14,7 @@ import top.parak.kraft.core.node.Node;
 import top.parak.kraft.kvstore.support.toolkit.RuntimeUtil;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 /**
  * KV-store server.
@@ -31,9 +32,9 @@ public class KVStoreServer {
      */
     private final Node node;
     /**
-     * Service port.
+     * Service address;
      */
-    private final int port;
+    private final InetSocketAddress serviceAddress;
     /**
      * KV-store service.
      */
@@ -54,13 +55,13 @@ public class KVStoreServer {
     /**
      * Create KVStoreServer.
      *
-     * @param node raft node
-     * @param port service port
+     * @param node           raft node
+     * @param serviceAddress service address
      */
-    public KVStoreServer(Node node, int port) {
+    public KVStoreServer(Node node, InetSocketAddress serviceAddress) {
         this.node = node;
+        this.serviceAddress = serviceAddress;
         this.KVStoreServerService = new KVStoreServerService(node);
-        this.port = port;
     }
 
     /**
@@ -74,9 +75,9 @@ public class KVStoreServer {
         ServerBootstrap serverBootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, 128)         // length of connection queue
                 .childOption(ChannelOption.TCP_NODELAY, true)  // use nagle algorithm
                 .childOption(ChannelOption.SO_KEEPALIVE, true) // open tcp heart beat
-                .option(ChannelOption.SO_BACKLOG, 128)         // length of connection queue
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
@@ -86,8 +87,8 @@ public class KVStoreServer {
                         pipeline.addLast(handlerGroup, new KVStoreServerHandler(KVStoreServerService));
                     }
                 });
-        logger.info("kv-store server is serving at port {}", this.port);
-        serverBootstrap.bind(this.port);
+        logger.info("kv-store server is serving at [{}]", this.serviceAddress.toString());
+        serverBootstrap.bind(this.serviceAddress);
     }
 
     /**

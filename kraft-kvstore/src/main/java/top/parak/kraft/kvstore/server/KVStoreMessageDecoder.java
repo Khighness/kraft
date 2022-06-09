@@ -4,8 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
-import top.parak.kraft.core.service.AddNodeCommand;
-import top.parak.kraft.core.service.RemoveNodeCommand;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.message.MessageConstants;
 import top.parak.kraft.kvstore.support.proto.Protos;
 import top.parak.kraft.kvstore.message.*;

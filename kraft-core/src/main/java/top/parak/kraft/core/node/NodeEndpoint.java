@@ -1,6 +1,7 @@
 package top.parak.kraft.core.node;
 
 import com.google.common.base.Preconditions;
+
 import top.parak.kraft.core.rpc.Address;
 
 import javax.annotation.Nonnull;
@@ -9,6 +10,10 @@ import java.util.Objects;
 
 /**
  * Node endpoint.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
 @Immutable
 public class NodeEndpoint {
@@ -17,9 +22,9 @@ public class NodeEndpoint {
     private final Address address;
 
     /**
-     * Create.
+     * Create NodeEndpoint.
      *
-     * @param id node id
+     * @param id   node id
      * @param host host
      * @param port port
      */
@@ -28,9 +33,9 @@ public class NodeEndpoint {
     }
 
     /**
-     * Create.
+     * Create NodeEndpoint.
      *
-     * @param id id
+     * @param id      nodeId
      * @param address address
      */
     public NodeEndpoint(@Nonnull NodeId id, @Nonnull Address address) {

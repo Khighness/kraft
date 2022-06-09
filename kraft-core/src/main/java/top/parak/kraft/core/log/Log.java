@@ -15,47 +15,48 @@ import java.util.Set;
 /**
  * Log.
  *
- * @see top.parak.kraft.core.log.sequence.EntrySequence
- * @see top.parak.kraft.core.log.snapshot.Snapshot
+ * @author KHighness
+ * @since 2022-03-19
+ * @email parakovo@gmail.com
  */
 public interface Log {
 
     int ALL_ENTRIES = -1;
 
     /**
-     * Get meta of last entry.
+     * Get the metadata of the last log entry.
      *
-     * @return entry meta
+     * @return the metadata of the last log entry
      */
     @Nonnull
     EntryMeta getLastEntryMeta();
 
     /**
-     * Create append entries rpc from log.
+     * Create rpc request to append log entries from log.
      *
      * @param term       current term
      * @param selfId     self node id
      * @param nextIndex  next index
      * @param maxEntries max entries
-     * @return append entries rpc
+     * @return rpc request to append log entries
      */
     AppendEntriesRpc createAppendEntriesRpc(int term, NodeId selfId, int nextIndex, int maxEntries);
 
     /**
-     * Create install snapshot rpc from log.
+     * Create rpc request to install snapshot from log.
      *
-     * @param term   current term
-     * @param selfId self node id
-     * @param offset data offset
-     * @param length data length
-     * @return install snapshot rpc
+     * @param term    current term
+     * @param selfId  self node id
+     * @param offset  data offset
+     * @param length  data length
+     * @return rpc request to install snapshot
      */
     InstallSnapshotRpc createInstallSnapshotRpc(int term, NodeId selfId, int offset, int length);
 
     /**
-     * Get last uncommitted group config entry.
+     * Get the last uncommitted group config entry.
      *
-     * @return last committed group config entry, maybe {@code null}
+     * @return the last uncommitted group config entry, maybe {@code null}
      */
     @Nullable
     GroupConfigEntry getLastUncommittedGroupConfigEntry();
@@ -75,19 +76,19 @@ public interface Log {
     int getCommitIndex();
 
     /**
-     * Test if last log self is new than last log of leader.
+     * Return if the candidate's last log entry is newer than the leader's last log entry.
      *
-     * @param lastLogIndex last log index
-     * @param lastLogTerm  last log term
-     * @return true if last log self is newer than last log of leader, otherwise false
+     * @param lastLogIndex the index of the leader's last log entry
+     * @param lastLogTerm  the term of the leader's last log entry
+     * @return true if the candidate's last log entry is newer than the leader's last log, otherwise false
      */
     boolean isNewerThan(int lastLogIndex, int lastLogTerm);
 
     /**
-     * Append a NO-OP log entry.
+     * Append a no-operation log entry.
      *
      * @param term current term
-     * @return no-op entry
+     * @return no-operation log entry
      */
     NoOpEntry appendEntry(int term);
 
@@ -96,7 +97,7 @@ public interface Log {
      *
      * @param term    current term
      * @param command command in bytes
-     * @return general entry
+     * @return general log entry
      */
     GeneralEntry appendEntry(int term, byte[] command);
 
@@ -115,30 +116,29 @@ public interface Log {
      *
      * @param term          current term
      * @param nodeEndpoints current node configs
-     * @param nodeToRemove  node to remove
-     * @return remove node entry
+     * @param nodeToRemove  id of node to be removed
+     * @return log entry for removing node
      */
     RemoveNodeEntry appendEntryForRemoveNode(int term, Set<NodeEndpoint> nodeEndpoints, NodeId nodeToRemove);
 
     /**
-     * Append entries to log.
+     * Append log entries to log.
      *
-     * @param prevLogIndex expected index of previous log entry
-     * @param prevLogTerm  expected term of previous log entry
-     * @param entries      entries to append
-     * @return true if success, false if previous log check failed
+     * @param prevLogIndex  expected index of previous log entry
+     * @param prevLogTerm   expected term of previous log entry
+     * @param leaderEntries log entries from leader to be appended
+     * @return true if succeeded, false if previous log check failed
      */
-    boolean appendEntriesFromLeader(int prevLogIndex, int prevLogTerm, List<Entry> entries);
+    boolean appendEntriesFromLeader(int prevLogIndex, int prevLogTerm, List<Entry> leaderEntries);
 
     /**
-     * Advance commit index.
-     *
+     * Advance commitIndex.
      * <p>
-     * The log entry with new commit index must be the same term as the one in parameter,
+     * The log entry with new {@code commitIndex} must be the same term sa the one in parameter,
      * otherwise commit index will not change.
      * </p>
      *
-     * @param newCommitIndex new commit index
+     * @param newCommitIndex new commitIndex
      * @param currentTerm    current term
      */
     void advanceCommitIndex(int newCommitIndex, int currentTerm);
@@ -162,7 +162,8 @@ public interface Log {
     /**
      * Set state machine.
      * <p>
-     * It will be called when
+     * It will be called in the following cases
+     * </p>
      * <ul>
      * <li>apply the log entry</li>
      * <li>generate snapshot</li>

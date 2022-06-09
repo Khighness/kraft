@@ -7,10 +7,28 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Group config log entry for adding node.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
+ */
 public class AddNodeEntry extends GroupConfigEntry {
 
+    /**
+     * The endpoint of the node to be added.
+     */
     private final NodeEndpoint newNodeEndpoint;
 
+    /**
+     * Create AddNodeEntry.
+     *
+     * @param index           the index of the membership-change log entry
+     * @param term            the term of the membership-change log entry
+     * @param nodeEndpoints   the endpoints of the nodes in group
+     * @param newNodeEndpoint the endpoint of the node to be added
+     */
     public AddNodeEntry(int index, int term, Set<NodeEndpoint> nodeEndpoints, NodeEndpoint newNodeEndpoint) {
         super(KIND_ADD_NODE, index, term, nodeEndpoints);
         this.newNodeEndpoint = newNodeEndpoint;

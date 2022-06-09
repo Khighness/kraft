@@ -7,13 +7,37 @@ import top.parak.kraft.core.rpc.message.InstallSnapshotRpc;
 import java.io.IOException;
 import java.util.Set;
 
-abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBuilder<T> {
+/**
+ * Abstract snapshot builder.
+ *
+ * @author KHighness
+ * @since 2022-04-06
+ * @email parakovo@gmail.com
+ */
+public abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBuilder<T> {
 
+    /**
+     * The index of the last log entry in the snapshot.
+     */
     int lastIncludedIndex;
+    /**
+     * The term of the last log entry in the snapshot.
+     */
     int lastIncludedTerm;
+    /**
+     * The last group config in the snapshot.
+     */
     Set<NodeEndpoint> lastConfig;
+    /**
+     * The file-pointer of the snapshot.
+     */
     private int offset;
 
+    /**
+     * Create AbstractSnapshotBuilder.
+     *
+     * @param firstRpc the first installSnapshotRpc
+     */
     AbstractSnapshotBuilder(InstallSnapshotRpc firstRpc) {
         assert firstRpc.getOffset() == 0;
         lastIncludedIndex = firstRpc.getLastIndex();
@@ -22,6 +46,11 @@ abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBu
         offset = firstRpc.getDataLength();
     }
 
+    /**
+     * Write data.
+     *
+     * @param data data.
+     */
     protected void write(byte[] data) {
         try {
             doWrite(data);
@@ -30,6 +59,12 @@ abstract class AbstractSnapshotBuilder<T extends Snapshot> implements SnapshotBu
         }
     }
 
+    /**
+     * Do write data.
+     *
+     * @param data data
+     * @throws IOException if IO exception occurs
+     */
     protected abstract void doWrite(byte[] data) throws IOException;
 
     @Override

@@ -11,8 +11,8 @@ import top.parak.kraft.core.node.task.GroupConfigChangeTaskReference;
 import top.parak.kraft.core.node.Node;
 import top.parak.kraft.core.node.role.RoleName;
 import top.parak.kraft.core.node.role.RoleNameAndLeaderId;
-import top.parak.kraft.core.service.AddNodeCommand;
-import top.parak.kraft.core.service.RemoveNodeCommand;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.support.proto.Protos;
 import top.parak.kraft.kvstore.message.*;
 
@@ -112,7 +112,7 @@ public class KVStoreServerService {
         }
 
         SetCommand command = commandRequest.getCommand();
-        logger.debug("set {}", command.getKey());
+        logger.debug("process command: [set {} {}]", command.getKey(), new String(command.getValue()));
         this.pendingCommands.put(command.getRequestId(), commandRequest);
         commandRequest.addCloseListener(() -> pendingCommands.remove(command.getRequestId()));
         this.node.appendLog(command.toBytes());
@@ -125,7 +125,7 @@ public class KVStoreServerService {
      */
     public void get(CommandRequest<GetCommand> commandRequest) {
         String key = commandRequest.getCommand().getKey();
-        logger.debug("get {}", key);
+        logger.debug("process command: [get {}]", key);
         byte[] value = this.map.get(key);
         // TODO view from node state machine
         commandRequest.reply(new GetCommandResponse(value));

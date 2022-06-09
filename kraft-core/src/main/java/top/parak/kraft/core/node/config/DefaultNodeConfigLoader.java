@@ -1,24 +1,44 @@
 package top.parak.kraft.core.node.config;
 
-import top.parak.kraft.core.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import top.parak.kraft.core.log.Log;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Default node config loader.
+ *
+ * @author KHighness
+ * @since 2022-06-05
+ * @email parakovo@gmail.com
+ */
 public class DefaultNodeConfigLoader implements NodeConfigLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultNodeConfigLoader.class);
 
+    /**
+     * Property nme prefix.
+     */
     private final String propertyNamePrefix;
 
+    /**
+     * Create DefaultNodeConfigLoader.
+     * <p>Used empty string as default property name prefix.</p>
+     */
     public DefaultNodeConfigLoader() {
         this("");
     }
 
+    /**
+     * Create DefaultNodeConfigLoader.
+     *
+     * @param propertyNamePrefix property name prefix
+     */
     public DefaultNodeConfigLoader(String propertyNamePrefix) {
         this.propertyNamePrefix = propertyNamePrefix;
     }

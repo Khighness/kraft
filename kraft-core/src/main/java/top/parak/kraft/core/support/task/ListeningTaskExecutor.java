@@ -8,6 +8,13 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.concurrent.*;
 
+/**
+ * Listening task executor.
+ *
+ * @author KHighness
+ * @since 2022-04-02
+ * @email parakovo@gmail.com
+ */
 public class ListeningTaskExecutor extends AbstractTaskExecutor {
 
     private final ListeningExecutorService listeningExecutorService;

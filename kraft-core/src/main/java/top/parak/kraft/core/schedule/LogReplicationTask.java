@@ -6,6 +6,13 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Log replication task.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
+ */
 public class LogReplicationTask {
 
     public static final LogReplicationTask NONE = new LogReplicationTask(new NullScheduledFuture());

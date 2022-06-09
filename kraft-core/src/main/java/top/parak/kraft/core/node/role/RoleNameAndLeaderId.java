@@ -1,6 +1,7 @@
 package top.parak.kraft.core.node.role;
 
 import com.google.common.base.Preconditions;
+
 import top.parak.kraft.core.node.NodeId;
 
 import javax.annotation.Nonnull;
@@ -9,6 +10,10 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Role name and leader id.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
 @Immutable
 public class RoleNameAndLeaderId {
@@ -17,7 +22,7 @@ public class RoleNameAndLeaderId {
     private final NodeId leaderId;
 
     /**
-     * Create.
+     * Create RoleNameANdLeaderId.
      *
      * @param roleName role name
      * @param leaderId leader id

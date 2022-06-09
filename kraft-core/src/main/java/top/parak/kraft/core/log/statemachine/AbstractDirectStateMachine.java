@@ -10,6 +10,13 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Abstract direct state machine.
+ *
+ * @author KHighness
+ * @since 2022-04-07
+ * @email parakovo@gmail.com
+ */
 public abstract class AbstractDirectStateMachine implements StateMachine {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractNodeRole.class);

@@ -5,15 +5,46 @@ import top.parak.kraft.core.node.NodeId;
 
 import java.util.Set;
 
+/**
+ * InstallSnapshot RPC arguments.
+ *
+ * @author KHighness
+ * @since 2022-04-06
+ * @email parakovo@gmail.com
+ */
 public class InstallSnapshotRpc {
 
+    /**
+     * The leader's term.
+     */
     private int term;
+    /**
+     * The id of leader, so follower can redirect clients.
+     */
     private NodeId leaderId;
+    /**
+     * The snapshot replaces all entries up through and including this index.
+     */
     private int lastIndex;
+    /**
+     * The term of lastIndex.
+     */
     private int lastTerm;
+    /**
+     * Current node configs.
+     */
     private Set<NodeEndpoint> lastConfig;
+    /**
+     * The byte offset where chunk id position in the snapshot file.
+     */
     private int offset;
+    /**
+     * The raw bytes of the snapshot chunk, starting at offset.
+     */
     private byte[] data;
+    /**
+     * True if this is the last chunk.
+     */
     private boolean done;
 
     public int getTerm() {

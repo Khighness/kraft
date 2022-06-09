@@ -1,8 +1,8 @@
 package top.parak.kraft.kvstore.client;
 
-import top.parak.kraft.core.service.AddNodeCommand;
-import top.parak.kraft.core.service.RemoveNodeCommand;
 import top.parak.kraft.core.service.ServerRouter;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.message.GetCommand;
 import top.parak.kraft.kvstore.message.SetCommand;
 

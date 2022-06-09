@@ -19,10 +19,10 @@ public class RaftAddNodeCommand implements Command {
 
     @Override
     public void execute(String arguments, CommandContext context) {
-        // <node-id> <host> <port-raft-node>
+        // <node-id> <host> <raft-rpc-port>
         String[] pieces = arguments.split("\\s");
         if (pieces.length != 3) {
-            throw new IllegalArgumentException("usage " + getName() + " <node-id> <host> <port-raft-node>");
+            throw new IllegalArgumentException("usage: " + getName() + " <node-id> <host> <raft-rpc-node>");
         }
 
         String nodeId = pieces[0];

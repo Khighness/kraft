@@ -5,6 +5,13 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Log generation.
+ *
+ * @author KHighness
+ * @since 2022-04-01
+ * @email parakovo@gmail.com
+ */
 class LogGeneration extends AbstractLogDir implements Comparable<LogGeneration> {
 
     private static final Pattern DIR_NAME_PATTERN = Pattern.compile("log-(\\d+)");

@@ -1,7 +1,14 @@
-package top.parak.kraft.core.service;
+package top.parak.kraft.kvstore.message;
 
 import top.parak.kraft.core.node.NodeEndpoint;
 
+/**
+ * AddNodeCommand message.
+ *
+ * @author KHighness
+ * @since 2022-06-09
+ * @email parakovo@gmail.com
+ */
 public class AddNodeCommand {
 
     private final String nodeId;

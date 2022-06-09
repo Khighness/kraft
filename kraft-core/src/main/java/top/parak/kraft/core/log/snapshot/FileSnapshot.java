@@ -1,6 +1,7 @@
 package top.parak.kraft.core.log.snapshot;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+
 import top.parak.kraft.core.Protos;
 import top.parak.kraft.core.log.LogDir;
 import top.parak.kraft.core.log.LogException;
@@ -16,25 +17,68 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * File-based snapshot.
+ *
+ * @author KHighness
+ * @since 2022-04-06
+ * @email parakovo@gmail.com
+ */
 public class FileSnapshot implements Snapshot {
 
+    /**
+     * The log directory.
+     */
     private LogDir logDir;
+    /**
+     * The file to store snapshot.
+     */
     private SeekableFile seekableFile;
+    /**
+     * The index of the last log entry in the snapshot.
+     */
     private int lastIncludedIndex;
+    /**
+     * The term of the last log entry in the snapshot.
+     */
     private int lastIncludedTerm;
+    /**
+     * The last group config.
+     */
     private Set<NodeEndpoint> lastConfig;
+    /**
+     * The offset of the data starting position.
+     */
     private long dataStart;
+    /**
+     * The length of the data.
+     */
     private long dataLength;
 
+    /**
+     * Create FileSnapshot.
+     *
+     * @param logDir the log dir
+     */
     public FileSnapshot(LogDir logDir) {
         this.logDir = logDir;
         readHeader(logDir.getSnapshotFile());
     }
 
+    /**
+     * Create FileSnapshot.
+     *
+     * @param file file
+     */
     public FileSnapshot(File file) {
         readHeader(file);
     }
 
+    /**
+     * Create FileSnapshot.
+     *
+     * @param seekableFile seekableFile
+     */
     public FileSnapshot(SeekableFile seekableFile) {
         readHeader(seekableFile);
     }
@@ -115,10 +159,6 @@ public class FileSnapshot implements Snapshot {
         }
     }
 
-    public LogDir getLogDir() {
-        return logDir;
-    }
-
     @Override
     public void close() {
         try {
@@ -126,6 +166,10 @@ public class FileSnapshot implements Snapshot {
         } catch (IOException e) {
             throw new LogException("failed to close file", e);
         }
+    }
+
+    public LogDir getLogDir() {
+        return logDir;
     }
 
 }

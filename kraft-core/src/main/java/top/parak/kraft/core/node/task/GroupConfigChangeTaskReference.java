@@ -4,7 +4,11 @@ import javax.annotation.Nonnull;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Reference for group config change task.
+ * Task reference for {@link GroupConfigChangeTask}.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
  */
 public interface GroupConfigChangeTaskReference {
 

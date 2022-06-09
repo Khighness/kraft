@@ -8,20 +8,24 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 
 /**
- * Connector.
+ * Connector which used to communicate between nodes internally.
+ *
+ * @author KHighness
+ * @since 2022-03-31
+ * @email parakovo@gmail.com
  */
 public interface Connector {
 
     /**
-     * Initialize connector.
+     * Initialize the connector.
      * <p>
-     * SHOULD NOT call more than one.
+     * Should not call more than once.
      * </p>
      */
     void initialize();
 
     /**
-     * Send request vote rpc.
+     * Send RequestVote RPC.
      * <p>
      * Remember to exclude self node before sending.
      * </p>
@@ -35,7 +39,7 @@ public interface Connector {
     void sendRequestVote(@Nonnull RequestVoteRpc rpc, @Nonnull Collection<NodeEndpoint> destinationEndpoints);
 
     /**
-     * Reply request vote result.
+     * Reply RequestVote result.
      *
      * @param result     result
      * @param rpcMessage rpc message
@@ -43,7 +47,7 @@ public interface Connector {
     void replyRequestVote(@Nonnull RequestVoteResult result, @Nonnull RequestVoteRpcMessage rpcMessage);
 
     /**
-     * Send append entries rpc.
+     * Send AppendEntries RPC.
      *
      * @param rpc                 rpc
      * @param destinationEndpoint destination endpoint
@@ -51,25 +55,25 @@ public interface Connector {
     void sendAppendEntries(@Nonnull AppendEntriesRpc rpc, @Nonnull NodeEndpoint destinationEndpoint);
 
     /**
-     * Reply append entries result.
+     * Reply AppendEntries result.
      *
-     * @param result result
+     * @param result     result
      * @param rpcMessage rpc message
      */
     void replyAppendEntries(@Nonnull AppendEntriesResult result, @Nonnull AppendEntriesRpcMessage rpcMessage);
 
     /**
-     * Send install snapshot rpc.
+     * Send InstallSnapshot RPC.
      *
-     * @param rpc rpc
+     * @param rpc                 rpc
      * @param destinationEndpoint destination endpoint
      */
     void sendInstallSnapshot(@Nonnull InstallSnapshotRpc rpc, @Nonnull NodeEndpoint destinationEndpoint);
 
     /**
-     * Reply install snapshot result.
+     * Reply InstallSnapshot result.
      *
-     * @param result result
+     * @param result     result
      * @param rpcMessage rpc message
      */
     void replyInstallSnapshot(@Nonnull InstallSnapshotResult result, @Nonnull InstallSnapshotRpcMessage rpcMessage);
@@ -77,13 +81,13 @@ public interface Connector {
     /**
      * Called when node becomes leader.
      * <p>
-     * Connector may use this chance to close inbound channels.
+     * Connector may use this chance yo close inbound channels.
      * </p>
      */
     void resetChannels();
 
     /**
-     * Close connector.
+     * Close the connector.
      */
     void close();
 

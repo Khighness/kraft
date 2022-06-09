@@ -6,6 +6,10 @@ import javax.annotation.Nullable;
 
 /**
  * Node store.
+ *
+ * @author KHighness
+ * @since 2022-03-20
+ * @email parakovo@gmail.com
  */
 public interface NodeStore {
 

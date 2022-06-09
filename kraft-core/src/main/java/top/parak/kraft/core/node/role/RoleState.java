@@ -5,8 +5,13 @@ import top.parak.kraft.core.node.NodeId;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+
 /**
  * Role state.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
 public interface RoleState {
 
@@ -30,14 +35,14 @@ public interface RoleState {
     /**
      * Get votes count.
      *
-     * @return votes count, {@value VOTES_COUNT_NOT_SET} if unknown
+     * @return votes count, {@link RoleState#VOTES_COUNT_NOT_SET} if unknown
      */
     int getVotesCount();
 
     /**
-     * Get voted for.
+     * Get node id voted for.
      *
-     * @return voted for
+     * @return node id voted for
      */
     @Nullable
     NodeId getVotedFor();

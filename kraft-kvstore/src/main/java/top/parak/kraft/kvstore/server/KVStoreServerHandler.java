@@ -5,8 +5,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.parak.kraft.core.service.AddNodeCommand;
-import top.parak.kraft.core.service.RemoveNodeCommand;
+import top.parak.kraft.kvstore.message.AddNodeCommand;
+import top.parak.kraft.kvstore.message.RemoveNodeCommand;
 import top.parak.kraft.kvstore.message.CommandRequest;
 import top.parak.kraft.kvstore.message.GetCommand;
 import top.parak.kraft.kvstore.message.SetCommand;

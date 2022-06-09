@@ -8,12 +8,16 @@ import javax.annotation.Nonnull;
 
 /**
  * Node.
+ *
+ * @author KHighness
+ * @since 2022-03-18
+ * @email parakovo@gmail.com
  */
 public interface Node {
 
     /**
      * Register state machine to node.
-     * <p>State machine should be registered before node start, or it may not take effect.</p>
+     * <p>State machine should be registered before node starts, or it may not task effect.</p>
      *
      * @param stateMachine state machine
      */
@@ -21,11 +25,9 @@ public interface Node {
 
     /**
      * Get current role name and leader id.
-     * <p>
-     * Available results:
-     * </p>
+     * <p><b>Available results</b></p>
      * <ul>
-     * <li>FOLLOWER, current leader id</li>
+     * <li>FOLLOWER, current leader</li>
      * <li>CANDIDATE, <code>null</code></li>
      * <li>LEADER, self id</li>
      * </ul>
@@ -51,7 +53,7 @@ public interface Node {
      * Append log.
      *
      * @param commandBytes command bytes
-     * @throws NotLeaderException if not leader
+     * @throws NotLeaderException if current node is not a leader
      */
     void appendLog(@Nonnull byte[] commandBytes);
 
@@ -60,7 +62,7 @@ public interface Node {
      *
      * @param endpoint new node endpoint
      * @return task reference
-     * @throws NotLeaderException if not leader
+     * @throws NotLeaderException    if current node is not a leader
      * @throws IllegalStateException if group config change concurrently
      */
     @Nonnull
@@ -69,9 +71,9 @@ public interface Node {
     /**
      * Remove node.
      *
-     * @param id id
+     * @param id node id
      * @return task reference
-     * @throws NotLeaderException if not leader
+     * @throws NotLeaderException    if current node is not a leader
      * @throws IllegalStateException if group config change concurrently
      */
     @Nonnull
