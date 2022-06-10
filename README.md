@@ -49,9 +49,9 @@ $ mvn package assembly:single
 ```shell
 # Start Server-K1
 $ mvn exec:java -Dexec.mainClass="top.parak.kraft.kvstore.server.CommandServerLauncher" -Dexec.args="-gc K1,127.0.0.1,10001 K2,127.0.0.1,10002 K3,127.0.0.1,2333 -m group-member -i K1 -p2 10011"
-# Start Server-B
+# Start Server-K2
 $ mvn exec:java -Dexec.mainClass="top.parak.kraft.kvstore.server.CommandServerLauncher" -Dexec.args="-gc K1,127.0.0.1,10001 K2,127.0.0.1,10002 K3,127.0.0.1,2333 -m group-member -i K2 -p2 10012"
-# Srart Server-B
+# Srart Server-K3
 $ mvn exec:java -Dexec.mainClass="top.parak.kraft.kvstore.server.CommandServerLauncher" -Dexec.args="-gc K1,127.0.0.1,10001 K2,127.0.0.1,10002 K3,127.0.0.1,2333 -m group-member -i K3 -p2 10013"
 ```
 
