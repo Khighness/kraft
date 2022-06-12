@@ -226,6 +226,23 @@ public class KVStoreServerService {
             map = fromSnapshot(input);
         }
 
+        /**
+         * In developing environment, I set the threshold to 3.
+         * <p>
+         * In other words, for every 3 new log entries, a new log snapshot is generated.
+         * </p>
+         * <p><b>Threshold calculation rules</b></p>
+         * <p><b>Assume lastApplied - firstLogIndex > N</b></p>
+         * <p><b>threshold = N + 2</b></p>
+         * <p>
+         * In production environment, the value of log entry threshold must be larger to prevent
+         * generating snapshot frequently.
+         * </p>
+         *
+         * @param firstLogIndex the index of the first applied log, may not be {@code 0}
+         * @param lastApplied  the index of the last applied log
+         * @return true if the state machine should generate snapshot, otherwise false
+         */
         @Override
         public boolean shouldGenerateSnapshot(int firstLogIndex, int lastApplied) {
             return lastApplied - firstLogIndex > 1;

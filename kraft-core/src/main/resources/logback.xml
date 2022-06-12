@@ -31,8 +31,8 @@
         </encoder>
     </appender>
 
-    <logger name="top.parak.kraft.core" level="info" />
-    <logger name="top.parak.kraft.kvstore" level="info" />
+    <logger name="top.parak.kraft.core" level="debug" />
+    <logger name="top.parak.kraft.kvstore" level="debug" />
     <logger name="io.netty" level="info" />
 
     <root level="DEBUG">

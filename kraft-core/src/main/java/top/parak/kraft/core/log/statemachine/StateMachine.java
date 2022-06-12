@@ -34,6 +34,9 @@ public interface StateMachine {
 
     /**
      * Return whether the state machine should generate snapshot or not.
+     * <p>
+     * Generate snapshot when existing log entries exceed a certain threshold.
+     * </p>
      *
      * @param firstLogIndex the index of the first applied log, may not be {@code 0}
      * @param lastApplied  the index of the last applied log
