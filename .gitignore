@@ -2,6 +2,7 @@
 **/target/
 .class
 *.log
+**/data/
 
 
 ### STS
