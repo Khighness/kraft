@@ -76,10 +76,10 @@ public interface Log {
     int getCommitIndex();
 
     /**
-     * Return if the candidate's last log entry is newer than the leader's last log entry.
+     * Return if the candidate's last log entry is newer than the node's own last log entry.
      *
-     * @param lastLogIndex the index of the leader's last log entry
-     * @param lastLogTerm  the term of the leader's last log entry
+     * @param lastLogIndex the index of node's own last log entry
+     * @param lastLogTerm  the term of node's own last log entry
      * @return true if the candidate's last log entry is newer than the leader's last log, otherwise false
      */
     boolean isNewerThan(int lastLogIndex, int lastLogTerm);

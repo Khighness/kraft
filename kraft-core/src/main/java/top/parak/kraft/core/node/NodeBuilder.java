@@ -1,4 +1,5 @@
 package top.parak.kraft.core.node;
+
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -277,8 +278,8 @@ public class NodeBuilder {
         nodeContext.setEventBus(eventBus);
         nodeContext.setScheduler(scheduler != null ? scheduler : new DefaultScheduler(config));
         nodeContext.setConnector(connector != null ? connector : createNioConnector());
-        nodeContext.setTaskExecutor(taskExecutor != null ? taskExecutor : new ListeningTaskExecutor(
-                Executors.newSingleThreadExecutor(r -> new Thread(r, "node"))
+        nodeContext.setTaskExecutor(taskExecutor != null ? taskExecutor :
+                new ListeningTaskExecutor(Executors.newSingleThreadExecutor(r -> new Thread(r, "node"))
         ));
         nodeContext.setGroupConfigChangeTaskExecutor(groupConfigChangeTaskExecutor != null ? groupConfigChangeTaskExecutor :
                 new ListeningTaskExecutor(Executors.newSingleThreadExecutor(r -> new Thread(r, "group-config-change"))));
@@ -301,7 +302,6 @@ public class NodeBuilder {
         }
         return NodeMode.GROUP_MEMBER;
     }
-
 
     /**
      * Create nio connector.
