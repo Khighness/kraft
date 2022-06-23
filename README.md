@@ -3,7 +3,7 @@
 <a href="https://www.parak.top/kraft/"><img src="https://img.shields.io/badge/java-reference-fff?logo=java&style=social" alt="Java"></a>
 <a href="https://github.com/Khighness/kraft"><img src="https://img.shields.io/github/stars/Khighness/kraft?style=social" alt="Star"></a>
 <br/><br/>
-<span>⚔️ A distributed KV store system based on <a href="https://raft.github.io/raft.pdf">raft</a> protocol ⚔️</span>
+<span>⚔️ A distributed KV storage system based on <a href="https://raft.github.io/raft.pdf">raft</a> protocol ⚔️</span>
 </p>
 
 

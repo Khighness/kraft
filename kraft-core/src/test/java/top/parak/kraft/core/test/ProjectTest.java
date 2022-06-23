@@ -15,12 +15,12 @@ public class ProjectTest {
 
     // @Test
     public void updateJavaDoc() throws IOException {
-        File file = new File("D:\\Java\\Learn\\kraft\\kraft-core\\target\\site\\apidocs\\allclasses-noframe.html");
+        File file = new File("D:\\Java\\Learn\\kraft\\kraft-core\\target\\site\\apidocs\\allclasses-frame.html");
         FileInputStream inputStream = new FileInputStream(file);
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-        File newFile = new File("D:\\Java\\Learn\\kraft\\allclasses-noframe.html");
+        File newFile = new File("D:\\Java\\Learn\\kraft\\allclasses-frame.html");
         if  (newFile.createNewFile()) {
             FileOutputStream outputStream = new FileOutputStream(newFile);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
