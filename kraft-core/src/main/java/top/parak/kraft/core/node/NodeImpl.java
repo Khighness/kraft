@@ -963,7 +963,7 @@ public class NodeImpl implements Node {
      * @param event dead event
      */
     @Subscribe
-    public void obReceiveDeadEvent(DeadEvent event) {
+    public void onReceiveDeadEvent(DeadEvent event) {
         logger.warn("dead event {}", event);
     }
 
