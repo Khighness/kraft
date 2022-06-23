@@ -711,7 +711,7 @@ public class NodeImpl implements Node {
     }
 
     /**
-     * Process {@link AppendEntriesResultMessage}
+     * Process {@link AppendEntriesResultMessage}.
      *
      * @param resultMessage append entries result message
      */
@@ -963,7 +963,7 @@ public class NodeImpl implements Node {
      * @param event dead event
      */
     @Subscribe
-    public void obReceiveDeadEvent(DeadEvent event) {
+    public void onReceiveDeadEvent(DeadEvent event) {
         logger.warn("dead event {}", event);
     }
 

@@ -18,7 +18,7 @@ import java.util.Set;
 public abstract class GroupConfigEntry extends AbstractEntry {
 
     /**
-     * The endpoints of the nodes in group
+     * The endpoints of the nodes in group.
      */
     private final Set<NodeEndpoint> nodeEndpoints;
 

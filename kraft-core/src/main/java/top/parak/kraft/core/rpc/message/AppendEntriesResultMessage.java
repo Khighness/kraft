@@ -1,6 +1,7 @@
 package top.parak.kraft.core.rpc.message;
 
 import com.google.common.base.Preconditions;
+
 import top.parak.kraft.core.node.NodeId;
 
 import javax.annotation.Nonnull;
