@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import top.parak.kraft.core.node.NodeId;
 
-
 /**
  * Netty Handler to deal with remote node's connection.
  *

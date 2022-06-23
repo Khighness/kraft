@@ -711,7 +711,7 @@ public class NodeImpl implements Node {
     }
 
     /**
-     * Process {@link AppendEntriesResultMessage}
+     * Process {@link AppendEntriesResultMessage}.
      *
      * @param resultMessage append entries result message
      */
