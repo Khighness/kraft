@@ -40,7 +40,7 @@ public class KVStoreServer {
      */
     private final KVStoreServerService KVStoreServerService;
     /**
-     * Netty boss group., default 1 thread.
+     * Netty boss group, default 1 thread.
      */
     private final NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
     /**

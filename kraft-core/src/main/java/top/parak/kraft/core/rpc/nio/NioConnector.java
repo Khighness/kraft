@@ -96,7 +96,6 @@ public class NioConnector implements Connector {
         Preconditions.checkNotNull(destinationEndpoints);
         for (NodeEndpoint endpoint : destinationEndpoints) {
             logger.debug("send {} to node {}", rpc, endpoint.getId());
-            logger.info("sendRequestVote {} {}", endpoint.getId(), getChannel(endpoint));
             executorService.execute(() -> getChannel(endpoint).writeRequestVoteRpc(rpc));
         }
     }
@@ -115,7 +114,6 @@ public class NioConnector implements Connector {
         Preconditions.checkNotNull(rpcMessage);
         logger.debug("reply {} to node {}", result, rpcMessage.getSourceNodeId());
         try {
-            logger.info("replyRequestVote {} {}", rpcMessage.getSourceNodeId(), rpcMessage.getChannel());
             rpcMessage.getChannel().writeRequestVoteResult(result);
         } catch (Exception e) {
             logException(e);
