@@ -35,9 +35,7 @@ public class CommandContext {
     /**
      * Command context.
      *
-     * @author KHighness
-     * @since 2022-05-29
-     * @email parakovo@gmail.com
+     * @param serverMap server map
      */
     public CommandContext(Map<NodeId, Address> serverMap) {
         this.serverMap = serverMap;
