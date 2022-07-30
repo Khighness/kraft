@@ -26,7 +26,7 @@
 ## Core Architecture
 
 <p align="center">
-<img src="images/kraft-core-architecture.png" alt="kraft-core-architecture" />
+<img src="images/kraft-core-architecture.svg" alt="kraft-core-architecture" />
 </p>
 
 
