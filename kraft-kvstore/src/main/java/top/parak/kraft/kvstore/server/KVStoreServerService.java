@@ -44,7 +44,7 @@ public class KVStoreServerService {
     /**
      * Map to store pending commands.
      * <p>
-     * As for {@link SetCommand}, it will be stored in {@link #pendingCommands} util
+     * As for {@link SetCommand}, it will be stored in {@link #pendingCommands} until
      * {@link StateMachine#applyLog(StateMachineContext, int, byte[], int)}.
      * </p>
      */
@@ -62,7 +62,6 @@ public class KVStoreServerService {
     public KVStoreServerService(Node node) {
         this.node = node;
         this.node.registerStateMachine(new StateMachineImpl());
-
     }
 
     /**
