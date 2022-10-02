@@ -17,7 +17,7 @@ import top.parak.kraft.core.node.NodeId;
 class ToRemoteHandler extends AbstractHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ToRemoteHandler.class);
-    private final NodeId selfNodeId;
+    private final NodeId selfId;
 
     /**
      * Create ToRemoteHandler.
@@ -26,15 +26,15 @@ class ToRemoteHandler extends AbstractHandler {
      * @param remoteId id of remote node
      * @param selfId   self id
      */
-    ToRemoteHandler(EventBus eventBus, NodeId remoteId, NodeId selfNodeId) {
+    ToRemoteHandler(EventBus eventBus, NodeId remoteId, NodeId selfId) {
         super(eventBus);
         this.remoteId = remoteId;
-        this.selfNodeId = selfNodeId;
+        this.selfId = selfId;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        ctx.write(selfNodeId);
+        ctx.write(selfId);
         channel = new NioChannel(ctx.channel());
     }
 
