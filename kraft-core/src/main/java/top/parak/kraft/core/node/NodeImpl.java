@@ -844,7 +844,7 @@ public class NodeImpl implements Node {
 
         // check role
         if (role.getName() != RoleName.LEADER) {
-            logger.warn("receive install snapshot result from {} node but current node isn't leader, ignore", resultMessage.getSourceNodeId());
+            logger.warn("receive install snapshot result from node {} but current node isn't leader, ignore", resultMessage.getSourceNodeId());
             return;
         }
 
