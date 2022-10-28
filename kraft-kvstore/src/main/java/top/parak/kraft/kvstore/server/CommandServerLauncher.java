@@ -227,24 +227,12 @@ public class CommandServerLauncher {
      */
     private void printBanner(boolean enableBanner) {
         System.out.println(
-                "kkkkkkkk                                                  ffffffffffffffff           tttt          \n" +
-                "k::::::k                                                 f::::::::::::::::f       ttt:::t          \n" +
-                "k::::::k                                                f::::::::::::::::::f      t:::::t          \n" +
-                "k::::::k                                                f::::::fffffff:::::f      t:::::t          \n" +
-                " k:::::k    kkkkkkkrrrrr   rrrrrrrrr   aaaaaaaaaaaaa    f:::::f       ffffffttttttt:::::ttttttt    \n" +
-                " k:::::k   k:::::k r::::rrr:::::::::r  a::::::::::::a   f:::::f             t:::::::::::::::::t    \n" +
-                " k:::::k  k:::::k  r:::::::::::::::::r aaaaaaaaa:::::a f:::::::ffffff       t:::::::::::::::::t    \n" +
-                " k:::::k k:::::k   rr::::::rrrrr::::::r         a::::a f::::::::::::f       tttttt:::::::tttttt    \n" +
-                " k::::::k:::::k     r:::::r     r:::::r  aaaaaaa:::::a f::::::::::::f             t:::::t          \n" +
-                " k:::::::::::k      r:::::r     rrrrrrraa::::::::::::a f:::::::ffffff             t:::::t          \n" +
-                " k:::::::::::k      r:::::r           a::::aaaa::::::a  f:::::f                   t:::::t          \n" +
-                " k::::::k:::::k     r:::::r          a::::a    a:::::a  f:::::f                   t:::::t    tttttt\n" +
-                "k::::::k k:::::k    r:::::r          a::::a    a:::::a f:::::::f                  t::::::tttt:::::t\n" +
-                "k::::::k  k:::::k   r:::::r          a:::::aaaa::::::a f:::::::f                  tt::::::::::::::t\n" +
-                "k::::::k   k:::::k  r:::::r           a::::::::::aa:::af:::::::f                    tt:::::::::::tt\n" +
-                "kkkkkkkk    kkkkkkk rrrrrrr            aaaaaaaaaa  aaaafffffffff                      ttttttttttt  \n" +
-                "                                                                                                   "
-        );
+                "██╗  ██╗██████╗  █████╗ ███████╗████████╗\n" +
+                "██║ ██╔╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝\n" +
+                "█████╔╝ ██████╔╝███████║█████╗     ██║   \n" +
+                "██╔═██╗ ██╔══██╗██╔══██║██╔══╝     ██║   \n" +
+                "██║  ██╗██║  ██║██║  ██║██║        ██║   \n" +
+                "╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ");
     }
 
 }
