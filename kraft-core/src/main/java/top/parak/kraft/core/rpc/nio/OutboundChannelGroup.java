@@ -30,7 +30,7 @@ class OutboundChannelGroup {
     private static final Logger logger = LoggerFactory.getLogger(OutboundChannelGroup.class);
     private final EventLoopGroup workerGroup;
     private final EventBus eventBus;
-    private final NodeId slefId;
+    private final NodeId selfId;
     private final int connectTimeoutMillis;
     private final ConcurrentMap<NodeId, Future<NioChannel>> channelMap = new ConcurrentHashMap<>();
 
@@ -45,7 +45,7 @@ class OutboundChannelGroup {
     OutboundChannelGroup(EventLoopGroup workerGroup, EventBus eventBus, NodeId selfId, int logReplicationInterval) {
         this.workerGroup = workerGroup;
         this.eventBus = eventBus;
-        this.slefId = selfId;
+        this.selfId = selfId;
         this.connectTimeoutMillis = logReplicationInterval / 2;
     }
 
@@ -102,7 +102,7 @@ class OutboundChannelGroup {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new NodeRpcMessageDecoder());
                         pipeline.addLast(new NodeRpcMessageEncoder());
-                        pipeline.addLast(new ToRemoteHandler(eventBus, nodeId, slefId));
+                        pipeline.addLast(new ToRemoteHandler(eventBus, nodeId, selfId));
                     }
                 });
         ChannelFuture future = bootstrap.connect(address.getHost(), address.getPort()).sync();
