@@ -25,7 +25,6 @@
         <commons-cli.version>1.4</commons-cli.version>
         <jline.version>3.19.0</jline.version>
         <junit.version>4.13.1</junit.version>
-        <slf.version>1.7.32</slf.version>
         <logback.version>1.2.3</logback.version>
         <netty.version>4.1.46.Final</netty.version>
         <protobuf-java.version>3.19.4</protobuf-java.version>
@@ -78,18 +77,8 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
             </dependency>
             <dependency>
